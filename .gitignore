@@ -1,0 +1,6 @@
+tmp/
+*.swp
+
+vehicle-accidents.db
+
+__pycache__
