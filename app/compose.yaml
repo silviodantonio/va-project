@@ -1,0 +1,8 @@
+services:
+  d3:
+    container_name: "d3"
+    build: .
+    volumes:
+      - ./src/:/app/src
+    ports: 
+      - "127.0.0.1:8080:80"
