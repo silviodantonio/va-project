@@ -32,4 +32,37 @@ def db_to_csv(database, query_string, query_params, csv_out):
     connection.close()
 
 if __name__ == '__main__':
-    db_to_csv('../data/vehicle-accidents.db', 'select * from accidents', (), 'accidents.csv')
+    db_to_csv('../data/vehicle-accidents.db', 'select * from accidents', (), 'accidents_all.csv')
+
+# Remove all totals and remove aggregates for
+# geographical zone centro, sud ecc..
+    remove_totals_query = """\
+select * from accidents
+where area_desc <> 'Italy' and 
+      area_desc <> 'Nord-ovest' and 
+      area_desc <> 'Nord-est' and 
+      area_desc <> 'Centro (I)' and 
+      area_desc <> 'Sud' and 
+      road_type_desc <> 'Total' and 
+      road_section_desc <> 'Total' and 
+      accident_type_desc <> 'Total' and 
+      vehicle_type_desc <> 'Total' and
+      month_desc <> 'Total'
+"""
+
+# Keep accidents for Italy but removes totals for
+# road type, road section, accident type ...
+    totals_only_query = """\
+select * from accidents
+where area_code = 'Italy' and
+      road_type_desc <> 'Total' and
+      road_section_desc <> 'Total' and
+      accident_type_desc <> 'Total' and
+      vehicle_type_desc <> 'Total' and
+      month_desc <> 'Total'
+"""
+
+    db_to_csv('../data/vehicle-accidents.db', 'select * from accidents', (), 'accidents_all.csv')
+
+    db_to_csv('../data/vehicle-accidents.db', totals_only_query, (), 'accidents_italy.csv')
+    db_to_csv('../data/vehicle-accidents.db', remove_totals_query, (), 'accidents.csv')
