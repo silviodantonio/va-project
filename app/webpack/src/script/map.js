@@ -71,7 +71,7 @@ export default function main() {
                 .attr("x", i*boxWidth)
                 .attr("y", legendHeight+15)
                 .attr("text-anchor","middle")
-                .text(d3.format(".1s")(t));
+                .text(d3.format(".2s")(t));
         });
         legendG.append("text")
             .attr("x", legendWidth/2)

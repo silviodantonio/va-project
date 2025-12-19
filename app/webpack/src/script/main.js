@@ -4,5 +4,7 @@ import '../style/main.css';
 // mainSilvioExample()
 // import mainMap from './map.js';
 // mainMap();
-import mainMapAlt from './mapAlt.js';
-mainMapAlt();
+// import mainMapAlt from './mapAlt.js';
+// mainMapAlt();
+import mainMapLin from './mapLin.js';
+mainMapLin();
