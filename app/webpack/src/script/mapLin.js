@@ -29,7 +29,7 @@ export default function main() {
         // QUANTIZE scale (linear bins)
         const color = d3.scaleQuantize()
             .domain([0, maxValue])
-            .range(d3.schemePuBu[nSteps]);
+            .range(d3.schemeBlues[nSteps]);
 
         const regions = topojson.feature(it, it.objects.regions);
 
@@ -127,11 +127,16 @@ export default function main() {
             .on("mouseenter", function(event, d) {
                 const v = valuemap.get(d.properties.reg_name);
                 if (v == null) return;
-
+                
+                const [cx, cy] = path.centroid(d);
+                
+                // Enlarge region
                 d3.select(this)
                     .raise()
-                    .attr("stroke", "LightSalmon")
-                    .attr("stroke-width", 3);
+                    .transition().duration(100)
+                    .attr("transform", `translate(${cx},${cy}) scale(1.15) translate(${-cx},${-cy})`)
+                    .attr("stroke","LightSalmon")
+                    .attr("stroke-width",3);
             })
             .on("mousemove", function(event, d) {
                 const v = valuemap.get(d.properties.reg_name);
@@ -186,6 +191,8 @@ export default function main() {
             })
             .on("mouseleave", function() {
                 d3.select(this)
+                    .transition().duration(100)
+                    .attr("transform","translate(0,0)")
                     .attr("stroke", "black")
                     .attr("stroke-width", 1);
 
