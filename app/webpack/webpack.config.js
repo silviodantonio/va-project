@@ -27,5 +27,12 @@ module.exports = {
     devServer: {
         host: '0.0.0.0',
         port: '80',
+        client: {
+            webSocketURL: {
+                hostname: "localhost",
+                port: 8080,
+                protocol: "ws",
+            },
+        },
     }
 };
