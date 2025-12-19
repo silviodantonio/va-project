@@ -22,14 +22,13 @@ export default function main() {
         );
 
         const values = Array.from(valuemap.values()).filter(v => v != null);
-        const minValue = d3.min(values);
         const maxValue = d3.max(values);
 
         const nSteps = 9;
 
         // QUANTIZE scale (linear bins)
         const color = d3.scaleQuantize()
-            .domain([minValue, maxValue])
+            .domain([0, maxValue])
             .range(d3.schemePuBu[nSteps]);
 
         const regions = topojson.feature(it, it.objects.regions);
@@ -77,7 +76,7 @@ export default function main() {
 
         // Linear ticks
         const tickValues = d3.range(nSteps + 1)
-            .map(i => minValue + i * (maxValue - minValue) / nSteps);
+            .map(i => 0 + i * (maxValue - 0) / nSteps);
 
         tickValues.forEach((t, i) => {
             legendG.append("text")
