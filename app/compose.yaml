@@ -1,8 +1,15 @@
 services:
-  d3:
-    container_name: "d3"
-    build: .
+  webpack:
+    container_name: "webpack"
+    build: ./webpack
     volumes:
-      - ./src/:/app/src
+      - ./webpack/src/:/app/src
     ports: 
       - "127.0.0.1:8080:80"
+  server:
+    container_name: "server"
+    build: ./server
+    volumes:
+      - ./server:/app
+    ports:
+      - "127.0.0.1:7000:7000"
