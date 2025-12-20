@@ -3,16 +3,17 @@ from matplotlib import pyplot as plt
 
 PCA_FILE = 'accidents_region_pca.csv'
 
-data = np.loadtxt(
-    PCA_FILE,
-    delimiter=',', 
-    # Use the following columns of numeric values: road_type_code,
-    # road_section_code, accident_type_code, vehile_type_code, month_code,
-    # observations, x_pca, y_pca
-    usecols=(2, 4, 6, 8, 10, 13, 14, 15),
-    # Skip first row since it contains column labels
-    skiprows=1
-)
+cat_colors = [
+    '#e41a1c',
+    '#377eb8',
+    '#4daf4a',
+    '#984ea3',
+    '#ff7f00',
+    '#ffff33',
+    '#a65628',
+    '#f781bf',
+    '#999999'
+]
 
 # Thanks colorbrewer (PuBu color scale)
 colors = [
@@ -25,20 +26,21 @@ colors = [
     '#0570b0',
     '#045a8d',
     '#023858',
-    '#000e32'
 ]
 
-vehicle_accidents = [[] for i in range(10)]
-print(vehicle_accidents)
+csv_data = np.loadtxt(
+    PCA_FILE,
+    delimiter=',', 
+    # Use the following columns of numeric values: road_type_code,
+    # road_section_code, accident_type_code, vehile_type_code, month_code,
+    # observations, x_pca, y_pca
+    # usecols=(2, 4, 6, 8, 10, 13, 14, 15),
+    # Skip first row since it contains column labels
+    skiprows=1
+)
 
-for row in data:
-    vehicle_code = int(row[3])
-    # Sometimes i get some "-1", I don't know why
-    if vehicle_code < 0: vehicle_code = 1
-    print(vehicle_code)
-    vehicle_accidents[vehicle_code].append(row)
-
-plt.plot(data[:,-2:-1],data[:,-1:],
+# Plot standard PCA
+plt.plot(csv_data[:,-2:-1],csv_data[:,-1:],
         'o', markersize=3,
         color='blue',
         alpha=0.5,
@@ -47,17 +49,38 @@ plt.xlabel('X')
 plt.ylabel('Y')
 plt.legend()
 
+
+# Plot PCA with road_sections
+
+attr_column = 1 # Index of column of the attribute road_section
+text_labels = [
+    "crossroad",
+    "traffic circle",
+    "level crossing",
+    "straight stretch",
+    "bend",
+    "bottleneck",
+    "tunnel",
+]
+
+n_values = len(text_labels)
+accident_type = [[] for i in range(n_values)]
+
+for row in csv_data:
+    accident_type_code = int(attr_column) - 1
+    accident_type[accident_type_code].append(row)
+
 plt.figure()
-for i in range(10):
-    data = np.array(vehicle_accidents[i])
-    plt.plot(data[:,6:7],data[:,-1:],
+for i in range(n_values):
+    data = np.array(accident_type[i])
+    plt.plot(data[:,-2:-1],data[:,-1:],
             'o', markersize=3,
-            color=colors[i],
+            color=cat_colors[i],
             alpha=0.5,
-            label=f'Vehicle type {i}')
+            label=f'{text_labels[i]}')
 
 plt.xlabel('X')
-plt.ylabel('X')
+plt.ylabel('Y')
 plt.legend()
 
 plt.show()
