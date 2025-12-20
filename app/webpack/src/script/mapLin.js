@@ -6,9 +6,11 @@ export default function main() {
     const title = document.getElementById('title');
     title.innerHTML = 'Incidenti stradali - dettaglio regionale';
 
+    const region_list=["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
+
     Promise.all([
         fetch("http://127.0.0.1:7000/limits_IT_regions.topo.json").then(res => res.json()),
-        fetch("http://127.0.0.1:7000/accidents_region.csv").then(res => res.text())
+        fetch("http://127.0.0.1:7000/accidents_regions_complete.csv").then(res => res.text())
     ])
     .then(([itJson, csvText]) => {
         const it = itJson;
@@ -17,8 +19,8 @@ export default function main() {
         // Rollup sum of accidents per region
         const valuemap = d3.rollup(
             accidents,
-            v => d3.sum(v, d => +d.observations),
-            d => d.area_desc
+            v => d3.sum(v, d => +d.observation),
+            d => region_list[+d.region - 1]
         );
 
         const values = Array.from(valuemap.values()).filter(v => v != null);
