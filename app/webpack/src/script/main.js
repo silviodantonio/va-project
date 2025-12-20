@@ -12,5 +12,3 @@ import '../style/main.css';
 // mainBars();
 import mainCoordinated from './coordinated.js';
 mainCoordinated();
-// import mainCoordinatedLog from './coordinatedLog.js';
-// mainCoordinated();
