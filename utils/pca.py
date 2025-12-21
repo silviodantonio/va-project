@@ -2,8 +2,8 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn import preprocessing
 
-IN_FILE = 'accidents_region.csv'
-OUT_FILE = 'accidents_region_pca.csv'
+IN_FILE = '../data/accidents_regions_complete.csv'
+OUT_FILE = 'accidents_region_pca_reduced.csv'
 
 def append_pca_columns(pca_data, in_file, out_file):
     """Append to each line of in_file two columns: x_pca and y_pca.
@@ -29,12 +29,12 @@ def append_pca_columns(pca_data, in_file, out_file):
 
 # Get data from CSV
 accidents_data = np.loadtxt(
-    'accidents_region.csv', 
+    IN_FILE, 
     delimiter=',', 
     # Use only the following columns of integer values: road_type_code,
     # road_section_code, accident_type_code, vehile_type_code, month_code,
     # observations 
-    usecols=(2,4,6,8,10,13),
+    usecols=(0, 3, 4, 6, 7),
     # Skip first row since it contains column labels
     skiprows=1
 )
