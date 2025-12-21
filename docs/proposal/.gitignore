@@ -1,0 +1,13 @@
+# Ignore everything
+*
+
+# Except these
+!.gitignore
+
+!*.jpg
+!*.png
+!*.svg
+
+!*.tex
+
+!*.pdf
