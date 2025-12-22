@@ -2,9 +2,9 @@ import * as d3 from 'd3';
 import * as topojson from "topojson-client";
 
 export default function main() {
-    const container = document.getElementById('container');
-    const title = document.getElementById('title');
-    title.innerHTML = 'Incidenti stradali - dettaglio regionale';
+    const container = document.getElementById('map-container');
+    // const title = document.getElementById('title');
+    // title.innerHTML = 'Incidenti stradali - dettaglio regionale';
 
     const region_list=["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
 

@@ -1,4 +1,29 @@
+body {
+    height: 100vh;
+}
+
 #title {
     text-align: center;
     color: #152F67;
+}
+
+#viz {
+    display: flex;
+}
+
+#main-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#pca-container {
+    background-color: lightpink;
+}
+
+#bar-container {
+    background-color:palegoldenrod;
+}
+
+#map-container {
+    background-color: lightsteelblue
 }

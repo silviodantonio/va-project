@@ -1,8 +1,7 @@
 import * as d3 from 'd3';
 
 export default async function main () {
-    title.innerHTML = 'Incidenti stradali – dettaglio regionale e mensile';
-    const container = document.getElementById('container');
+    const container = document.getElementById('bar-container');
 
     // ---------- LOAD & PREPARE RAW DATA ----------
     const rawData = await d3.csv(
