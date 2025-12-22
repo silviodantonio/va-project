@@ -18,3 +18,9 @@ There are two docker containers:
 - `git checkout mybranch`, `git reset --hard origin/mybranch` to reset the **local** personal branch to the **remote** personal branch `mybranch`.
 - `git log --oneline` to see branch commits (without details) and to which commit each branch is pointing to, then to quit just press `q`.
 - `git status` to see branch status with respect to **remote** branches
+
+## Git flow:
+1) > git rebase dev // dal tuo branch
+2) > git switch dev
+3) > git merge tuobranch
+4) > git switch - // torni al branch precedente (tuobranch)
