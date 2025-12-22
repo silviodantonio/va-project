@@ -12,3 +12,6 @@ mainMapLin();
 // mainBars();
 import mainCoordinated from './coordinated.js';
 mainCoordinated();
+
+import pca from './pca.js'
+pca()
