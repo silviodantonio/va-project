@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 export default async function main () {
     const container = document.getElementById('pca-container');
 
-    const data = await d3.csv("http://localhost:7000/accidents_region_pca.csv", d => {
+    const data = await d3.csv("http://127.0.0.1:7000/accidents_region_pca.csv", d => {
             // Converting from string to integer
             d.x_pca =  +d.x_pca;
             d.y_pca = +d.y_pca;

@@ -13,13 +13,13 @@ export default async function main () {
     const rawData = await d3.csv(
         "http://127.0.0.1:7000/accidents_region.csv",
         d => ({
-            area: d.area_desc,
-            month: d.month_desc,
-            road_type: d.road_type_desc,
-            road_section: d.road_section_desc,
-            accident_type: d.accident_type_desc,
-            vehicle_type: d.vehicle_type_desc,
-            observations: +d.observations
+            //region: region_list[+d.region - 1],
+            //intersection: d.road_section_desc,
+            //accident_type: d.accident_type_desc,
+            //deadly: d.deadly,
+            //vehicle_type: d.vehicle_type_desc,
+            //month: month_list[+d.month - 1],
+            //observations: +d.observations
         })
     );
 
