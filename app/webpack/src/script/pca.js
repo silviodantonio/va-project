@@ -4,12 +4,13 @@ import * as d3 from 'd3';
 export default async function main () {
     const container = document.getElementById('pca-container');
 
-    const data = await d3.csv("http://localhost:7000/accidents_region_pca.csv", d => (
-        {
-            x_pca: +d.x_pca,
-            y_pca: +d.y_pca
+    const data = await d3.csv("http://localhost:7000/accidents_region_pca.csv", d => {
+            // Converting from string to integer
+            d.x_pca =  +d.x_pca;
+            d.y_pca = +d.y_pca;
+            return d
         }
-    ));
+    );
 
     // Set up dimensions with margins for axes
     const width = 640;
@@ -18,19 +19,24 @@ export default async function main () {
     const marginRight = 20;
     const marginBottom = 30;
     const marginLeft = 40;
+    const datamargin = 1;
 
     const svg = d3.create('svg')
         .attr('width', width)
         .attr('height', height);
 
     const x = d3.scaleLinear()
-        .domain([d3.min(data, d => d.x_pca), d3.max(data, d => d.x_pca)])        // Not clear how d3.max() works
-        .range([marginLeft, width - marginRight]);     // SGV maps 0,0 in top left. Bottom left corner has
+        .domain([d3.min(data, d => d.x_pca) - datamargin, d3.max(data, d => d.x_pca) + datamargin])
+        .range([marginLeft, width - marginRight]);
 
     const y = d3.scaleLinear()
-        .domain([d3.min(data, d => d.y_pca), d3.max(data, d => d.y_pca)])        // Not clear how d3.max() works
-        .range([height - marginBottom, marginTop]);     // SGV maps 0,0 in top left. Bottom left corner has
-                                                        // a "high" pixel position
+        .domain([d3.min(data, d => d.y_pca) - datamargin, d3.max(data, d => d.y_pca) + datamargin])
+        .range([height - marginBottom, marginTop]);
+
+    // Here we need something smarter
+    const colorCategory = d3.scaleOrdinal()
+        .domain(["0", "1"])
+        .range([ "#5165b7ff", "#e12d2dff"])
 
     // Add X axis
     svg.append('g')
@@ -50,7 +56,9 @@ export default async function main () {
         .attr('cx', d => x(d.x_pca))
         .attr('cy', d => y(d.y_pca))
         .attr('r', 3)
-        .attr('fill', 'steelblue');
+        .attr('opacity', 0.7)
+        .attr('fill', d => colorCategory(d.deadly))
 
     container.append(svg.node());
+
 }
