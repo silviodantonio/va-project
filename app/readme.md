@@ -23,7 +23,7 @@ There are two docker containers:
 - `git rebase -i HEAD~n` to manage the latest `n` commits **interactively** while performing a **rebase**.
 
 ## Git flow:
-1) > git rebase dev // dal tuo branch
-2) > git switch dev
-3) > git merge tuobranch
-4) > git switch - // torni al branch precedente (tuobranch)
+1) > `git rebase dev` // dal tuo branch
+2) > `git switch dev`
+3) > `git merge tuobranch`
+4) > `git switch -` // torni al branch precedente (`tuobranch`)

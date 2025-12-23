@@ -10,7 +10,9 @@ import mainMapLin from './mapLin.js';
 mainMapLin();
 // import mainBars from './bars.js';
 // mainBars();
-import mainCoordinated from './coordinated.js';
+// import mainCoordinated from './coordinated.js';
+// mainCoordinated();
+import mainCoordinated from './coordinatedComplete.js';
 mainCoordinated();
 
 import pca from './pca.js'

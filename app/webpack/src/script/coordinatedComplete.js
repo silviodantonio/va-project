@@ -5,37 +5,46 @@ export default async function main () {
 
     const region_list = ["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
 
-    const month_list = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]
+    const intersection_list = ["crossroad", "traffic circle", "level crossing", "straight stretch", "bend", "bump-slope-bottleneck", "tunnel"];
 
-    const intersection_list = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]
+    const accident_type_list = ["accident between vehicles", "vehicle-pedestrian accident", "accidents involving a single vehicle"];
+
+    const deadly_list = ["Injured", "Dead"];
+
+    const week_day_list = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    const month_list = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
 
     // ---------- LOAD & PREPARE RAW DATA ----------
     const rawData = await d3.csv(
-        "http://127.0.0.1:7000/accidents_region.csv",
+        "http://127.0.0.1:7000/accidents_regions_complete.csv",
         d => ({
-            //region: region_list[+d.region - 1],
-            //intersection: d.road_section_desc,
-            //accident_type: d.accident_type_desc,
-            //deadly: d.deadly,
-            //vehicle_type: d.vehicle_type_desc,
-            //month: month_list[+d.month - 1],
-            //observations: +d.observations
+            region: region_list[+d.region - 1],
+            intersection: intersection_list[+d.intersection - 1],
+            accident_type: accident_type_list[+d.accident_type - 1],
+            deadly: deadly_list[d.deadly],
+            hour: d.hour,
+            week_day: week_day_list[+d.week_day - 1],
+            month: month_list[+d.month - 1],
+            observation: +d.observation
         })
     );
 
     // ---------- SHARED FILTER STATE ----------
     const filters = {
-        area: null,
-        month: null,
-        road_type: null,
-        road_section: null,
+        region: null,
+        intersection: null,
         accident_type: null,
-        vehicle_type: null
+        deadly: null,
+        hour: null,
+        week_day: null,
+        month: null
     };
 
     const distanceColors = [
         'steelblue',
         '#8ecae6',
+        "#a3b8c9", // jolly color
         '#adb5bd',
         '#6c757d',
         '#495057',
@@ -56,15 +65,7 @@ export default async function main () {
         .attr('width', width)
         .attr('height', height);
 
-    const svgMonth = d3.create('svg')
-        .attr('width', width)
-        .attr('height', height);
-
-    const svgRoadType = d3.create('svg')
-        .attr('width', width)
-        .attr('height', height);
-
-    const svgRoadSection = d3.create('svg')
+    const svgIntersection = d3.create('svg')
         .attr('width', width)
         .attr('height', height);
 
@@ -72,7 +73,19 @@ export default async function main () {
         .attr('width', width)
         .attr('height', height);
 
-    const svgVehicleType = d3.create('svg')
+    const svgDeadly = d3.create('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+    const svgHour = d3.create('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+    const svgWeekDay = d3.create('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+    const svgMonth = d3.create('svg')
         .attr('width', width)
         .attr('height', height);
 
@@ -84,25 +97,11 @@ export default async function main () {
     const yRegion = d3.scaleLinear()
         .range([height - marginBottom, marginTop]);
 
-    const xMonth = d3.scaleBand()
+    const xIntersection = d3.scaleBand()
         .range([marginLeft, width - marginRight])
         .padding(0.2);
 
-    const yMonth = d3.scaleLinear()
-        .range([height - marginBottom, marginTop]);
-
-    const xRoadType = d3.scaleBand()
-        .range([marginLeft, width - marginRight])
-        .padding(0.2);
-
-    const yRoadType = d3.scaleLinear()
-        .range([height - marginBottom, marginTop]);
-
-    const xRoadSection = d3.scaleBand()
-        .range([marginLeft, width - marginRight])
-        .padding(0.2);
-
-    const yRoadSection = d3.scaleLinear()
+    const yIntersection = d3.scaleLinear()
         .range([height - marginBottom, marginTop]);
 
     const xAccidentType = d3.scaleBand()
@@ -112,11 +111,32 @@ export default async function main () {
     const yAccidentType = d3.scaleLinear()
         .range([height - marginBottom, marginTop]);
 
-    const xVehicleType = d3.scaleBand()
+    const xDeadly = d3.scaleBand()
         .range([marginLeft, width - marginRight])
         .padding(0.2);
 
-    const yVehicleType = d3.scaleLinear()
+    const yDeadly = d3.scaleLinear()
+        .range([height - marginBottom, marginTop]);
+
+    const xHour = d3.scaleBand()
+        .range([marginLeft, width - marginRight])
+        .padding(0.2);
+
+    const yHour = d3.scaleLinear()
+        .range([height - marginBottom, marginTop]);
+
+    const xWeekDay = d3.scaleBand()
+        .range([marginLeft, width - marginRight])
+        .padding(0.2);
+
+    const yWeekDay = d3.scaleLinear()
+        .range([height - marginBottom, marginTop]);
+
+    const xMonth = d3.scaleBand()
+        .range([marginLeft, width - marginRight])
+        .padding(0.2);
+
+    const yMonth = d3.scaleLinear()
         .range([height - marginBottom, marginTop]);
 
     // ---------- AXES ----------
@@ -126,22 +146,10 @@ export default async function main () {
     const yAxisRegion = svgRegion.append('g')
         .attr('transform', `translate(${marginLeft},0)`);
 
-    const xAxisMonth = svgMonth.append('g')
+    const xAxisIntersection = svgIntersection.append('g')
         .attr('transform', `translate(0,${height - marginBottom})`);
 
-    const yAxisMonth = svgMonth.append('g')
-        .attr('transform', `translate(${marginLeft},0)`);
-
-    const xAxisRoadType = svgRoadType.append('g')
-        .attr('transform', `translate(0,${height - marginBottom})`);
-
-    const yAxisRoadType = svgRoadType.append('g')
-        .attr('transform', `translate(${marginLeft},0)`);
-
-    const xAxisRoadSection = svgRoadSection.append('g')
-        .attr('transform', `translate(0,${height - marginBottom})`);
-
-    const yAxisRoadSection = svgRoadSection.append('g')
+    const yAxisIntersection = svgIntersection.append('g')
         .attr('transform', `translate(${marginLeft},0)`);
 
     const xAxisAccidentType = svgAccidentType.append('g')
@@ -150,21 +158,40 @@ export default async function main () {
     const yAxisAccidentType = svgAccidentType.append('g')
         .attr('transform', `translate(${marginLeft},0)`);
 
-    const xAxisVehicleType = svgVehicleType.append('g')
+    const xAxisDeadly = svgDeadly.append('g')
         .attr('transform', `translate(0,${height - marginBottom})`);
 
-    const yAxisVehicleType = svgVehicleType.append('g')
+    const yAxisDeadly = svgDeadly.append('g')
+        .attr('transform', `translate(${marginLeft},0)`);
+
+    const xAxisHour = svgHour.append('g')
+        .attr('transform', `translate(0,${height - marginBottom})`);
+
+    const yAxisHour = svgHour.append('g')
+        .attr('transform', `translate(${marginLeft},0)`);
+
+    const xAxisWeekDay = svgWeekDay.append('g')
+        .attr('transform', `translate(0,${height - marginBottom})`);
+
+    const yAxisWeekDay = svgWeekDay.append('g')
+        .attr('transform', `translate(${marginLeft},0)`);
+
+    const xAxisMonth = svgMonth.append('g')
+        .attr('transform', `translate(0,${height - marginBottom})`);
+
+    const yAxisMonth = svgMonth.append('g')
         .attr('transform', `translate(${marginLeft},0)`);
 
     // ---------- CORE LOGIC ----------
     function filterDistance(d) {
         let dist = 0;
-        if (filters.area && d.area !== filters.area) dist++;
-        if (filters.month && d.month !== filters.month) dist++;
-        if (filters.road_type && d.road_type !== filters.road_type) dist++;
-        if (filters.road_section && d.road_section !== filters.road_section) dist++;
+        if (filters.region && d.region !== filters.region) dist++;
+        if (filters.intersection && d.intersection !== filters.intersection) dist++;
         if (filters.accident_type && d.accident_type !== filters.accident_type) dist++;
-        if (filters.vehicle_type && d.vehicle_type !== filters.vehicle_type) dist++;
+        if (filters.deadly && d.deadly !== filters.deadly) dist++;
+        if (filters.hour && d.hour !== filters.hour) dist++;
+        if (filters.week_day && d.week_day !== filters.week_day) dist++;
+        if (filters.month && d.month !== filters.month) dist++;
         return dist;
     }
 
@@ -178,7 +205,7 @@ export default async function main () {
         return Array.from(grouped, ([key, rows]) => {
             const stacks = d3.rollup(
                 rows,
-                v => d3.sum(v, d => d.observations),
+                v => d3.sum(v, d => d.observation),
                 d => filterDistance(d)
             );
 
@@ -254,8 +281,8 @@ export default async function main () {
     const charts = [
         makeChart({
             svg: svgRegion,
-            accessor: d => d.area,
-            filterKey: 'area',
+            accessor: d => d.region,
+            filterKey: 'region',
             x: xRegion,
             y: yRegion,
             xAxis: xAxisRegion,
@@ -267,31 +294,13 @@ export default async function main () {
                 )
         }),
         makeChart({
-            svg: svgMonth,
-            accessor: d => d.month,
-            filterKey: 'month',
-            x: xMonth,
-            y: yMonth,
-            xAxis: xAxisMonth,
-            yAxis: yAxisMonth
-        }),
-        makeChart({
-            svg: svgRoadType,
-            accessor: d => d.road_type,
-            filterKey: 'road_type',
-            x: xRoadType,
-            y: yRoadType,
-            xAxis: xAxisRoadType,
-            yAxis: yAxisRoadType
-        }),
-        makeChart({
-            svg: svgRoadSection,
-            accessor: d => d.road_section,
-            filterKey: 'road_section',
-            x: xRoadSection,
-            y: yRoadSection,
-            xAxis: xAxisRoadSection,
-            yAxis: yAxisRoadSection
+            svg: svgIntersection,
+            accessor: d => d.intersection,
+            filterKey: 'intersection',
+            x: xIntersection,
+            y: yIntersection,
+            xAxis: xAxisIntersection,
+            yAxis: yAxisIntersection
         }),
         makeChart({
             svg: svgAccidentType,
@@ -303,13 +312,40 @@ export default async function main () {
             yAxis: yAxisAccidentType
         }),
         makeChart({
-            svg: svgVehicleType,
-            accessor: d => d.vehicle_type,
-            filterKey: 'vehicle_type',
-            x: xVehicleType,
-            y: yVehicleType,
-            xAxis: xAxisVehicleType,
-            yAxis: yAxisVehicleType
+            svg: svgDeadly,
+            accessor: d => d.deadly,
+            filterKey: 'deadly',
+            x: xDeadly,
+            y: yDeadly,
+            xAxis: xAxisDeadly,
+            yAxis: yAxisDeadly
+        }),
+        makeChart({
+            svg: svgHour,
+            accessor: d => d.hour,
+            filterKey: 'hour',
+            x: xHour,
+            y: yHour,
+            xAxis: xAxisHour,
+            yAxis: yAxisHour
+        }),
+        makeChart({
+            svg: svgWeekDay,
+            accessor: d => d.week_day,
+            filterKey: 'week_day',
+            x: xWeekDay,
+            y: yWeekDay,
+            xAxis: xAxisWeekDay,
+            yAxis: yAxisWeekDay
+        }),
+        makeChart({
+            svg: svgMonth,
+            accessor: d => d.month,
+            filterKey: 'month',
+            x: xMonth,
+            y: yMonth,
+            xAxis: xAxisMonth,
+            yAxis: yAxisMonth
         })
     ];
 
@@ -320,9 +356,10 @@ export default async function main () {
     // ---------- INITIAL RENDER ----------
     updateAll();
     container.append(svgRegion.node());
-    container.append(svgMonth.node());
-    container.append(svgRoadType.node());
-    container.append(svgRoadSection.node());
+    container.append(svgIntersection.node());
     container.append(svgAccidentType.node());
-    container.append(svgVehicleType.node());
+    container.append(svgDeadly.node());
+    container.append(svgHour.node());
+    container.append(svgWeekDay.node());
+    container.append(svgMonth.node());
 }
