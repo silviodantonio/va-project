@@ -3,16 +3,22 @@ import * as d3 from 'd3';
 export default async function main () {
     const container = document.getElementById('bar-container');
 
+    const region_list = ["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
+
+    const month_list = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]
+
+    const intersection_list = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]
+
     // ---------- LOAD & PREPARE RAW DATA ----------
     const rawData = await d3.csv(
         "http://127.0.0.1:7000/accidents_region.csv",
         d => ({
-            area: d.area_desc,
-            month: d.month_desc,
-            road_type: d.road_type_desc,
-            road_section: d.road_section_desc,
+            region: region_list[+d.region - 1],
+            intersection: d.road_section_desc,
             accident_type: d.accident_type_desc,
+            deadly: d.deadly,
             vehicle_type: d.vehicle_type_desc,
+            month: month_list[+d.month - 1],
             observations: +d.observations
         })
     );

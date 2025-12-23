@@ -4,7 +4,15 @@
 \usepackage{graphicx}
 \usepackage{tabularx}
 \usepackage{caption}
+\usepackage{xcolor}
 \usepackage{hyperref}
+\hypersetup{
+    colorlinks=false,
+    linkbordercolor=red,
+    urlbordercolor=blue,
+    pdfborder={1 1 1},
+    pdfborderstyle={/S/U/W 1}
+}
 \usepackage[indent=0pt]{parskip}
 
 \geometry{
@@ -66,14 +74,13 @@ As an example, selecting the accidents that occurred between January and March
 also highlights the corresponding road section types and accident categories within that timeframe.
 
 
-Section B presentes the result of a PCA performed on the dataset.
+Section B presents the result of a PCA performed on the dataset.
 Data points can be colored according to the categorical attributes of the dataset:
 accident type, deadliness etc.
 The PCA graph is coordinated with the charts in section A.
 As an example, selecting accidents that occurred between January and March in Section A highlights the corresponding data points in the PCA plot, and vice versa.
 
-Furthermore, the user can visually trigger an analytic directly from the PCA by requesting the system
-to find clusters (\textit{e.g. k-means}) within a selected subset of data points.
+Furthermore, the user can visually trigger an analytic directly brushing on the PCA graph, the system will respond by searching for clusters (\textit{e.g. with k-means}) within the selected subset of data points.
 
 
 
@@ -90,7 +97,7 @@ Area & ID of Region \\
 Road section & Number identifying a road section. Identifies: tunnel, bend, crossroad, traffic circle, bump/slope or bottleneck, straight stretch, level crossing. \\
 \hline
 Accident type &  Number identifying the accident type. Identifies:
-accidents between vehicles, vehicle-pedestrian accients and accidents involving
+accidents between vehicles, vehicle-pedestrian accidents and accidents involving
 a single vehicle. \\ 
 \hline
 Deadliness &  Boolean attribute that identifies if the accident involved death or only injury \\
