@@ -59,6 +59,8 @@ export default async function main () {
         .attr('opacity', 0.7)
         .attr('fill', d => colorCategory(d.deadly))
 
+    svg.call(d3.brush())
+
     container.append(svg.node());
 
 }
