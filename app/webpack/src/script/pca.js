@@ -19,18 +19,18 @@ export default async function main () {
     const marginRight = 20;
     const marginBottom = 30;
     const marginLeft = 40;
-    const datamargin = 1;
+    const dataMargin = 1;
 
     const svg = d3.create('svg')
         .attr('width', width)
         .attr('height', height);
 
     const x = d3.scaleLinear()
-        .domain([d3.min(data, d => d.x_pca) - datamargin, d3.max(data, d => d.x_pca) + datamargin])
+        .domain([d3.min(data, d => d.x_pca) - dataMargin, d3.max(data, d => d.x_pca) + dataMargin])
         .range([marginLeft, width - marginRight]);
 
     const y = d3.scaleLinear()
-        .domain([d3.min(data, d => d.y_pca) - datamargin, d3.max(data, d => d.y_pca) + datamargin])
+        .domain([d3.min(data, d => d.y_pca) - dataMargin, d3.max(data, d => d.y_pca) + dataMargin])
         .range([height - marginBottom, marginTop]);
 
     // Here we need something smarter
@@ -40,16 +40,15 @@ export default async function main () {
 
     // Add X axis
     svg.append('g')
-        .attr('transform', `translate(0,${height - marginBottom})`)     // Not clear what this is doing
-        .call(d3.axisBottom(x));                                        // Draw axis with given scale on bottom
+        .attr('transform', `translate(0,${height - marginBottom})`)
+        .call(d3.axisBottom(x));
 
     // Add Y axis
     svg.append('g')
-        .attr('transform', `translate(${marginLeft},0)`)    // Not clear what this is doing
+        .attr('transform', `translate(${marginLeft},0)`)
         .call(d3.axisLeft(y));
 
-    // Create bars using ONLY enter()
-    svg.selectAll('.dot')
+    const dot = svg.selectAll('.dot')
         .data(data)
         .enter()
         .append('circle')
@@ -59,7 +58,28 @@ export default async function main () {
         .attr('opacity', 0.7)
         .attr('fill', d => colorCategory(d.deadly))
 
-    svg.call(d3.brush())
+    console.log(`Number of dots in PCA: ${dot.size()}`)
+
+    // Brushing
+    svg.call(d3.brush().on("start end", ({selection}) => {
+        if (selection) {
+            // Unpacking the selection variable -- called destructuring in js lingo
+            const [[x0, y0], [x1, y1]] = selection;
+
+            dot.attr('opacity', 0.1)
+                // Arrow functions without curly brackets return implicitly
+                .filter(d => x0 <= x(d.x_pca) && x(d.x_pca) < x1 &&
+                             y0 <= y(d.y_pca) && y(d.y_pca) < y1 )
+                .attr('opacity', '0.7')
+                .classed('selected', true)
+                .data();
+        }
+        else {
+            dot.attr('opacity', 0.7)
+            .classed('selected', false)
+        }
+
+    }));
 
     container.append(svg.node());
 
