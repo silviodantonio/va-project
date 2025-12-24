@@ -1,24 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
         <title>Document</title>
+        <style>
+            body {
+                height: 100vh;
+                margin: 0;
+                padding: 15px;
+            }
+
+            .viz-area {
+                background: white;
+                border-radius: 8px;
+                padding: 10px;
+                margin-bottom: 10px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
+            .bar-chart-container .viz-area {
+                height: 250px; /* Adjusted for better proportions */
+            }
+
+            #map-container {
+                height: 510px; /* 2 rows of bar charts (250px each) + margins */
+            }
+
+            #pca-container {
+                height: 300px;
+            }
+
+            svg {
+                width: 100%;
+                height: 100%;
+                display: block;
+                background-color: #fff;
+            }
+        </style>
     </head>
 
     <body>
 
-        <h1 id="title">Visualization title</h1>
-
         <section id="viz">
-            <div id="main-container">
-                <div id="bar-container"></div>
-                <div id="pca-container"></div>
+            <div class="row">
+                <!-- Left side: 8 bar charts in 4x2 grid -->
+                <div class="col-md-9">
+                    <div class="row row-cols-4 g-2">
+                        <!-- First row of bar charts -->
+                        <div class="col">
+                            <div class="viz-area" id="chart-region"></div>
+                        </div>
+                        <div class="col">
+                            <div class="viz-area" id="chart-intersection"></div>
+                        </div>
+                        <div class="col">
+                            <div class="viz-area" id="chart-accident-type"></div>
+                        </div>
+                        <div class="col">
+                            <div class="viz-area" id="chart-deadly"></div>
+                        </div>
+                        
+                        <!-- Second row of bar charts -->
+                        <div class="col-4">
+                            <div class="viz-area" id="chart-hour"></div>
+                        </div>
+                        <div class="col-4">
+                            <div class="viz-area" id="chart-week-day"></div>
+                        </div>
+                        <div class="col-4">
+                            <div class="viz-area" id="chart-month"></div>
+                        </div>
+                        <!-- Empty cell to align with map -->
+                        <div class="col"></div>
+                    </div>
+                    
+                    <!-- PCA container spanning full width below -->
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <div class="viz-area" id="pca-container"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right side: Map taking 2 rows height -->
+                <div class="col-md-3">
+                    <div class="viz-area h-100" id="map-container"></div>
+                </div>
             </div>
-            <div id="map-container">
         </section>
-        
     </body>
-
 </html>

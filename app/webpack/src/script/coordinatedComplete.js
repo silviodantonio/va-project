@@ -1,7 +1,15 @@
 import * as d3 from 'd3';
 
 export default async function main () {
-    const container = document.getElementById('bar-container');
+    const container = {
+        region: document.getElementById('chart-region'),
+        intersection: document.getElementById('chart-intersection'),
+        accidentType: document.getElementById('chart-accident-type'),
+        deadly: document.getElementById('chart-deadly'),
+        hour: document.getElementById('chart-hour'),
+        weekDay: document.getElementById('chart-week-day'),
+        month: document.getElementById('chart-month')
+    };
 
     const region_list = ["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
 
@@ -53,41 +61,39 @@ export default async function main () {
     ];
 
     // ---------- DIMENSIONS ----------
-    const width = 640;
-    const height = 400;
+    const width = 350;
+    const height = 350;
+
     const marginTop = 20;
-    const marginRight = 20;
-    const marginBottom = 110;
-    const marginLeft = 60;
+    const marginRight = 15;
+    const marginBottom = 70;  // More space for rotated labels
+    const marginLeft = 50;
 
     // ---------- SVGs ----------
     const svgRegion = d3.create('svg')
-        .attr('width', width)
-        .attr('height', height);
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 "+ width + " " + height)
 
     const svgIntersection = d3.create('svg')
-        .attr('width', width)
-        .attr('height', height);
-
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 "+ width + " " + height)
     const svgAccidentType = d3.create('svg')
-        .attr('width', width)
-        .attr('height', height);
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 "+ width + " " + height)
 
     const svgDeadly = d3.create('svg')
-        .attr('width', width)
-        .attr('height', height);
-
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 "+ width + " " + height)
     const svgHour = d3.create('svg')
-        .attr('width', width)
-        .attr('height', height);
-
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 "+ width + " " + height)
     const svgWeekDay = d3.create('svg')
-        .attr('width', width)
-        .attr('height', height);
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 "+ width + " " + height)
 
     const svgMonth = d3.create('svg')
-        .attr('width', width)
-        .attr('height', height);
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 "+ width + " " + height)
 
     // ---------- SCALES ----------
     const xRegion = d3.scaleBand()
@@ -355,11 +361,11 @@ export default async function main () {
 
     // ---------- INITIAL RENDER ----------
     updateAll();
-    container.append(svgRegion.node());
-    container.append(svgIntersection.node());
-    container.append(svgAccidentType.node());
-    container.append(svgDeadly.node());
-    container.append(svgHour.node());
-    container.append(svgWeekDay.node());
-    container.append(svgMonth.node());
+    container.region.append(svgRegion.node());
+    container.intersection.append(svgIntersection.node());
+    container.accidentType.append(svgAccidentType.node());
+    container.deadly.append(svgDeadly.node());
+    container.hour.append(svgHour.node());
+    container.weekDay.append(svgWeekDay.node());
+    container.month.append(svgMonth.node());
 }
