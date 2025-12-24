@@ -22,8 +22,9 @@ export default async function main () {
     const dataMargin = 1;
 
     const svg = d3.create('svg')
-        .attr('width', width)
-        .attr('height', height);
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 "+ width + " " + height)
+
 
     const x = d3.scaleLinear()
         .domain([d3.min(data, d => d.x_pca) - dataMargin, d3.max(data, d => d.x_pca) + dataMargin])

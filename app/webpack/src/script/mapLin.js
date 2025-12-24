@@ -45,10 +45,11 @@ export default function main() {
         const path = d3.geoPath(projection);
 
         const svg = d3.create("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .attr("viewBox", [0, 0, width, height])
-            .attr("style", "max-width: 100%; height: auto;");
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 "+ width + " " + height)
+
+            // .attr("viewBox", [0, 0, width, height])
+            // .attr("style", "max-width: 100%; height: auto;");
 
         /* ------------------ MESH (UNDER REGIONS) ------------------ */
         svg.append("path")
