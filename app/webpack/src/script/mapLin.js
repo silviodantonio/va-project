@@ -6,6 +6,12 @@ export default function main() {
     // const title = document.getElementById('title');
     // title.innerHTML = 'Incidenti stradali - dettaglio regionale';
 
+        
+    // Get container dimensions first
+    const containerWidth = container.clientWidth -20;
+    const containerHeight = container.clientHeight;
+    
+
     const region_list=["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
 
     Promise.all([
@@ -35,21 +41,22 @@ export default function main() {
 
         const regions = topojson.feature(it, it.objects.regions);
 
-        const width = 975;
-        const height = 700;
+        // Use container dimensions instead of fixed values
+        const width = containerWidth;
+        const height = containerHeight;
         const mapCenter = [width / 2, height / 2];
+
 
         const projection = d3.geoMercator()
             .fitSize([width, height], regions);
 
         const path = d3.geoPath(projection);
 
+        // Create SVG that fills the container
         const svg = d3.create("svg")
-        .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", "0 0 "+ width + " " + height)
-
-            // .attr("viewBox", [0, 0, width, height])
-            // .attr("style", "max-width: 100%; height: auto;");
+            .attr("width", width)
+            .attr("height", height)
+            .attr("preserveAspectRatio", "xMidYMid meet");
 
         /* ------------------ MESH (UNDER REGIONS) ------------------ */
         svg.append("path")
