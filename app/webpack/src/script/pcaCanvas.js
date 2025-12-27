@@ -37,8 +37,8 @@ async function main () {
     canvas.setAttribute('width', width - (marginLeft + marginRight));
     canvas.setAttribute('height', height - (marginBottom + marginTop));
     canvas.style.position = 'absolute';
-    canvas.style.top = marginTop + 'px';
-    canvas.style.left = marginLeft + 'px';
+    canvas.style.top = marginTop +'px';
+    canvas.style.left = marginLeft;
     // Get canvas context, used for drawing
     const ctx = canvas.getContext('2d');
 
