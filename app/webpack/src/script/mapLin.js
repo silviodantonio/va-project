@@ -8,7 +8,7 @@ export default function main() {
 
         
     // Get container dimensions first
-    const containerWidth = container.clientWidth -20;
+    const containerWidth = container.clientWidth - 20;
     const containerHeight = container.clientHeight;
     
 
@@ -42,24 +42,31 @@ export default function main() {
         const regions = topojson.feature(it, it.objects.regions);
 
         // Use container dimensions instead of fixed values
+        const legendBlockHeight = 90;
         const width = containerWidth;
-        const height = containerHeight;
+        const height = containerHeight - legendBlockHeight;
         const mapCenter = [width / 2, height / 2];
+        const legendFontSize = width / 20; // adjust divisor to taste
 
-
+        const mapPadding = 20; // safe buffer
         const projection = d3.geoMercator()
-            .fitSize([width, height], regions);
+            .fitExtent([[mapPadding, mapPadding], [width - mapPadding, height - mapPadding]], regions);
 
         const path = d3.geoPath(projection);
 
         // Create SVG that fills the container
         const svg = d3.create("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .attr("preserveAspectRatio", "xMidYMid meet");
+            .attr("viewBox", `0 0 ${width} ${height + legendBlockHeight}`)
+            .attr("preserveAspectRatio", "xMidYMid meet")
+            .style("width", "100%")
+            .style("height", "auto");
+
+        const legendLayer = svg.append("g");
+        const mapLayer = svg.append("g")
+            .attr("transform", `translate(0, ${legendBlockHeight})`);
 
         /* ------------------ MESH (UNDER REGIONS) ------------------ */
-        svg.append("path")
+        mapLayer.append("path")
             .datum(topojson.mesh(it, it.objects.regions, (a, b) => a !== b))
             .attr("fill", "none")
             .attr("stroke", "black")
@@ -67,12 +74,13 @@ export default function main() {
             .attr("d", path);
 
         /* ------------------ LEGEND ------------------ */
-        const legendWidth = 300;
+        const legendWidth = Math.min(width * 0.8, 420);
         const legendHeight = 20;
         const boxWidth = legendWidth / nSteps;
 
         const legendG = svg.append("g")
-            .attr("transform", `translate(${width - legendWidth - 20},20)`);
+    .attr("transform", `translate(${(width - legendWidth)/2}, ${legendHeight*2})`);
+
 
         color.range().forEach((c, i) => {
             legendG.append("rect")
@@ -91,8 +99,9 @@ export default function main() {
         tickValues.forEach((t, i) => {
             legendG.append("text")
                 .attr("x", i * boxWidth)
-                .attr("y", legendHeight + 15)
+                .attr("y", legendHeight + legendFontSize)
                 .attr("text-anchor", "middle")
+                .attr("font-size", legendFontSize * 0.8)
                 .text(d3.format(".2s")(t));
         });
 
@@ -101,12 +110,15 @@ export default function main() {
             .attr("y", -6)
             .attr("text-anchor", "middle")
             .attr("font-weight", "bold")
+            .attr("font-size", legendFontSize)
             .text("Numero di incidenti");
 
         /* ------------------ MAP LAYERS ------------------ */
-        const baseG = svg.append("g").attr("class", "base");
+        const baseG = mapLayer.append("g")
+            .attr("class", "base")
+            .attr("clip-path", "url(#map-clip)");
 
-        const hoverOverlay = svg.append("g")
+        const hoverOverlay = mapLayer.append("g")
             .style("pointer-events", "none")
             .style("visibility", "hidden");
 
@@ -122,6 +134,13 @@ export default function main() {
             .attr("text-anchor", "middle")
             .attr("font-weight", "bold")
             .attr("font-size", 16);
+
+        svg.append("defs")
+            .append("clipPath")
+            .attr("id", "map-clip")
+            .append("rect")
+            .attr("width", width)
+            .attr("height", height);
 
         /* ------------------ REGIONS ------------------ */
         baseG.selectAll("path")
@@ -152,7 +171,8 @@ export default function main() {
                 const v = valuemap.get(d.properties.reg_name);
                 if (v == null) return;
 
-                const [mx, my] = d3.pointer(event, svg.node());
+                const [mx, myRaw] = d3.pointer(event, svg.node());
+                const my = myRaw - legendBlockHeight;
                 const [rx, ry] = path.centroid(d);
 
                 const dx = mapCenter[0] - rx;

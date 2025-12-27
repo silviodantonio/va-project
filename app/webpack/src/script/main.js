@@ -15,8 +15,11 @@ mainMapLin();
 import mainCoordinated from './coordinatedComplete.js';
 mainCoordinated();
 
-// import pca from './pca.js'
-// pca()
+import pca from './pca.js';
+pca();
 
-import pcaCanvas from './pcaCanvas.js'
-pcaCanvas();
+// import pcaCanvas from './pcaCanvas.js'
+// pcaCanvas();
+
+import mainHeatmap from './heatmap.js';
+mainHeatmap();

@@ -8,29 +8,14 @@ body {
     background: white;
     border-radius: 8px;
     padding: 10px;
+    margin-top: 10px;
     margin-bottom: 10px;
     box-shadow: 0 10px 10px rgba(0,0,0,0.1);
-}
-
-.bar-chart-container .viz-area {
-    height: 250px; /* Adjusted for better proportions */
-}
-
-#map-container {
-    height: 635px; /* 2 rows of bar charts (250px each) + margins */
-}
-
-/* PCA container - bigger */
-#pca-container  {
-    height: 450px; /* Increased from 300px */
-    min-height: 450px;
-    width: 100%;
-    position: relative;
-}
-
-svg {
     width: 100%;
     height: 100%;
-    display: block;
-    background-color: #fff;
+    min-height: 350px;
+}
+
+#pca-container {
+    position: relative;
 }

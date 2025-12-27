@@ -3,6 +3,8 @@ import * as d3 from 'd3';
 // Putting async here otherwise a warning is raised when fetching data
 export default async function main () {
     const container = document.getElementById('pca-container');
+    const containerHeight = container.clientHeight;
+    const containerWidth = container.clientWidth - 20;
 
     const data = await d3.csv("http://127.0.0.1:7000/accidents_region_pca.csv", d => {
             // Converting from string to integer
@@ -13,8 +15,8 @@ export default async function main () {
     );
 
     // Set up dimensions with margins for axes
-    const width = 640;
-    const height = 400;
+    const width = containerWidth;
+    const height = containerHeight;
     const marginTop = 20;
     const marginRight = 20;
     const marginBottom = 30;
@@ -22,8 +24,9 @@ export default async function main () {
     const dataMargin = 1;
 
     const svg = d3.create('svg')
-        .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", "0 0 "+ width + " " + height)
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .style("width", "100%")
+        .style("height", "auto")
 
 
     const x = d3.scaleLinear()
