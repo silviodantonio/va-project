@@ -17,3 +17,6 @@ mainCoordinated();
 
 import pca from './pca.js'
 pca()
+
+// import pcaCanvas from './pcaCanvas.js'
+// pcaCanvas();
