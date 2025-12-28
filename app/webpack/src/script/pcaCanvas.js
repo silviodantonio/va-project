@@ -30,16 +30,18 @@ async function main () {
 
     const svg = d3.create('svg')
         .attr('width', width)
-        .attr('height', height);
+        .attr('height', height)
+        .style('z-index',1);
 
     // Set up canvas witdth and positioning
     const canvas = document.createElement('canvas')
-    canvas.setAttribute('width', width - (marginLeft + marginRight));
-    canvas.setAttribute('height', height - (marginBottom + marginTop));
+    canvas.setAttribute('width', width );
+    canvas.setAttribute('height', height );
+    canvas.style.zIndex = -1;
     canvas.style.position = 'absolute';
     canvas.style.top = marginTop +'px';
     canvas.style.left = marginLeft;
-    // Get canvas context, used for drawing
+    //Get canvas context, used for drawing
     const ctx = canvas.getContext('2d');
 
     const x = d3.scaleLinear()
@@ -82,9 +84,19 @@ async function main () {
         drawCircle(ctx, d.x, d.y, 3);
     }
 
-    container.append(svg.node());
+    //Brushing
+    svg.call(d3.brush().extent([[0, 0], [width, height]]));
+
+
+
     container.append(canvas);
+    container.append(svg.node());
+    
+
 
 }
 
 export default main;
+
+
+
