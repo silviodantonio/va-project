@@ -1,102 +1,166 @@
-import * as d3 from 'd3';
+import * as d3 from "d3";
 
-// Draw solid circles on given canvas
-function drawCircle(ctx, cx, cy, r) {
-    ctx.beginPath()
-    ctx.arc(cx, cy, r, 0, Math.PI * 2, true);
-    ctx.fill()
+/* ============================
+   Canvas helper
+============================ */
+
+function drawCircle(ctx, x, y, r) {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
 }
 
-// Putting async here otherwise a warning is raised when fetching data
-async function main () {
-    const container = document.getElementById('pca-container');
+/* ============================
+   Main
+============================ */
 
-    const data = await d3.csv("http://127.0.0.1:7000/accidents_region_pca.csv", d => {
-            // Converting from string to integer
-            d.x_pca =  +d.x_pca;
-            d.y_pca = +d.y_pca;
-            return d
-        }
+async function main() {
+    const container = document.getElementById("pca-container");
+    container.style.position = "relative";
+
+    const width = container.clientWidth ;
+    const height = container.clientHeight;
+
+    const margin = {
+        top: 20,
+        right: 20,
+        bottom: 30,
+        left: 40
+    };
+
+    /* ============================
+       Load data
+    ============================ */
+
+    const data = await d3.csv(
+        "http://127.0.0.1:7000/accidents_region_pca.csv",
+        d => ({
+            ...d,
+            x_pca: +d.x_pca,
+            y_pca: +d.y_pca
+        })
     );
 
-    // Set up dimensions with margins for axes
-    const width = 640;
-    const height = 400;
-    const marginTop = 20;
-    const marginRight = 20;
-    const marginBottom = 30;
-    const marginLeft = 40;
-    const dataMargin = 1;
-
-    const svg = d3.create('svg')
-        .attr('width', width)
-        .attr('height', height)
-        .style('z-index',1);
-
-    // Set up canvas witdth and positioning
-    const canvas = document.createElement('canvas')
-    canvas.setAttribute('width', width );
-    canvas.setAttribute('height', height );
-    canvas.style.zIndex = -1;
-    canvas.style.position = 'absolute';
-    canvas.style.top = marginTop +'px';
-    canvas.style.left = marginLeft;
-    //Get canvas context, used for drawing
-    const ctx = canvas.getContext('2d');
+    /* ============================
+       Scales (margins live HERE)
+    ============================ */
 
     const x = d3.scaleLinear()
-        .domain([d3.min(data, d => d.x_pca - dataMargin), d3.max(data, d => d.x_pca + dataMargin)])
-        .range([marginLeft, width - marginRight]);
-
-    // const x = d3.scaleLinear()
-    //     .domain([d3.min(data, d => d.x_pca), d3.max(data, d => d.x_pca)])
-    //     .range([marginLeft, width - marginRight]);
+        .domain(d3.extent(data, d => d.x_pca))
+        .nice()
+        .range([margin.left, width - margin.right]);
 
     const y = d3.scaleLinear()
-        .domain([d3.min(data, d => d.y_pca - dataMargin), d3.max(data, d => d.y_pca + dataMargin)])
-        .range([height - marginBottom, marginTop]);
+        .domain(d3.extent(data, d => d.y_pca))
+        .nice()
+        .range([height - margin.bottom, margin.top]);
 
-    // Precompute x and y positions in order to reduce calls to scale functions.
-    data.forEach((d) => {
+    // Precompute pixel positions
+    data.forEach(d => {
         d.x = x(d.x_pca);
         d.y = y(d.y_pca);
-        return d;
     });
 
-    // Here we need something smarter
-    const colorCategory = d3.scaleOrdinal()
-        .domain(["0", "1"])
-        .range([ "#5165b7ff", "#e12d2dff"])
+    /* ============================
+       SVG layer (axes only)
+    ============================ */
 
-    // Add X axis
-    svg.append('g')
-        .attr('transform', `translate(0,${height - marginBottom})`)
+    const svg = d3.create("svg")
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .style("position", "absolute")
+        .style("top", 0)
+        .style("left", 0)
+        .style("width", "100%")
+        .style("height", "auto")
+        .style("z-index", 1);
+
+    svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
         .call(d3.axisBottom(x));
 
-    // Add Y axis
-    svg.append('g')
-        .attr('transform', `translate(${marginLeft},0)`)
+    svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y));
 
-    // Dots are drawn on a canvas element set as overlay
+    /* ============================
+       Canvas layer (points only)
+    ============================ */
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    // to check for high-DPI screens
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    canvas.style.position = "absolute";
+    canvas.style.top = 0;
+    canvas.style.left = 0;
+    canvas.style.zIndex = -1;
+
+    ctx.scale(dpr, dpr);
+
+    // Draw points once
     for (const d of data) {
-        d.deadly === '0' ? ctx.fillStyle = 'steelblue' : ctx.fillStyle = 'red';
+        ctx.fillStyle = d.deadly === "0" ? "steelblue" : "red";
         drawCircle(ctx, d.x, d.y, 3);
     }
 
-    //Brushing
-    svg.call(d3.brush().extent([[0, 0], [width, height]]));
+
+    /* ============================
+       Brushing
+    ============================ */
+    const brush = d3.brush()
+    .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
+    .on("start brush end", ({selection}) => {
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+
+        // If nothing selected, draw all normally
+        if (!selection) {
+            ctx.globalAlpha = 1;
+            for (const d of data) {
+                ctx.fillStyle = d.deadly === "0" ? "steelblue" : "red";
+                drawCircle(ctx, d.x, d.y, 3);
+            }
+            return;
+        }
+
+        // Extract selection coordinates
+        const [[x0, y0], [x1, y1]] = selection;
+
+        for (const d of data) {
+            const isSelected =
+                d.x >= x0 && d.x <= x1 &&
+                d.y >= y0 && d.y <= y1;
+
+            // Fade non-selected points
+            ctx.globalAlpha = isSelected ? 1 : 0.4;
+
+            // Selected points appear orange
+            ctx.fillStyle = isSelected ? "orange" : (d.deadly === "0" ? "steelblue" : "red");
+
+            drawCircle(ctx, d.x, d.y, 3);
+        }
+
+        // Reset
+        ctx.globalAlpha = 1;
+    });
+
+svg.append("g").call(brush);
 
 
 
-    container.append(canvas);
-    container.append(svg.node());
-    
+    /* ============================
+       Mount layers
+    ============================ */
 
 
+    container.appendChild(canvas);
+    container.appendChild(svg.node());
 }
 
 export default main;
-
-
-

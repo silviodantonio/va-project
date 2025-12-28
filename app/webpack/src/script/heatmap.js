@@ -75,7 +75,7 @@ export default function main () {
     /* -------------------- COLOR -------------------- */
 
     const maxValue = d3.max(heatmapData, d => d.value);
-    // const minValue = d3.min(heatmapData, d => d.value);
+    const minValue = d3.min(heatmapData, d => d.value);
 
     // const myColor = d3.scaleSequential()
     //   .interpolator(d3.interpolateBlues)
@@ -83,8 +83,8 @@ export default function main () {
     //   .domain([0, maxValue]);
 
     const myColor = d3.scaleQuantize()
-        .domain([0, maxValue])
-        .range(d3.schemeBlues[9]);
+        .domain([minValue, maxValue])
+        .range(d3.schemeBlues[7]);
 
     /* -------------------- TOOLTIP -------------------- */
 
