@@ -227,9 +227,19 @@ export default function main() {
                     .attr("stroke-width", 1);
 
                 hoverOverlay.style("visibility", "hidden");
+            })
+            .on("click", function(event, d) {
+            // Dispatch a custom event with the region name
+            const regionClickEvent = new CustomEvent('region-click', { 
+                detail: { regionName: d.properties.reg_name }
             });
+
+            console.log(d.properties.reg_name);
+            document.dispatchEvent(regionClickEvent);
+        });
 
         container.append(svg.node());
     })
+    
     .catch(err => console.error(err));
 }
