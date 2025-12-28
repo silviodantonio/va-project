@@ -18,8 +18,10 @@ mainCoordinated();
 import pca from './pca.js';
 pca();
 
-// import pcaCanvas from './pcaCanvas.js'
-// pcaCanvas();
+import pcaCanvas from './pcaCanvas.js'
+pcaCanvas();
 
 import mainHeatmap from './heatmap.js';
 mainHeatmap();
+// import pcaAllCanvas from './pcaAllCanvas.js'
+// pcaAllCanvas();
