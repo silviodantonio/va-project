@@ -138,10 +138,9 @@ async function main() {
                 d.y >= y0 && d.y <= y1;
 
             // Fade non-selected points
-            ctx.globalAlpha = isSelected ? 1 : 0.4;
-
+            ctx.globalAlpha = isSelected ? 1 : 0.4; 
             // Selected points appear orange
-            ctx.fillStyle = isSelected ? "orange" : (d.deadly === "0" ? "steelblue" : "red");
+            ctx.fillStyle = isSelected ? (d.deadly === "0" ? "steelblue" : "red") : "lightgrey" ;
 
             drawCircle(ctx, d.x, d.y, 3);
         }
