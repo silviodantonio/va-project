@@ -78,8 +78,8 @@ export default function main() {
         const legendHeight = 20;
         const boxWidth = legendWidth / nSteps;
 
-        const legendG = svg.append("g")
-    .attr("transform", `translate(${(width - legendWidth)/2}, ${legendHeight*2})`);
+        const legendG = legendLayer.append("g")
+            .attr("transform", `translate(${(width - legendWidth)/2}, ${legendHeight*2})`);
 
 
         color.range().forEach((c, i) => {
