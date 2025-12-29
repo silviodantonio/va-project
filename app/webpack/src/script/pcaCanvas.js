@@ -328,36 +328,38 @@ document.addEventListener('single-hetmapMonthWeeks-click', function(event) {
    HeatMap-WeekHours-PCA connection
 ====================================*/
 
-document.addEventListener('single-hetmapWeekHours-click', function(event) {
+document.addEventListener('heatmap_week-hours_multi-select', function(event) {
 
-    const week_day = event.detail.week_day;
-    console.log("Week day clicked:", week_day);
-    const hours = event.detail.hours;
+    const week_days = event.detail.days;   // array of selected days
+    const hours = event.detail.hours;      // array of selected hours
+
+    console.log("Week days clicked:", week_days);
     console.log("Hours clicked:", hours);
 
-    const week_day_Index = WEEK_DAY_LIST.indexOf(week_day)+1; 
-    const hour_Index = HOUR_LIST.indexOf(hours)+1; 
-    console.log("Week day index:", week_day_Index);
-    console.log("Hour index:", hour_Index);
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
 
-    // reset della selezione della regione cliccata
-    ctx.clearRect(0, 0, width, height); 
-
-
-    // Draw all points
+    // Draw all points normally
     for (const d of data) {
-
-        if (+d.week_day !== week_day_Index || +d.hour !== hour_Index){
-            ctx.fillStyle = catColors[d.accident_type];;
-            ctx.globalAlpha = 0.7;
-            drawCircle(ctx, d.x, d.y, 3);
-        }
+        ctx.fillStyle = catColors[d.accident_type];
+        ctx.globalAlpha = 0.7;
+        drawCircle(ctx, d.x, d.y, 3);
     }
-    for (const d of data) {
-        if (+d.week_day === week_day_Index && +d.hour === hour_Index){
-            ctx.fillStyle = "orange";
-            ctx.globalAlpha = 0.7;
-            drawCircle(ctx, d.x, d.y, 4);
+
+    // Highlight selected cells
+    for (let i = 0; i < week_days.length; i++) {
+        const wdIndex = WEEK_DAY_LIST.indexOf(week_days[i]) + 1;
+        const hrIndex = HOUR_LIST.indexOf(hours[i]) + 1;
+
+        console.log("Week day index:", wdIndex);
+        console.log("Hour index:", hrIndex);
+
+        for (const d of data) {
+            if (+d.week_day === wdIndex && +d.hour === hrIndex) {
+                ctx.fillStyle = "orange";
+                ctx.globalAlpha = 0.7;
+                drawCircle(ctx, d.x, d.y, 4);
+            }
         }
     }
 });
