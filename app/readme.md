@@ -26,4 +26,5 @@ There are two docker containers:
 1) > `git rebase dev` // dal tuo branch
 2) > `git switch dev`
 3) > `git merge tuobranch`
-4) > `git switch -` // torni al branch precedente (`tuobranch`)
+4) > `git push`
+5) > `git switch -` // torni al branch precedente (`tuobranch`)
