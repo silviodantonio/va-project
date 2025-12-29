@@ -22,7 +22,7 @@ mainCoordinated();
 import pcaCanvas from './pcaCanvas.js'
 pcaCanvas();
 
-import mainHeatmap from './heatmap.js';
+import mainHeatmap from './heatmapMonthWeeks.js';
 mainHeatmap();
 // import pcaAllCanvas from './pcaAllCanvas.js'
 // pcaAllCanvas();
