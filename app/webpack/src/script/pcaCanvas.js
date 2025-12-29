@@ -187,9 +187,60 @@ document.addEventListener('region-click', function(event) {
 });
 
 
+
+/* ============================
+   HeatMap-PCA connection
+============================ */
+
+
+document.addEventListener('single-hetmap-click', function(event) {
+    const week_day = event.detail.week_day;
+    console.log("Week day clicked:", week_day);
+    const month = event.detail.month;
+    console.log("Month clicked:", month);
+
+    const week_day_list = [
+      "Dom", "Lun", "Mar",
+      "Mer", "Gio", "Ven", "Sab"
+    ];
+
+    const month_list = [
+      "Gennaio", "Febbraio", "Marzo", "Aprile",
+      "Maggio", "Giugno", "Luglio", "Agosto",
+      "Settembre", "Ottobre", "Novembre", "Dicembre"
+    ];
+
+    
+
+    const week_day_Index = week_day_list.indexOf(week_day) +1; 
+    const month_Index = month_list.indexOf(month) + 1 
+    console.log("Week day index:", week_day_Index);
+    console.log("Month index:", month_Index);
+
+    // reset della selezione della regione cliccata
+    ctx.clearRect(0, 0, width, height)
+
+    // Draw all points
+    for (const d of data) {
+
+        if (+d.week_day !== week_day_Index || +d.month !== month_Index){
+            ctx.fillStyle = (d.deadly === "0" ? "steelblue" : "red");
+            ctx.globalAlpha = 0.7;
+            drawCircle(ctx, d.x, d.y, 3);
+        }
+    }
+    for (const d of data) {
+        if (+d.week_day === week_day_Index && +d.month === month_Index){
+            ctx.fillStyle = "orange";
+            ctx.globalAlpha = 0.7;
+            drawCircle(ctx, d.x, d.y, 3);
+        }
+    }
+});
     /* ============================
        Mount layers
     ============================ */
+
 
 
     container.appendChild(canvas);

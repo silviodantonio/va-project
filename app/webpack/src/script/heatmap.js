@@ -142,6 +142,13 @@ export default function main () {
       .style("opacity", 0.85)
       .on("mouseover", mouseover)
       .on("mousemove", mousemove)
-      .on("mouseleave", mouseleave);
+      .on("mouseleave", mouseleave)
+      .on("click",function(event,d){
+        const SingleClickHeatMapEvent = new CustomEvent('single-hetmap-click',{
+          detail:{month: d.month, week_day: d.week_day}
+        });
+        console.log(d.month,d.week_day);
+        document.dispatchEvent(SingleClickHeatMapEvent);
+      });
   });
 }
