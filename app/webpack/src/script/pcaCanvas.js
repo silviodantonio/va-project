@@ -165,18 +165,27 @@ document.addEventListener('region-click', function(event) {
     
     const regionIndex = region_list.indexOf(regionName) + 1; // +1 because your region codes start at 1
 
+    // reset della selezione della regione cliccata
     ctx.clearRect(0, 0, width, height)
 
     // Draw all points
     for (const d of data) {
-        // Compare the region number from PCA data with the region index
-        const isSelectedRegion = +d.region === regionIndex;
-        
-        ctx.fillStyle = isSelectedRegion ? "orange": (d.deadly === "0" ? "steelblue" : "red") ;
-        ctx.globalAlpha = isSelectedRegion ? 1 : 0.9; 
-        drawCircle(ctx, d.x, d.y, isSelectedRegion ? 5 : 3);
+
+        if (+d.region !== regionIndex){
+            ctx.fillStyle = (d.deadly === "0" ? "steelblue" : "red");
+            ctx.globalAlpha = 0.7;
+            drawCircle(ctx, d.x, d.y, 3);
+        }
+    }
+    for (const d of data) {
+        if (+d.region === regionIndex){
+            ctx.fillStyle = "orange";
+            ctx.globalAlpha = 0.7;
+            drawCircle(ctx, d.x, d.y, 3);
+        }
     }
 });
+
 
     /* ============================
        Mount layers
