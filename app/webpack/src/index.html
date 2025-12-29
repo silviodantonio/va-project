@@ -15,37 +15,40 @@
                 <!-- LEFT: charts -->
                 <div class="col-9">
                 
-                <!-- ROW 1: 3 charts -->
-                <div class="row g-2">
-                    <div class="col-4">
-                    <div class="viz-area" id="chart-intersection"></div>
+                    <!-- ROW 1: 3 charts -->
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <div class="viz-area" id="chart-intersection"></div>
+                        </div>
+                        <div class="col-4">
+                            <div class="viz-area" id="chart-accident-type"></div>
+                        </div>
+                        <div class="col-4">
+                            <div class="viz-area" id="heatmap-week-hours"></div>
+                        </div>
                     </div>
-                    <div class="col-4">
-                    <div class="viz-area" id="chart-accident-type"></div>
+
+                    <!-- ROW 2: PCA + extra -->
+                    <div class="row g-2 mt-2">
+                        <div class="col-8">
+                            <div class="viz-area" id="pca-container"></div>
+                        </div>
+                        <div class="col-4">
+                            <div class="viz-area" id="extra-chart"></div>
+                        </div>
                     </div>
-                    <div class="col-4">
-                    <div class="viz-area" id="chart-region"></div>
-                    </div>
+
                 </div>
 
-                <!-- ROW 2: PCA + extra -->
-                <div class="row g-2 mt-2">
-                    <div class="col-8">
-                    <div class="viz-area" id="pca-container"></div>
+                <!-- RIGHT: MAP + HEATMAP -->
+                <div class="col-3 h-100">
+                    <div class="d-flex flex-column h-100">
+                        <div class="viz-area" id="heatmap-month-week" style="flex: 1 1 0;"></div>
+                        <div class="viz-area flex-fill" id="map-container" style="flex: 2 1 0;"></div>
                     </div>
-                    <div class="col-4">
-                    <div class="viz-area" id="extra-chart"></div>
-                    </div>
-                </div>
-
-                </div>
-
-                <!-- RIGHT: MAP (full height) -->
-                <div class="col-3 d-flex">
-                <div class="viz-area flex-fill" id="map-container"></div>
                 </div>
 
             </div>
-            </section>
+        </section>
     </body>
 </html>

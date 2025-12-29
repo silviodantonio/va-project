@@ -26,3 +26,6 @@ import mainHeatmap from './heatmap.js';
 mainHeatmap();
 // import pcaAllCanvas from './pcaAllCanvas.js'
 // pcaAllCanvas();
+
+import mainHeatmapWeekHours from './heatmapWeekHours.js';
+mainHeatmapWeekHours();

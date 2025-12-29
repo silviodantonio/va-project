@@ -1,11 +1,11 @@
 import * as d3 from 'd3';
 
 export default function main () {
-  const margin = { top: 35, right: 45, bottom: 35, left: 85 },
+  const margin = { top: 35, right: 45, bottom: 15, left: 65 },
         width = 350 - margin.left - margin.right,
-        height = 260 - margin.top - margin.bottom;
+        height = 390 - margin.top - margin.bottom;
 
-  const svg = d3.select("#heatmap-month-week")
+  const svg = d3.select("#heatmap-week-hours")
     .append("svg")
     .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
     .attr("preserveAspectRatio", "xMidYMid meet")
@@ -26,10 +26,10 @@ export default function main () {
       "Mer": "Mercoledì", "Gio": "Giovedì", "Ven": "Venerdì", "Sab": "Sabato"
     };
 
-    const month_list = [
-      "Gennaio", "Febbraio", "Marzo", "Aprile",
-      "Maggio", "Giugno", "Luglio", "Agosto",
-      "Settembre", "Ottobre", "Novembre", "Dicembre"
+    const hour_list = [
+        "1", "2", "3", "4", "5", "6", "7", "8",
+        "9", "10", "11", "12", "13", "14", "15", "16",
+        "17", "18", "19", "20", "21", "22", "23", "24"
     ];
 
     /* -------------------- ROLLUP -------------------- */
@@ -38,16 +38,16 @@ export default function main () {
       data,
       v => v.length, // count accidents
       d => week_day_list[+d.week_day - 1],
-      d => month_list[+d.month - 1]
+      d => hour_list[+d.hour - 1]
     );
 
     /* ---- convert Map -> array for the heatmap ---- */
 
     const heatmapData = [];
-    valuemap.forEach((monthMap, week_day) => {
-        monthMap.forEach((value, month) => {
+    valuemap.forEach((hourMap, week_day) => {
+        hourMap.forEach((value, hour) => {
             const week_day_label = week_day_dictionary[week_day];
-            heatmapData.push({ week_day, week_day_label, month, value });
+            heatmapData.push({ week_day, week_day_label, hour, value });
         });
     });
 
@@ -65,7 +65,7 @@ export default function main () {
 
     const y = d3.scaleBand()
       .range([height, 0])
-      .domain(month_list)
+      .domain(hour_list)
       .padding(0.05);
 
     svg.append("g")
@@ -88,7 +88,7 @@ export default function main () {
 
     /* -------------------- TOOLTIP -------------------- */
 
-    const tooltip = d3.select("#heatmap-month-week")
+    const tooltip = d3.select("#heatmap-week-hours")
       .append("div")
       .style("opacity", 0)
       .style("position", "absolute")
@@ -112,7 +112,7 @@ export default function main () {
 
         tooltip
             .html(
-            `<strong>${d.month}</strong><br>
+            `<strong>${d.hour}</strong><br>
             ${d.week_day_label}<br>
             Incidenti: ${d.value}`
             )
@@ -130,10 +130,10 @@ export default function main () {
     /* -------------------- HEATMAP -------------------- */
 
     svg.selectAll("rect")
-      .data(heatmapData, d => d.month + ":" + d.week_day)
+      .data(heatmapData, d => d.hour + ":" + d.week_day)
       .join("rect")
       .attr("x", d => x(d.week_day))
-      .attr("y", d => y(d.month))
+      .attr("y", d => y(d.hour))
       .attr("width", x.bandwidth())
       .attr("height", y.bandwidth())
       .attr("rx", 4)
@@ -142,13 +142,6 @@ export default function main () {
       .style("opacity", 0.85)
       .on("mouseover", mouseover)
       .on("mousemove", mousemove)
-      .on("mouseleave", mouseleave)
-      .on("click",function(event,d){
-        const SingleClickHeatMapEvent = new CustomEvent('single-hetmap-click',{
-          detail:{month: d.month, week_day: d.week_day}
-        });
-        console.log(d.month,d.week_day);
-        document.dispatchEvent(SingleClickHeatMapEvent);
-      });
+      .on("mouseleave", mouseleave);
   });
 }
