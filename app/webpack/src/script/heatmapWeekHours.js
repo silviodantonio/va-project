@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import {WEEK_DAY_LIST,WEEK_DAY_DICTIONARY,HOUR_LIST} from './constants.js';
 
 export default function main () {
   const margin = { top: 35, right: 45, bottom: 15, left: 65 },
@@ -16,29 +17,29 @@ export default function main () {
 
   d3.csv("http://127.0.0.1:7000/accidents_regions_complete.csv").then(data => {
 
-    const week_day_list = [
-      "Dom", "Lun", "Mar",
-      "Mer", "Gio", "Ven", "Sab"
-    ];
+    // const week_day_list = [
+    //   "Dom", "Lun", "Mar",
+    //   "Mer", "Gio", "Ven", "Sab"
+    // ];
 
-    const week_day_dictionary = {
-      "Dom": "Domenica", "Lun": "Lunedì", "Mar": "Martedì",
-      "Mer": "Mercoledì", "Gio": "Giovedì", "Ven": "Venerdì", "Sab": "Sabato"
-    };
+    // const week_day_dictionary = {
+    //   "Dom": "Domenica", "Lun": "Lunedì", "Mar": "Martedì",
+    //   "Mer": "Mercoledì", "Gio": "Giovedì", "Ven": "Venerdì", "Sab": "Sabato"
+    // };
 
-    const hour_list = [
-        "1", "2", "3", "4", "5", "6", "7", "8",
-        "9", "10", "11", "12", "13", "14", "15", "16",
-        "17", "18", "19", "20", "21", "22", "23", "24"
-    ];
+    // const hour_list = [
+    //     "1", "2", "3", "4", "5", "6", "7", "8",
+    //     "9", "10", "11", "12", "13", "14", "15", "16",
+    //     "17", "18", "19", "20", "21", "22", "23", "24"
+    // ];
 
     /* -------------------- ROLLUP -------------------- */
 
     const valuemap = d3.rollup(
       data,
       v => v.length, // count accidents
-      d => week_day_list[+d.week_day - 1],
-      d => hour_list[+d.hour - 1]
+      d => WEEK_DAY_LIST[+d.week_day - 1],
+      d => HOUR_LIST[+d.hour - 1]
     );
 
     /* ---- convert Map -> array for the heatmap ---- */
@@ -46,7 +47,7 @@ export default function main () {
     const heatmapData = [];
     valuemap.forEach((hourMap, week_day) => {
         hourMap.forEach((value, hour) => {
-            const week_day_label = week_day_dictionary[week_day];
+            const week_day_label = WEEK_DAY_DICTIONARY[week_day];
             heatmapData.push({ week_day, week_day_label, hour, value });
         });
     });
@@ -55,7 +56,7 @@ export default function main () {
 
     const x = d3.scaleBand()
       .range([0, width])
-      .domain(week_day_list)
+      .domain(WEEK_DAY_LIST)
       .padding(0.05);
 
     svg.append("g")
@@ -65,7 +66,7 @@ export default function main () {
 
     const y = d3.scaleBand()
       .range([height, 0])
-      .domain(hour_list)
+      .domain(HOUR_LIST)
       .padding(0.05);
 
     svg.append("g")
@@ -142,6 +143,13 @@ export default function main () {
       .style("opacity", 0.85)
       .on("mouseover", mouseover)
       .on("mousemove", mousemove)
-      .on("mouseleave", mouseleave);
+      .on("mouseleave", mouseleave)
+      .on("click",function(event,d){
+        const SingleClickHeatMapWeekHoursEvent = new CustomEvent('single-hetmapWeekHours-click',{
+          detail:{week_day: d.week_day, hours: d.hour}
+        });
+        console.log(d.week_day, d.hour);
+        document.dispatchEvent(SingleClickHeatMapWeekHoursEvent);
+      });
   });
 }

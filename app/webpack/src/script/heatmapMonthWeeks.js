@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import {WEEK_DAY_LIST, WEEK_DAY_DICTIONARY, MONTH_LIST} from './constants.js';
 
 export default function main () {
   const margin = { top: 35, right: 45, bottom: 35, left: 85 },
@@ -16,29 +17,29 @@ export default function main () {
 
   d3.csv("http://127.0.0.1:7000/accidents_regions_complete.csv").then(data => {
 
-    const week_day_list = [
-      "Dom", "Lun", "Mar",
-      "Mer", "Gio", "Ven", "Sab"
-    ];
+    // const week_day_list = [
+    //   "Dom", "Lun", "Mar",
+    //   "Mer", "Gio", "Ven", "Sab"
+    // ];
 
-    const week_day_dictionary = {
-      "Dom": "Domenica", "Lun": "Lunedì", "Mar": "Martedì",
-      "Mer": "Mercoledì", "Gio": "Giovedì", "Ven": "Venerdì", "Sab": "Sabato"
-    };
+    // const week_day_dictionary = {
+    //   "Dom": "Domenica", "Lun": "Lunedì", "Mar": "Martedì",
+    //   "Mer": "Mercoledì", "Gio": "Giovedì", "Ven": "Venerdì", "Sab": "Sabato"
+    // };
 
-    const month_list = [
-      "Gennaio", "Febbraio", "Marzo", "Aprile",
-      "Maggio", "Giugno", "Luglio", "Agosto",
-      "Settembre", "Ottobre", "Novembre", "Dicembre"
-    ];
+    // const month_list = [
+    //   "Gennaio", "Febbraio", "Marzo", "Aprile",
+    //   "Maggio", "Giugno", "Luglio", "Agosto",
+    //   "Settembre", "Ottobre", "Novembre", "Dicembre"
+    // ];
 
     /* -------------------- ROLLUP -------------------- */
 
     const valuemap = d3.rollup(
       data,
       v => v.length, // count accidents
-      d => week_day_list[+d.week_day - 1],
-      d => month_list[+d.month - 1]
+      d => WEEK_DAY_LIST[+d.week_day - 1],
+      d => MONTH_LIST[+d.month - 1]
     );
 
     /* ---- convert Map -> array for the heatmap ---- */
@@ -46,7 +47,7 @@ export default function main () {
     const heatmapData = [];
     valuemap.forEach((monthMap, week_day) => {
         monthMap.forEach((value, month) => {
-            const week_day_label = week_day_dictionary[week_day];
+            const week_day_label = WEEK_DAY_DICTIONARY[week_day];
             heatmapData.push({ week_day, week_day_label, month, value });
         });
     });
@@ -55,7 +56,7 @@ export default function main () {
 
     const x = d3.scaleBand()
       .range([0, width])
-      .domain(week_day_list)
+      .domain(WEEK_DAY_LIST)
       .padding(0.05);
 
     svg.append("g")
@@ -65,7 +66,7 @@ export default function main () {
 
     const y = d3.scaleBand()
       .range([height, 0])
-      .domain(month_list)
+      .domain(MONTH_LIST)
       .padding(0.05);
 
     svg.append("g")
@@ -144,11 +145,11 @@ export default function main () {
       .on("mousemove", mousemove)
       .on("mouseleave", mouseleave)
       .on("click",function(event,d){
-        const SingleClickHeatMapEvent = new CustomEvent('single-hetmap-click',{
+        const SingleClickHeatMapMonthWeeksEvent = new CustomEvent('single-hetmapMonthWeeks-click',{
           detail:{month: d.month, week_day: d.week_day}
         });
         console.log(d.month,d.week_day);
-        document.dispatchEvent(SingleClickHeatMapEvent);
+        document.dispatchEvent(SingleClickHeatMapMonthWeeksEvent);
       });
   });
 }

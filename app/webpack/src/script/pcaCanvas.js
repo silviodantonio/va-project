@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { color, hsl } from "d3-color";
+import {REGION_LIST, WEEK_DAY_LIST, MONTH_LIST,HOUR_LIST} from './constants.js';
   // Convert HSL back to RGB (Magic part 2)
 
 /* ============================
@@ -227,7 +228,6 @@ async function main() {
             }
         }
         else {
-
             // Extract selection coordinates
             const [[x0, y0], [x1, y1]] = selection;
 
@@ -242,7 +242,6 @@ async function main() {
                 } else  {
                     ctx.fillStyle = catColors[d.accident_type];
                     drawCircle(ctx, d.x, d.y, 3);
-
                 }
 
             }
@@ -261,9 +260,8 @@ document.addEventListener('region-click', function(event) {
     console.log("Region clicked:", regionName);
     
     // Get the region index from the region name
-    const region_list = ["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
-    
-    const regionIndex = region_list.indexOf(regionName) + 1; // +1 because your region codes start at 1
+    // const region_list = ["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
+    const regionIndex = REGION_LIST.indexOf(regionName) + 1; // +1 because your region codes start at 1
 
     // reset della selezione della regione cliccata
     ctx.clearRect(0, 0, width, height)
@@ -272,7 +270,7 @@ document.addEventListener('region-click', function(event) {
     for (const d of data) {
 
         if (+d.region !== regionIndex){
-            ctx.fillStyle = (d.deadly === "0" ? "steelblue" : "red");
+            ctx.fillStyle = catColors[d.accident_type];
             ctx.globalAlpha = 0.7;
             drawCircle(ctx, d.x, d.y, 3);
         }
@@ -289,41 +287,30 @@ document.addEventListener('region-click', function(event) {
 
 
 /* ============================
-   HeatMap-PCA connection
+   HeatMap-MonthWeeks-PCA connection
 ============================ */
 
+document.addEventListener('single-hetmapMonthWeeks-click', function(event) {
 
-document.addEventListener('single-hetmap-click', function(event) {
     const week_day = event.detail.week_day;
     console.log("Week day clicked:", week_day);
     const month = event.detail.month;
     console.log("Month clicked:", month);
 
-    const week_day_list = [
-      "Dom", "Lun", "Mar",
-      "Mer", "Gio", "Ven", "Sab"
-    ];
-
-    const month_list = [
-      "Gennaio", "Febbraio", "Marzo", "Aprile",
-      "Maggio", "Giugno", "Luglio", "Agosto",
-      "Settembre", "Ottobre", "Novembre", "Dicembre"
-    ];
-
-    const week_day_Index = week_day_list.indexOf(week_day)+1; 
-    const month_Index = month_list.indexOf(month)+1; 
+    const week_day_Index = WEEK_DAY_LIST.indexOf(week_day)+1; 
+    const month_Index = MONTH_LIST.indexOf(month)+1; 
     console.log("Week day index:", week_day_Index);
     console.log("Month index:", month_Index);
 
     // reset della selezione della regione cliccata
     ctx.clearRect(0, 0, width, height); 
-    console.log("Week day index:", week_day_Index);
+
 
     // Draw all points
     for (const d of data) {
 
         if (+d.week_day !== week_day_Index || +d.month !== month_Index){
-            ctx.fillStyle = (d.deadly === "0" ? "steelblue" : "red");
+            ctx.fillStyle = catColors[d.accident_type];;
             ctx.globalAlpha = 0.7;
             drawCircle(ctx, d.x, d.y, 3);
         }
@@ -336,9 +323,49 @@ document.addEventListener('single-hetmap-click', function(event) {
         }
     }
 });
-    /* ============================
-       Mount layers
-    ============================ */
+
+/* =================================
+   HeatMap-WeekHours-PCA connection
+====================================*/
+
+document.addEventListener('single-hetmapWeekHours-click', function(event) {
+
+    const week_day = event.detail.week_day;
+    console.log("Week day clicked:", week_day);
+    const hours = event.detail.hours;
+    console.log("Hours clicked:", hours);
+
+    const week_day_Index = WEEK_DAY_LIST.indexOf(week_day)+1; 
+    const hour_Index = HOUR_LIST.indexOf(hours)+1; 
+    console.log("Week day index:", week_day_Index);
+    console.log("Hour index:", hour_Index);
+
+    // reset della selezione della regione cliccata
+    ctx.clearRect(0, 0, width, height); 
+
+
+    // Draw all points
+    for (const d of data) {
+
+        if (+d.week_day !== week_day_Index || +d.hour !== hour_Index){
+            ctx.fillStyle = catColors[d.accident_type];;
+            ctx.globalAlpha = 0.7;
+            drawCircle(ctx, d.x, d.y, 3);
+        }
+    }
+    for (const d of data) {
+        if (+d.week_day === week_day_Index && +d.hour === hour_Index){
+            ctx.fillStyle = "orange";
+            ctx.globalAlpha = 0.7;
+            drawCircle(ctx, d.x, d.y, 4);
+        }
+    }
+});
+
+
+/* ============================
+    Mount layers
+============================ */
 
 
 

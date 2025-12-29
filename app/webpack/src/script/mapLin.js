@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import * as topojson from "topojson-client";
+import { REGION_LIST } from './constants.js';
 
 export default function main() {
     const container = document.getElementById('map-container');
@@ -12,7 +13,7 @@ export default function main() {
     const containerHeight = container.clientHeight;
     
 
-    const region_list=["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
+    // const region_list=["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
 
     Promise.all([
         fetch("http://127.0.0.1:7000/limits_IT_regions.topo.json").then(res => res.json()),
@@ -26,7 +27,7 @@ export default function main() {
         const valuemap = d3.rollup(
             accidents,
             v => d3.sum(v, d => +d.observation),
-            d => region_list[+d.region - 1]
+            d => REGION_LIST[+d.region - 1]
         );
 
         const values = Array.from(valuemap.values()).filter(v => v != null);
