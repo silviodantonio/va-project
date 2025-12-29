@@ -210,15 +210,14 @@ document.addEventListener('single-hetmap-click', function(event) {
       "Settembre", "Ottobre", "Novembre", "Dicembre"
     ];
 
-    
-
-    const week_day_Index = week_day_list.indexOf(week_day) +1; 
-    const month_Index = month_list.indexOf(month) + 1 
+    const week_day_Index = week_day_list.indexOf(week_day)+1; 
+    const month_Index = month_list.indexOf(month)+1; 
     console.log("Week day index:", week_day_Index);
     console.log("Month index:", month_Index);
 
     // reset della selezione della regione cliccata
-    ctx.clearRect(0, 0, width, height)
+    ctx.clearRect(0, 0, width, height); 
+    console.log("Week day index:", week_day_Index);
 
     // Draw all points
     for (const d of data) {
@@ -233,7 +232,7 @@ document.addEventListener('single-hetmap-click', function(event) {
         if (+d.week_day === week_day_Index && +d.month === month_Index){
             ctx.fillStyle = "orange";
             ctx.globalAlpha = 0.7;
-            drawCircle(ctx, d.x, d.y, 3);
+            drawCircle(ctx, d.x, d.y, 4);
         }
     }
 });

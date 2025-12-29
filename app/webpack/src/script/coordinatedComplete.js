@@ -1,5 +1,9 @@
 import * as d3 from 'd3';
 
+import { REGION_LIST, INTERSECTION_LIST, ACCIDENT_TYPE_LIST } from './constants.js';
+
+
+
 export default async function main () {
     const container = {
         // region: document.getElementById('chart-region'),
@@ -11,11 +15,11 @@ export default async function main () {
         // month: document.getElementById('chart-month')
     };
 
-    const region_list = ["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
+    //const region_list = ["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
 
-    const intersection_list = ["crossroad", "traffic circle", "level crossing", "straight stretch", "bend", "bump-slope-bottleneck", "tunnel"];
+    //const intersection_list = ["crossroad", "traffic circle", "level crossing", "straight stretch", "bend", "bump-slope-bottleneck", "tunnel"];
 
-    const accident_type_list = ["accident between vehicles", "vehicle-pedestrian accident", "accidents involving a single vehicle"];
+    //const accident_type_list = ["accident between vehicles", "vehicle-pedestrian accident", "accidents involving a single vehicle"];
 
     // const deadly_list = ["Injured", "Dead"];
 
@@ -28,8 +32,8 @@ export default async function main () {
         "http://127.0.0.1:7000/accidents_regions_complete.csv",
         d => ({
             // region: region_list[+d.region - 1],
-            intersection: intersection_list[+d.intersection - 1],
-            accident_type: accident_type_list[+d.accident_type - 1],
+            intersection: INTERSECTION_LIST[+d.intersection - 1],
+            accident_type: ACCIDENT_TYPE_LIST[+d.accident_type - 1],
             // deadly: deadly_list[d.deadly],
             // hour: d.hour,
             // week_day: week_day_list[+d.week_day - 1],
