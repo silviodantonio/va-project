@@ -290,36 +290,38 @@ document.addEventListener('region-click', function(event) {
    HeatMap-MonthWeeks-PCA connection
 ============================ */
 
-document.addEventListener('single-hetmapMonthWeeks-click', function(event) {
+document.addEventListener("heatmap_month-weeks_multi-select", function(event) {
 
-    const week_day = event.detail.week_day;
-    console.log("Week day clicked:", week_day);
-    const month = event.detail.month;
+    const week_day = event.detail.week_days;
+    const month = event.detail.months;
     console.log("Month clicked:", month);
-
-    const week_day_Index = WEEK_DAY_LIST.indexOf(week_day)+1; 
-    const month_Index = MONTH_LIST.indexOf(month)+1; 
-    console.log("Week day index:", week_day_Index);
-    console.log("Month index:", month_Index);
+    console.log("Week day clicked:", week_day);
 
     // reset della selezione della regione cliccata
     ctx.clearRect(0, 0, width, height); 
 
 
-    // Draw all points
-    for (const d of data) {
 
-        if (+d.week_day !== week_day_Index || +d.month !== month_Index){
-            ctx.fillStyle = catColors[d.accident_type];;
-            ctx.globalAlpha = 0.7;
-            drawCircle(ctx, d.x, d.y, 3);
-        }
-    }
+    // Draw all points normally
     for (const d of data) {
-        if (+d.week_day === week_day_Index && +d.month === month_Index){
-            ctx.fillStyle = "orange";
-            ctx.globalAlpha = 0.7;
-            drawCircle(ctx, d.x, d.y, 4);
+        ctx.fillStyle = catColors[d.accident_type];
+        ctx.globalAlpha = 0.7;
+        drawCircle(ctx, d.x, d.y, 3);
+    }
+
+    for (let i = 0; i < week_day.length; i++) {
+        const wdIndex = WEEK_DAY_LIST.indexOf(week_day[i]) + 1;
+        const mthIndex = MONTH_LIST.indexOf(month[i]) + 1;
+
+        console.log("Week day index:", wdIndex);
+        console.log("Month index:", mthIndex);
+
+        for (const d of data) {
+            if (+d.week_day === wdIndex && +d.month === mthIndex) {
+                ctx.fillStyle = "orange";
+                ctx.globalAlpha = 0.7;
+                drawCircle(ctx, d.x, d.y, 4);
+            }
         }
     }
 });

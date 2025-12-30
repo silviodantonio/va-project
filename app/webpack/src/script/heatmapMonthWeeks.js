@@ -99,10 +99,21 @@ export default function main () {
       .style("border-radius", "5px")
       .style("padding", "5px");
 
-    const mouseover = function () {
+
+    // removed because of multi-selection
+
+    // const mouseover = function () {
+    //   tooltip.style("opacity", 1);
+    //   d3.select(this).style("stroke", "black");
+    // };
+
+    const mouseover = function (event, d) {
       tooltip.style("opacity", 1);
-      d3.select(this).style("stroke", "black");
+      if (!selectedCells.has(cellKey(d))) {
+        d3.select(this).style("stroke", "black");
+      }
     };
+    
 
     const mousemove = function (event, d) {
         const [mx, my] = d3.pointer(event, document.body);
@@ -122,17 +133,78 @@ export default function main () {
             .style("left", (mx + 10) + "px")
             .style("top", (my + 10) + "px");
     };
+      // removed because of multi-selection
 
-    const mouseleave = function () {
-      tooltip.style("opacity", 0);
-      d3.select(this).style("stroke", "none");
+    // const mouseleave = function () {
+    //   tooltip.style("opacity", 0);
+    //   d3.select(this).style("stroke", "none");
+    // };
+
+    const mouseleave = function (event, d) {
+       tooltip.style("opacity", 0);
+        if (!selectedCells.has(cellKey(d))) {
+            d3.select(this).style("stroke", "none");
+          }
     };
 
+    /* -------------------- MULTI-SELECTION -------------------- */
+    // track selected squares
+    const selectedCells = new Map();
+
+    function cellKey(d) {
+      return `${d.month}|${d.week_day}`;
+    }
+
+    function updateSelectionStyles() {
+      svg.selectAll(".heatmap-cell-MonthWeeks")
+        .style("opacity", d =>
+          selectedCells.size === 0 || selectedCells.has(cellKey(d)) ? 0.9 : 0.25
+        )
+        .style("stroke", d =>
+          selectedCells.has(cellKey(d)) ? "#000" : "none"
+        )
+        .style("stroke-width", d =>
+          selectedCells.has(cellKey(d)) ? 2 : 0
+    );
+    }
+
+    // map -> Array.prototype.map() so takes the selected array 
+    // (all the selected cells) and creates a new array containing just the week_day of each cell.
+
+
+    function dispatchMultiSelection() {
+      const selected = Array.from(selectedCells.values());
+      document.dispatchEvent(
+        new CustomEvent("heatmap_month-weeks_multi-select", {
+          detail: {
+            cells: selected,
+            months: selected.map(d => d.month),
+            week_days: selected.map(d => d.week_day)
+          }
+        })
+      );
+
+        console.log(selected);
+        console.log(selected.map(d => d.month));
+        console.log(selected.map(d => d.week_day));
+    }
+
+    const cellClicked = function (event, d) {
+      event.stopPropagation(); // prevent background clearing
+      const key = cellKey(d);
+
+      if (selectedCells.has(key)) selectedCells.delete(key);
+      else selectedCells.set(key, d);
+
+      updateSelectionStyles();
+      dispatchMultiSelection();
+    };
     /* -------------------- HEATMAP -------------------- */
 
     svg.selectAll("rect")
       .data(heatmapData, d => d.month + ":" + d.week_day)
       .join("rect")
+      .attr("class", "heatmap-cell-MonthWeeks")
       .attr("x", d => x(d.week_day))
       .attr("y", d => y(d.month))
       .attr("width", x.bandwidth())
@@ -144,12 +216,6 @@ export default function main () {
       .on("mouseover", mouseover)
       .on("mousemove", mousemove)
       .on("mouseleave", mouseleave)
-      .on("click",function(event,d){
-        const SingleClickHeatMapMonthWeeksEvent = new CustomEvent('single-hetmapMonthWeeks-click',{
-          detail:{month: d.month, week_day: d.week_day}
-        });
-        console.log(d.month,d.week_day);
-        document.dispatchEvent(SingleClickHeatMapMonthWeeksEvent);
-      });
+      .on("click", cellClicked);
   });
 }

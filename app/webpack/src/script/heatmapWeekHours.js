@@ -154,7 +154,7 @@ export default function main () {
     }
 
     function updateSelectionStyles() {
-      svg.selectAll(".heatmap-cell")
+      svg.selectAll(".heatmap-cell-WeekHours")
         .style("opacity", d =>
           selectedCells.size === 0 || selectedCells.has(cellKey(d)) ? 0.9 : 0.25
         )
@@ -203,7 +203,7 @@ export default function main () {
     svg.selectAll("rect")
       .data(heatmapData, d => d.hour + ":" + d.week_day)
       .join("rect")
-      .attr("class", "heatmap-cell") // aggiunto per multi selection
+      .attr("class", "heatmap-cell-WeekHours") // aggiunto per multi selection
       .attr("x", d => x(d.week_day))
       .attr("y", d => y(d.hour))
       .attr("width", x.bandwidth())
