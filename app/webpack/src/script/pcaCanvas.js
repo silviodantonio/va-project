@@ -143,7 +143,7 @@ async function main() {
     })
 
 
-    // /* ============================
+    /* ============================
     //    Brushing
     // ============================ */
 
@@ -217,86 +217,86 @@ document.addEventListener('region-click', function(event) {
     }
 });
 
-
 /* ============================
-   HeatMap-MonthWeeks-PCA connection
+   HeatMap-PCA connection
 ============================ */
-
-document.addEventListener("heatmap_month-weeks_multi-select", function(event) {
-
-    const week_day = event.detail.week_days;
-    const month = event.detail.months;
-    console.log("Month clicked:", month);
-    console.log("Week day clicked:", week_day);
-
-    // reset della selezione della regione cliccata
-    ctx.clearRect(0, 0, width, height); 
-
-
-
-    // Draw all points normally
-    for (const d of data) {
-        ctx.fillStyle = catColors[d[coloringAttribute]];
-        ctx.globalAlpha = 0.7;
-        drawCircle(ctx, d.x, d.y, 3);
-    }
-
-    for (let i = 0; i < week_day.length; i++) {
-        const wdIndex = WEEK_DAY_LIST.indexOf(week_day[i]) + 1;
-        const mthIndex = MONTH_LIST.indexOf(month[i]) + 1;
-
-        console.log("Week day index:", wdIndex);
-        console.log("Month index:", mthIndex);
-
-        for (const d of data) {
-            if (+d.week_day === wdIndex && +d.month === mthIndex) {
-                ctx.fillStyle = "orange";
-                ctx.globalAlpha = 0.7;
-                drawCircle(ctx, d.x, d.y, 4);
-            }
-        }
-    }
-});
-
-/* =================================
-   HeatMap-WeekHours-PCA connection
-====================================*/
-
-document.addEventListener('heatmap_week-hours_multi-select', function(event) {
-
-    const week_days = event.detail.days;   // array of selected days
-    const hours = event.detail.hours;      // array of selected hours
-
-    console.log("Week days clicked:", week_days);
-    console.log("Hours clicked:", hours);
-
-    // Clear canvas
+const selectionState = {
+    source: null, // 'week-hours' | 'month-weeks'
+    weekHours: null,
+    monthWeeks: null
+};
+function redrawPCA() {
     ctx.clearRect(0, 0, width, height);
 
-    // Draw all points normally
     for (const d of data) {
         ctx.fillStyle = catColors[d[coloringAttribute]];
         ctx.globalAlpha = 0.7;
         drawCircle(ctx, d.x, d.y, 3);
     }
 
-    // Highlight selected cells
-    for (let i = 0; i < week_days.length; i++) {
-        const wdIndex = WEEK_DAY_LIST.indexOf(week_days[i]) + 1;
-        const hrIndex = HOUR_LIST.indexOf(hours[i]) + 1;
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = "orange";
 
-        console.log("Week day index:", wdIndex);
-        console.log("Hour index:", hrIndex);
+    if (selectionState.source === "week-hours" && selectionState.weekHours) {
+        const { days, hours } = selectionState.weekHours;
 
-        for (const d of data) {
-            if (+d.week_day === wdIndex && +d.hour === hrIndex) {
-                ctx.fillStyle = "orange";
-                ctx.globalAlpha = 0.7;
-                drawCircle(ctx, d.x, d.y, 4);
+        for (let i = 0; i < days.length; i++) {
+            const wdIndex = WEEK_DAY_LIST.indexOf(days[i]) + 1;
+            const hrIndex = HOUR_LIST.indexOf(hours[i]) + 1;
+
+            for (const d of data) {
+                if (+d.week_day === wdIndex && +d.hour === hrIndex) {
+                    drawCircle(ctx, d.x, d.y, 4);
+                }
             }
         }
     }
+
+    if (selectionState.source === "month-weeks" && selectionState.monthWeeks) {
+        const { months, week_days } = selectionState.monthWeeks;
+
+        for (let i = 0; i < months.length; i++) {
+            const mIndex = MONTH_LIST.indexOf(months[i]) + 1;
+            const wdIndex = WEEK_DAY_LIST.indexOf(week_days[i]) + 1;
+
+            for (const d of data) {
+                if (+d.month === mIndex && +d.week_day === wdIndex) {
+                    drawCircle(ctx, d.x, d.y, 4);
+                }
+            }
+        }
+    }
+}
+
+document.addEventListener("heatmap_week-hours_multi-select", (event) => {
+
+    selectionState.source = "week-hours";
+    selectionState.weekHours = {
+        days: event.detail.days,
+        hours: event.detail.hours
+    };
+    selectionState.monthWeeks = null;
+
+    document.dispatchEvent(new CustomEvent("reset-month-weeks"));
+
+    redrawPCA();
 });
+
+document.addEventListener("heatmap_month-weeks_multi-select", (event) => {
+
+    selectionState.source = "month-weeks";
+    selectionState.monthWeeks = {
+        months: event.detail.months,
+        week_days: event.detail.week_days
+    };
+    selectionState.weekHours = null;
+
+    document.dispatchEvent(new CustomEvent("reset-week-hours"));
+
+    redrawPCA();
+});
+
+
 
 
 /* ============================

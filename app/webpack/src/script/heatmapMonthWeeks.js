@@ -199,6 +199,13 @@ export default function main () {
       updateSelectionStyles();
       dispatchMultiSelection();
     };
+
+    document.addEventListener("reset-month-weeks", () => {
+    selectedCells.clear();
+    updateSelectionStyles();
+});
+    
+
     /* -------------------- HEATMAP -------------------- */
 
     svg.selectAll("rect")

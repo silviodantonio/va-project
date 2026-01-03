@@ -196,7 +196,14 @@ export default function main () {
 
       updateSelectionStyles();
       dispatchMultiSelection();
+      
     };
+
+    document.addEventListener("reset-week-hours", () => {
+    selectedCells.clear();
+    updateSelectionStyles();
+});
+
 
     /* -------------------- HEATMAP -------------------- */
 
