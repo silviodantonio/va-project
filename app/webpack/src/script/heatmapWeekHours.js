@@ -204,6 +204,21 @@ export default function main () {
     updateSelectionStyles();
 });
 
+  d3.select("#heatmap-week-hours").on("click", (event) => {
+    // check if click target is NOT a heatmap cell
+    if (!event.target.classList.contains("heatmap-cell-WeekHours")) {
+      // reset selection
+      selectedCells.clear();
+      updateSelectionStyles();
+
+      // notify PCA / other components
+      document.dispatchEvent(
+        new CustomEvent("heatmap_weeks-hours_multi-select", {
+          detail: { cells: [], days: [], hours: [] }
+        })
+      );
+    }
+  });
 
     /* -------------------- HEATMAP -------------------- */
 

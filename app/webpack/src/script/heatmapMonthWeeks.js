@@ -204,7 +204,25 @@ export default function main () {
     selectedCells.clear();
     updateSelectionStyles();
 });
-    
+
+    /* -------------------- RESET WHEN CLICKING OUTSIDE HEATMAP -------------------- */
+
+  // 2) Listen for clicks on the container, but ignore clicks on cells
+  d3.select("#heatmap-month-week").on("click", (event) => {
+    // check if click target is NOT a heatmap cell
+    if (!event.target.classList.contains("heatmap-cell-MonthWeeks")) {
+      // reset selection
+      selectedCells.clear();
+      updateSelectionStyles();
+
+      // notify PCA / other components
+      document.dispatchEvent(
+        new CustomEvent("heatmap_month-weeks_multi-select", {
+          detail: { cells: [], months: [], week_days: [] }
+        })
+      );
+    }
+  });
 
     /* -------------------- HEATMAP -------------------- */
 
