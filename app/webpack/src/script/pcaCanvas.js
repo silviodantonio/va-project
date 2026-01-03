@@ -26,7 +26,7 @@ function drawBaseCanvas(ctx, data, coloringAttribute) {
         ctx.fill();
     }
 
-    console.log('New canvas drawn')
+    console.log('New canvas drawn');
 }
 
 
@@ -197,13 +197,13 @@ document.addEventListener('region-click', function(event) {
     const regionIndex = REGION_LIST.indexOf(regionName) + 1; // +1 because your region codes start at 1
 
     // reset della selezione della regione cliccata
-    ctx.clearRect(0, 0, width, height)
+    ctx.clearRect(0, 0, width, height);
 
     // Draw all points
     for (const d of data) {
 
         if (+d.region !== regionIndex){
-            ctx.fillStyle = catColors[d.accident_type];
+            ctx.fillStyle = catColors[d[coloringAttribute]];
             ctx.globalAlpha = 0.7;
             drawCircle(ctx, d.x, d.y, 3);
         }
@@ -236,7 +236,7 @@ document.addEventListener("heatmap_month-weeks_multi-select", function(event) {
 
     // Draw all points normally
     for (const d of data) {
-        ctx.fillStyle = catColors[d.accident_type];
+        ctx.fillStyle = catColors[d[coloringAttribute]];
         ctx.globalAlpha = 0.7;
         drawCircle(ctx, d.x, d.y, 3);
     }
@@ -275,7 +275,7 @@ document.addEventListener('heatmap_week-hours_multi-select', function(event) {
 
     // Draw all points normally
     for (const d of data) {
-        ctx.fillStyle = catColors[d.accident_type];
+        ctx.fillStyle = catColors[d[coloringAttribute]];
         ctx.globalAlpha = 0.7;
         drawCircle(ctx, d.x, d.y, 3);
     }

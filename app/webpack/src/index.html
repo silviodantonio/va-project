@@ -31,13 +31,17 @@
                     <!-- ROW 2: PCA + extra -->
                     <div class="row g-2 mt-2">
                         <div class="col-8">
-                            <div class="viz-area" id="pca-container"></div>
-                            <label for="cars">Color according to</label>
-                            <select name="attribute" id="colorSelector">
-                                <option value="deadly">Deadliness</option>
-                                <option value="accident_type">Accident type</option>
-                                <option value="intersection">Road section</option>
-                            </select> 
+                            <div class="viz-area d-flex flex-column">
+                                <div class="p-3" id="selector-container">
+                                    <label for="colorSelector">Color according to</label>
+                                    <select name="attribute" id="colorSelector">
+                                        <option value="deadly">Deadliness</option>
+                                        <option value="accident_type">Accident type</option>
+                                        <option value="intersection">Road section</option>
+                                    </select>
+                                </div>
+                                <div id="pca-container"></div>
+                            </div>
                         </div>
                         <div class="col-4">
                             <div class="viz-area" id="extra-chart"></div>
@@ -46,10 +50,10 @@
 
                 </div>
                 <!-- RIGHT: MAP + HEATMAP -->
-                <div class="col-3 h-100">
+                <div class="col-3">
                     <div class="d-flex flex-column h-100">
-                        <div class="viz-area" id="heatmap-month-week" style="flex: 1 1 0;"></div>
-                        <div class="viz-area flex-fill" id="map-container" style="flex: 2 1 0;"></div>
+                        <div class="viz-area-heatmap" id="heatmap-month-week" style="flex: 1 1 0;"></div>
+                        <div class="viz-area mt-3" id="map-container" style="flex: 2 1 0;"></div>
                     </div>
                 </div>
 

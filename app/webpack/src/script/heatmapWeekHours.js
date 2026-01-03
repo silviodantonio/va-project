@@ -2,9 +2,9 @@ import * as d3 from 'd3';
 import {WEEK_DAY_LIST,WEEK_DAY_DICTIONARY,HOUR_LIST} from './constants.js';
 
 export default function main () {
-  const margin = { top: 35, right: 45, bottom: 15, left: 65 },
+  const margin = { top: 35, right: 45, bottom: 15, left: 55 },
         width = 350 - margin.left - margin.right,
-        height = 390 - margin.top - margin.bottom;
+        height = 350 - margin.top - margin.bottom;
 
   const svg = d3.select("#heatmap-week-hours")
     .append("svg")

@@ -43,11 +43,11 @@ export default function main() {
         const regions = topojson.feature(it, it.objects.regions);
 
         // Use container dimensions instead of fixed values
-        const legendBlockHeight = 90;
+        const legendBlockHeight = 70;
         const width = containerWidth;
         const height = containerHeight - legendBlockHeight;
         const mapCenter = [width / 2, height / 2];
-        const legendFontSize = width / 20; // adjust divisor to taste
+        const legendFontSize = width / 25; // adjust divisor to taste
 
         const mapPadding = 20; // safe buffer
         const projection = d3.geoMercator()
@@ -57,10 +57,11 @@ export default function main() {
 
         // Create SVG that fills the container
         const svg = d3.create("svg")
-            .attr("viewBox", `0 0 ${width} ${height + legendBlockHeight}`)
+            .attr("viewBox", `0 0 ${width} ${height + legendBlockHeight - 25}`)
             .attr("preserveAspectRatio", "xMidYMid meet")
             .style("width", "100%")
-            .style("height", "auto");
+            .style("height", "auto")
+            .style("overflow", "visible");
 
         const legendLayer = svg.append("g");
         const mapLayer = svg.append("g")
@@ -72,6 +73,7 @@ export default function main() {
             .attr("fill", "none")
             .attr("stroke", "black")
             .attr("stroke-width", 1)
+            .attr("pointer-events", "none")
             .attr("d", path);
 
         /* ------------------ LEGEND ------------------ */
@@ -86,7 +88,7 @@ export default function main() {
         color.range().forEach((c, i) => {
             legendG.append("rect")
                 .attr("x", i * boxWidth)
-                .attr("y", 0)
+                .attr("y", 10)
                 .attr("width", boxWidth)
                 .attr("height", legendHeight)
                 .attr("stroke", "black")
@@ -100,7 +102,7 @@ export default function main() {
         tickValues.forEach((t, i) => {
             legendG.append("text")
                 .attr("x", i * boxWidth)
-                .attr("y", legendHeight + legendFontSize)
+                .attr("y", legendHeight + legendFontSize + 10)
                 .attr("text-anchor", "middle")
                 .attr("font-size", legendFontSize * 0.8)
                 .text(d3.format(".2s")(t));
@@ -117,6 +119,8 @@ export default function main() {
         /* ------------------ MAP LAYERS ------------------ */
         const baseG = mapLayer.append("g")
             .attr("class", "base")
+        
+        const clippedG = baseG.append("g")
             .attr("clip-path", "url(#map-clip)");
 
         const hoverOverlay = mapLayer.append("g")
@@ -144,7 +148,29 @@ export default function main() {
             .attr("height", height);
 
         /* ------------------ REGIONS ------------------ */
-        baseG.selectAll("path")
+
+        mapLayer.insert("rect", ":first-child")
+            .attr("width", width)
+            .attr("height", height)
+            .attr("fill", "transparent")   // invisible but captures clicks
+            .on("click", function() {
+                // Clear selection
+                clippedG.selectAll("path")
+                    .classed("clicked-region", false)
+                    .transition().duration(100)
+                    .attr("transform", "translate(0,0)")
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1);
+
+                // Notify deselection
+                document.dispatchEvent(
+                    new CustomEvent("region-click", {
+                        detail: { regionName: null }
+                    })
+                );
+        });
+
+        clippedG.selectAll("path")
             .data(regions.features)
             .join("path")
             .attr("fill", d => {
@@ -220,24 +246,53 @@ export default function main() {
 
                 hoverOverlay.style("visibility", "visible");
             })
-            .on("mouseleave", function() {
-                d3.select(this)
-                    .transition().duration(100)
-                    .attr("transform","translate(0,0)")
+            .on("mouseleave", function () {
+                const sel = d3.select(this);
+
+                // If this region is selected, only reset transform
+                if (sel.classed("clicked-region")) {
+                    sel.transition().duration(100)
+                    .attr("transform", "translate(0,0)");
+                } else {
+                    // Reset hover styling for non-selected regions
+                    sel.transition().duration(100)
+                    .attr("transform", "translate(0,0)")
                     .attr("stroke", "black")
                     .attr("stroke-width", 1);
+                }
+
+                // Re-raise the selected region (if any)
+                const selected = clippedG.select("path.clicked-region");
+                if (!selected.empty()) {
+                    selected.raise();
+                }
 
                 hoverOverlay.style("visibility", "hidden");
             })
-            .on("click", function(event, d) {
-            // Dispatch a custom event with the region name
-            const regionClickEvent = new CustomEvent('region-click', { 
-                detail: { regionName: d.properties.reg_name }
-            });
+            .on("click", function (event, d) {
+                event.stopPropagation();
 
-            console.log(d.properties.reg_name);
-            document.dispatchEvent(regionClickEvent);
-        });
+                // Reset all regions
+                clippedG.selectAll("path")
+                    .classed("clicked-region", false)
+                    .transition().duration(100)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1);
+
+                // Mark this region as selected
+                d3.select(this)
+                    .classed("clicked-region", true)
+                    .raise()
+                    .transition().duration(100)
+                    .attr("stroke", "LightSalmon")
+                    .attr("stroke-width", 3);
+
+                // Dispatch event
+                const regionClickEvent = new CustomEvent("region-click", {
+                    detail: { regionName: d.properties.reg_name }
+                });
+                document.dispatchEvent(regionClickEvent);
+            });
 
         container.append(svg.node());
     })
