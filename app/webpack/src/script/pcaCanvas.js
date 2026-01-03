@@ -132,7 +132,7 @@ async function main() {
         coloringAttribute = e.target.value;
 
         // Clear previous brushing selection
-        svg.call(brush.move, null);
+        svg.select('.brush').call(brush.move, null);
 
         // Clear canvas
         ctx.clearRect(0, 0, width, height);
@@ -181,7 +181,7 @@ async function main() {
         }
     });
 
-    svg.call(brush);
+    svg.append('g').attr("class", "brush").call(brush);
 
 
 /* ============================
