@@ -32,6 +32,12 @@
                     <div class="row g-2 mt-2">
                         <div class="col-8">
                             <div class="viz-area" id="pca-container"></div>
+                            <label for="cars">Color according to</label>
+                            <select name="attribute" id="colorSelector">
+                                <option value="deadly">Deadliness</option>
+                                <option value="accident_type">Accident type</option>
+                                <option value="intersection">Road section</option>
+                            </select> 
                         </div>
                         <div class="col-4">
                             <div class="viz-area" id="extra-chart"></div>
@@ -39,7 +45,6 @@
                     </div>
 
                 </div>
-
                 <!-- RIGHT: MAP + HEATMAP -->
                 <div class="col-3 h-100">
                     <div class="d-flex flex-column h-100">
