@@ -2,6 +2,8 @@ import * as d3 from "d3";
 import {REGION_LIST, WEEK_DAY_LIST, MONTH_LIST,HOUR_LIST} from './constants.js';
 import {catColors, catColorsDesat} from "./helpers.js";
 
+const seqColors = d3.schemePuBu[9];
+
 /* ===========================
    Canvas helper
 ============================ */
@@ -29,6 +31,97 @@ function drawBaseCanvas(ctx, data, coloringAttribute) {
     console.log('New canvas drawn');
 }
 
+function drawDensityScatter(ctx, data, quantizeX, quantizeY) {
+
+    // Initialize density matrix
+    let densityMatrix = [];
+    for (let i = 0; i < quantizeX; i++) {
+        let yRow = new Array(quantizeY).fill(0)
+        densityMatrix.push(yRow);
+    }
+
+    let [xMin, xMax] = d3.extent(data, d => d.x_pca);
+    let [yMin, yMax] = d3.extent(data, d => d.y_pca);
+
+    // Solves an issue with the index assigned to the element with Max.
+    // Probably there's a more elegant way of doing that but I 
+    // couldn't come up with one
+    const eps = 0.1;
+    xMax += eps;
+    yMax += eps;
+
+    const binSizeX = (xMax - xMin) / quantizeX;
+    const binSizeY = (yMax - yMin) / quantizeY;
+
+    let xBin = 0;
+    // Count the number of elements per X band.
+    // Assume data is sorted over x_pca in ascending order.
+    for (const d of data) {
+        // Compute y position of current point
+        let yBin = Math.floor((d.y_pca - yMin) / binSizeY);
+
+        // If x_pca is still in the current xBin
+        if (d.x_pca < xMin + (xBin+1) * binSizeX ) {
+            // Update counter for yBin
+            densityMatrix[xBin][yBin]++;
+        }
+        else {
+            // Go to next xBin
+            xBin++;
+            densityMatrix[xBin][yBin]++
+        }
+    }
+
+    for (let i = 0; i < densityMatrix.length; i++) {
+        console.log(densityMatrix[i]);
+    }
+
+    // color scale for drawing points
+    const color = d3.scaleSequential(d3.interpolatePuBu);
+
+    // Compute color matrix
+    let maxDensity = 0;
+    densityMatrix.forEach(d => {
+        let dataMax = Math.max(...d);
+        if (dataMax > maxDensity) {
+            maxDensity = dataMax;
+        }
+    });
+
+    console.log(maxDensity);
+    let normalizingFactor = 1 / maxDensity;
+    console.log(`Normalizing factor: ${normalizingFactor}`);
+
+    let colorMatrix = Array.from(densityMatrix)
+    colorMatrix = colorMatrix.map(row => row.map(d => color(d * normalizingFactor)));
+
+    for (let i = 0; i < colorMatrix.length; i++) {
+        console.log(colorMatrix[i]);
+    }
+
+    // Draw scatterplot with points colored according to density
+
+    xBin = 0;
+    for (const d of data) {
+        // Compute y position of current point
+        let yBin = Math.floor((d.y_pca - yMin) / binSizeY);
+
+        // If x_pca is still in the current xBin
+        if (d.x_pca < xMin + (xBin+1) * binSizeX ) {
+            ctx.fillStyle = colorMatrix[xBin][yBin];
+        }
+        else {
+            // Go to next xBin
+            xBin++;
+            ctx.fillStyle = densityMatrix[xBin][yBin];
+        }
+
+        drawCircle(ctx, d.x, d.y, 3);
+        ctx.fill();
+    }
+
+}
+
 
 /* ============================
    Main
@@ -49,7 +142,7 @@ async function main() {
     };
 
     // Load data
-    const data = await d3.csv(
+    let data = await d3.csv(
         "http://127.0.0.1:7000/accidents_region_pca.csv",
         d => ({
             ...d,
@@ -77,6 +170,13 @@ async function main() {
         d.x = x(d.x_pca);
         d.y = y(d.y_pca);
     });
+
+    // Sort data, required for drawing scatterplot using density map
+    data = d3.sort(data, (d) => d.x_pca);
+    for (let i = 0; i <= 10; i++) {
+        console.log(`${data[i].x_pca}`)
+    }
+
 
     /* ============================
        SVG layer (axes only)
@@ -119,12 +219,13 @@ async function main() {
     canvas.style.zIndex = -1;
 
     ctx.scale(dpr, dpr);
-    ctx.globalAlpha = 0.7;
+    ctx.globalAlpha = 0.05;
     
     // Draw PCA for the first time
     const coloringSelector = document.querySelector('#colorSelector');
     let coloringAttribute = coloringSelector.value;
-    drawBaseCanvas(ctx, data, coloringAttribute);
+    // drawBaseCanvas(ctx, data, coloringAttribute);
+    drawDensityScatter(ctx, data, 200, 140);
 
     // Event listener for recoloring when changing selected attribute
     coloringSelector.addEventListener('change', (e) => {
