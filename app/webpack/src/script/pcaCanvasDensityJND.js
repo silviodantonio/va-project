@@ -281,7 +281,7 @@ async function main() {
             ctx.clearRect(0, 0, width, height);
             
             if (coloringAttribute === "density") {
-                drawDensityScatter(ctx, drawOrder, colorMatrix);
+                drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
             } else {
                 drawBaseCanvas(ctx, data, coloringAttribute);
             }
