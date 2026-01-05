@@ -40,3 +40,13 @@ export const HOUR_LIST = [
     ];
 
 export const DEADLY_LIST = ["Injured", "Dead"];
+
+export const labels = {
+    region: REGION_LIST,
+    intersection: INTERSECTION_LIST,
+    accident_type: ACCIDENT_TYPE_LIST,
+    week_day: WEEK_DAY_LIST,
+    month: MONTH_LIST,
+    hour: HOUR_LIST,
+    deadly: DEADLY_LIST,
+}

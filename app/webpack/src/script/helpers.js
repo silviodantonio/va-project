@@ -115,3 +115,41 @@ function desatAndLightenSeq(color, desaturate, lighten) {
 // build array of Desaturated colors
 export const catColorsDesat = catColors.map((color) => desatAndLighten(color, 0.3, 0.7));
 export const seqColorsDesat = seqColors.map((color) => desatAndLightenSeq(color, 0.3, 0.7));
+
+export function drawLegends(svg, xPos, yPos, labels, colorScale) {
+
+    console.log(`Add labels for: ${labels}`)
+    const circleRadius = 5;
+
+    svg.selectAll(".legendDot")
+        .data(labels)
+        .join(
+            enter => enter
+                .append("circle")
+                .attr("cx", xPos)
+                .attr("cy", (_ , i) => yPos + i*20)
+                .attr("r", circleRadius)
+                .style("fill", (_, i) => colorScale(i))
+                .attr("class", "legendDot"),
+            update => update
+                .style("fill", (_, i) => colorScale(i)),
+            exit => exit.remove(),
+        );
+
+    svg.selectAll(".legendLabel")
+        .data(labels)
+        .join(
+            enter => enter
+                .append("text")
+                .attr("x", xPos + circleRadius + 8)
+                .attr("y", (_, i) => yPos + i*20 + circleRadius)
+                .style("fill", "black")
+                .text(d => d)
+                .attr("text-anchor", "left")
+                .style("alignment-baseline", "center")
+                .attr("class", "legendLabel"),
+            update => update
+                .text(d => d),
+            exit => exit.remove(),
+        )
+}

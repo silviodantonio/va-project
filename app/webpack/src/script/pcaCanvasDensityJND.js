@@ -1,6 +1,6 @@
 import * as d3 from "d3";
-import {REGION_LIST, WEEK_DAY_LIST, MONTH_LIST,HOUR_LIST} from './constants.js';
-import {catColors, catColorsDesat, seqColors, seqColorsDesat} from "./helpers.js";
+import {labels, REGION_LIST, WEEK_DAY_LIST, MONTH_LIST,HOUR_LIST, DEADLY_LIST} from './constants.js';
+import {drawLegends, catColors, catColorsDesat, seqColors, seqColorsDesat} from "./helpers.js";
 import { updateSelection } from "./selectionStore.js";
 
 /* ===========================
@@ -158,6 +158,9 @@ async function main() {
         d.y = y(d.y_pca);
     });
 
+    const { colorMatrix } = initializeDensityScatter(data, 600, 420);
+    const dataSortedByDensity = d3.sort(data, d => d.density);
+
     /* ============================
        SVG layer (axes only)
     ============================ */
@@ -202,13 +205,20 @@ async function main() {
     ctx.globalAlpha = 0.7;
     
     // Draw PCA for the first time
+
+    function colorScale(i) {
+        return catColors[i]
+    }
+    
     const coloringSelector = document.querySelector('#colorSelector');
     let coloringAttribute = coloringSelector.value;
-    // drawBaseCanvas(ctx, data, coloringAttribute);
-    const { colorMatrix } = initializeDensityScatter(data, 600, 420);
-    // draw from low density → high density
-    const dataSortedByDensity = d3.sort(data, d => d.density);
-    drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
+    if (coloringAttribute === 'density') {
+        drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
+    }
+    else {
+        drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], colorScale)
+        drawBaseCanvas(ctx, data, coloringAttribute);
+    }
 
     // Event listener for recoloring when changing selected attribute
     coloringSelector.addEventListener('change', (e) => {
@@ -228,6 +238,7 @@ async function main() {
             const dataSortedByDensity = d3.sort(data, (a, b) => a.density - b.density);
             drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
         } else {
+            drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], colorScale)
             drawBaseCanvas(ctx, data, coloringAttribute);
         }
     })
