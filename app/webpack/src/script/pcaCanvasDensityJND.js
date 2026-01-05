@@ -53,12 +53,7 @@ function initializeDensityScatter(data, quantizeX, quantizeY) {
         const xBin = Math.floor((d.x_pca - xMin) / binSizeX);
         const yBin = Math.floor((d.y_pca - yMin) / binSizeY);
 
-        if (
-            xBin >= 0 && xBin < quantizeX &&
-            yBin >= 0 && yBin < quantizeY
-        ) {
-            densityMatrix[xBin][yBin]++;
-        }
+        densityMatrix[xBin][yBin]++;
     }
 
     /* -------------------------
@@ -68,11 +63,7 @@ function initializeDensityScatter(data, quantizeX, quantizeY) {
         d.xBin = Math.floor((d.x_pca - xMin) / binSizeX);
         d.yBin = Math.floor((d.y_pca - yMin) / binSizeY);
 
-        d.density =
-            d.xBin >= 0 && d.xBin < quantizeX &&
-            d.yBin >= 0 && d.yBin < quantizeY
-                ? densityMatrix[d.xBin][d.yBin]
-                : 0;
+        d.density = densityMatrix[d.xBin][d.yBin];
     }
 
     /* -------------------------
@@ -109,15 +100,10 @@ function drawDensityScatter(ctx, data, colorMatrix, desaturated = false) {
     const palette = desaturated ? seqColorsDesat : seqColors;
 
     for (const d of data) {
-        if (
-            d.xBin >= 0 && d.xBin < colorMatrix.length &&
-            d.yBin >= 0 && d.yBin < colorMatrix[0].length
-        ) {
             const cls = colorMatrix[d.xBin][d.yBin];
             ctx.fillStyle = palette[cls];
             drawCircle(ctx, d.x, d.y, 3);
             ctx.fill();
-        }
     }
 }
 
@@ -170,13 +156,6 @@ async function main() {
         d.y = y(d.y_pca);
     });
 
-    // Sort data, required for drawing scatterplot using density map
-    // data = d3.sort(data, (d) => d.x_pca);
-    // for (let i = 0; i <= 10; i++) {
-    //     console.log(`${data[i].x_pca}`)
-    // }
-
-
     /* ============================
        SVG layer (axes only)
     ============================ */
@@ -226,8 +205,8 @@ async function main() {
     // drawBaseCanvas(ctx, data, coloringAttribute);
     const { colorMatrix } = initializeDensityScatter(data, 600, 420);
     // draw from low density → high density
-    const drawOrder = d3.sort(data, (a, b) => a.density - b.density);
-    drawDensityScatter(ctx, drawOrder, colorMatrix);
+    const dataSortedByDensity = d3.sort(data, d => d.density);
+    drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
 
     // Event listener for recoloring when changing selected attribute
     coloringSelector.addEventListener('change', (e) => {
@@ -244,8 +223,8 @@ async function main() {
         console.log(`Recoloring using ${coloringAttribute}`);
 
         if (coloringAttribute == "density") {
-            const drawOrder = d3.sort(data, (a, b) => a.density - b.density);
-            drawDensityScatter(ctx, drawOrder, colorMatrix);
+            const dataSortedByDensity = d3.sort(data, (a, b) => a.density - b.density);
+            drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
         } else {
             drawBaseCanvas(ctx, data, coloringAttribute);
         }
