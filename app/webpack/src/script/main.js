@@ -19,7 +19,7 @@ mainCoordinated();
 // import pca from './pca.js';
 // pca();
 
-import pcaCanvas from './pcaCanvas.js'
+import pcaCanvas from './pcaCanvasDensityJND.js'
 pcaCanvas();
 
 import mainHeatmap from './heatmapMonthWeeks.js';

@@ -1,3 +1,5 @@
+import * as d3 from "d3";
+
 function desatAndLighten(hexColor, desaturate, lighten) {
   
   // Remove the hash if present
@@ -92,5 +94,24 @@ export const catColors = [
     '#999999'
 ];
 
+const n = 50;
+export const seqColors = Array.from({ length: n }, (_, i) => 
+  // d3.interpolateCividis(i / (n - 1))
+  // d3.interpolatePuBu(i / (n - 1))
+  // d3.interpolateBlues(i / (n - 1))
+  d3.interpolateInferno(i / (n - 1))
+  // d3.interpolateViridis(i / (n - 1))
+);
+
+function desatAndLightenSeq(color, desaturate, lighten) {
+  const hcl = d3.hcl(color);
+  hcl.c *= desaturate;
+  // hcl.l += (100 - hcl.l) * lighten;
+  const adjustedLight = hcl.l + (100 - hcl.l) * lighten * (1 - hcl.l / 100);
+  hcl.l = Math.min(100, adjustedLight);
+  return hcl.formatHex();
+}
+
 // build array of Desaturated colors
 export const catColorsDesat = catColors.map((color) => desatAndLighten(color, 0.3, 0.7));
+export const seqColorsDesat = seqColors.map((color) => desatAndLightenSeq(color, 0.3, 0.7));
