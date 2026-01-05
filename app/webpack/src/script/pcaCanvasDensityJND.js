@@ -1,113 +1,15 @@
 import * as d3 from "d3";
 import {labels, REGION_LIST, WEEK_DAY_LIST, MONTH_LIST,HOUR_LIST, DEADLY_LIST} from './constants.js';
-import {drawLegends, catColors, catColorsDesat, seqColors, seqColorsDesat} from "./helpers.js";
 import { updateSelection } from "./selectionStore.js";
-
-/* ===========================
-   Canvas helper
-============================ */
-
-function drawCircle(ctx, x, y, r) {
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
-}
-
-/**
- * Draws a scatterplot on the specified canvas context using the given data.
- * Uses different colors for every value in coloringAttribute.
- * Requires data to have an attribute named `x` and `y`.
- **/
-function drawBaseCanvas(ctx, data, coloringAttribute) {
-
-    // Draw new content
-    for (const d of data) {
-        ctx.fillStyle = catColors[d[coloringAttribute]];
-        drawCircle(ctx, d.x, d.y, 3);
-        ctx.fill();
-    }
-
-    console.log('New canvas drawn');
-}
-
-function initializeDensityScatter(data, quantizeX, quantizeY) {
-
-    const densityMatrix = Array.from(
-        { length: quantizeX },
-        () => new Array(quantizeY).fill(0)
-    );
-
-    let [xMin, xMax] = d3.extent(data, d => d.x_pca);
-    let [yMin, yMax] = d3.extent(data, d => d.y_pca);
-
-    const eps = 1e-9;
-    xMax += eps;
-    yMax += eps;
-
-    const binSizeX = (xMax - xMin) / quantizeX;
-    const binSizeY = (yMax - yMin) / quantizeY;
-
-    /* -------------------------
-       Build density matrix
-    ------------------------- */
-    for (const d of data) {
-        const xBin = Math.floor((d.x_pca - xMin) / binSizeX);
-        const yBin = Math.floor((d.y_pca - yMin) / binSizeY);
-
-        densityMatrix[xBin][yBin]++;
-    }
-
-    /* -------------------------
-       Annotate points
-    ------------------------- */
-    for (const d of data) {
-        d.xBin = Math.floor((d.x_pca - xMin) / binSizeX);
-        d.yBin = Math.floor((d.y_pca - yMin) / binSizeY);
-
-        d.density = densityMatrix[d.xBin][d.yBin];
-    }
-
-    /* -------------------------
-       Color matrix
-    ------------------------- */
-    const maxDensity = d3.max(densityMatrix.flat());
-
-    const densityToClass = d3.scaleQuantize()
-        .domain([0, maxDensity])
-        .range(d3.range(seqColors.length));
-
-    const colorMatrix = densityMatrix.map(row =>
-        row.map(d => densityToClass(d))
-    );
-
-    /* -------------------------
-       Return everything needed
-    ------------------------- */
-    return {
-        colorMatrix,
-        binning: {
-            xMin,
-            yMin,
-            binSizeX,
-            binSizeY,
-            quantizeX,
-            quantizeY
-        }
-    };
-}
-
-function drawDensityScatter(ctx, data, colorMatrix, desaturated = false) {
-
-    const palette = desaturated ? seqColorsDesat : seqColors;
-
-    for (const d of data) {
-            const cls = colorMatrix[d.xBin][d.yBin];
-            ctx.fillStyle = palette[cls];
-            drawCircle(ctx, d.x, d.y, 3);
-            ctx.fill();
-    }
-}
-
+import {
+    initializeDensityScatter,
+    drawLegends, 
+    drawBaseCanvas,
+    drawCircle,
+    drawDensityScatter,
+    catColors, catColorsDesat, 
+    seqColors, seqColorsDesat
+} from "./pcaHelpers.js";
 
 /* ============================
    Main
@@ -135,6 +37,10 @@ async function main() {
             id: i,           // <-- generate unique ID based on row index
             x_pca: +d.x_pca,
             y_pca: +d.y_pca,
+            intersection: +d.intersection - 1,
+            accident_type: +d.accident_type - 1,
+            deadly: +d.deadly,
+            week_day: +d.week_day - 1,
         })
     );
 
