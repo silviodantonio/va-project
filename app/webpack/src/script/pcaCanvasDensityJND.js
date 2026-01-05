@@ -112,17 +112,13 @@ async function main() {
     
     // Draw PCA for the first time
 
-    function colorScale(i) {
-        return catColors[i]
-    }
-    
     const coloringSelector = document.querySelector('#colorSelector');
     let coloringAttribute = coloringSelector.value;
     if (coloringAttribute === 'density') {
         drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
     }
     else {
-        drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], colorScale)
+        drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
         drawBaseCanvas(ctx, data, coloringAttribute);
     }
 
@@ -141,10 +137,10 @@ async function main() {
         console.log(`Recoloring using ${coloringAttribute}`);
 
         if (coloringAttribute == "density") {
-            const dataSortedByDensity = d3.sort(data, (a, b) => a.density - b.density);
+            const dataSortedByDensity = d3.sort(data, d => d.density);
             drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
         } else {
-            drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], colorScale)
+            drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
             drawBaseCanvas(ctx, data, coloringAttribute);
         }
     })
@@ -215,14 +211,14 @@ async function main() {
                     const cls = colorMatrix[d.xBin][d.yBin];
                     ctx.fillStyle = seqColorsDesat[cls];
                 } else {
-                    ctx.fillStyle = catColorsDesat[d[coloringAttribute]];
+                    ctx.fillStyle = catColorsDesat(d[coloringAttribute]);
                 }
             } else {
                 if (coloringAttribute === "density") {
                     const cls = colorMatrix[d.xBin][d.yBin];
                     ctx.fillStyle = seqColors[cls];
                 } else {
-                    ctx.fillStyle = catColors[d[coloringAttribute]];
+                    ctx.fillStyle = catColors(d[coloringAttribute]);
                 }
             }
 
