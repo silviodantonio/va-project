@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import {REGION_LIST, WEEK_DAY_LIST, MONTH_LIST,HOUR_LIST} from './constants.js';
 import {catColors, catColorsDesat, seqColors, seqColorsDesat} from "./helpers.js";
+import { updateSelection } from "./selectionStore.js";
 
 /* ===========================
    Canvas helper
@@ -129,8 +130,9 @@ async function main() {
     // Load data
     let data = await d3.csv(
         "http://127.0.0.1:7000/accidents_region_pca.csv",
-        d => ({
+        (d, i) => ({
             ...d,
+            id: i,           // <-- generate unique ID based on row index
             x_pca: +d.x_pca,
             y_pca: +d.y_pca,
         })
@@ -237,49 +239,39 @@ async function main() {
 
     const brush = d3.brush()
     .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
-    .on("start brush end", ({selection}) => {
+    .on("start brush end", (event) => {
+        const { selection, type } = event;
 
-        // If something is selected
+        // ---------- LIVE BRUSHING (fast visual feedback only)
         if (selection) {
-
-            // Clear canvas
-            ctx.clearRect(0, 0, width, height);
-
-            // Extract selection coordinates
-            const [[x0, y0], [x1, y1]] = selection;
-            const drawOrder = (coloringAttribute == "density")
-            ? d3.sort(data, (a, b) => a.density - b.density)
-            : data;
-
-            for (const d of drawOrder) {
-                const isSelected =
-                    d.x > x0 && d.x < x1 &&
-                    d.y > y0 && d.y < y1;
-
-                if(!isSelected) {
-                    // Color points outside selection with desaturated colors
-                    if (coloringAttribute == "density") {
-                        const cls = colorMatrix[d.xBin][d.yBin];
-                        ctx.fillStyle = seqColorsDesat[cls];
-                    } else {
-                        ctx.fillStyle = catColorsDesat[d[coloringAttribute]];
-                    }
-                    drawCircle(ctx, d.x, d.y, 3);
-                } else  {
-                    // Color points inside selection with standard colors
-                    if (coloringAttribute == "density") {
-                        const cls = colorMatrix[d.xBin][d.yBin];
-                        ctx.fillStyle = seqColors[cls];
-                    } else {
-                        ctx.fillStyle = catColors[d[coloringAttribute]];
-                    }
-                    drawCircle(ctx, d.x, d.y, 3);
-                }
-            }
+            drawBrushFeedback(selection);
+            // return;
         }
-        else {
+
+        // ---------- BRUSH END (compute + broadcast once)
+        if (type === "brush" || type === "end") {
+            let brushedData = null;
+            let selectedIds = null;
+
+            if (selection) {
+                const [[x0, y0], [x1, y1]] = selection;
+
+                brushedData = data.filter(d =>
+                    d.x > x0 && d.x < x1 &&
+                    d.y > y0 && d.y < y1
+                );
+
+                selectedIds = new Set(brushedData.map(d => d.id));
+            }
+
+            updateSelection("pca", selectedIds);
+        }
+
+        // ---------- RESET
+        if (!selection) {
+            updateSelection("pca", null);
+
             ctx.clearRect(0, 0, width, height);
-            
             if (coloringAttribute === "density") {
                 drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
             } else {
@@ -287,6 +279,39 @@ async function main() {
             }
         }
     });
+
+    function drawBrushFeedback([[x0, y0], [x1, y1]]) {
+        ctx.clearRect(0, 0, width, height);
+
+        const drawOrder =
+            coloringAttribute === "density"
+                ? dataSortedByDensity
+                : data;
+
+        for (const d of drawOrder) {
+            const selected =
+                d.x > x0 && d.x < x1 &&
+                d.y > y0 && d.y < y1;
+
+            if (!selected) {
+                if (coloringAttribute === "density") {
+                    const cls = colorMatrix[d.xBin][d.yBin];
+                    ctx.fillStyle = seqColorsDesat[cls];
+                } else {
+                    ctx.fillStyle = catColorsDesat[d[coloringAttribute]];
+                }
+            } else {
+                if (coloringAttribute === "density") {
+                    const cls = colorMatrix[d.xBin][d.yBin];
+                    ctx.fillStyle = seqColors[cls];
+                } else {
+                    ctx.fillStyle = catColors[d[coloringAttribute]];
+                }
+            }
+
+            drawCircle(ctx, d.x, d.y, 3);
+        }
+    }
 
     svg.append('g').attr("class", "brush").call(brush);
 
@@ -308,7 +333,7 @@ document.addEventListener('region-click', function(event) {
 
     // Draw all points
     if (coloringAttribute === "density") {
-        drawDensityScatter(ctx, drawOrder, colorMatrix);
+        drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
     } else {
         drawBaseCanvas(ctx, data, coloringAttribute);
     }
@@ -334,7 +359,7 @@ function redrawPCA() {
     ctx.clearRect(0, 0, width, height);
 
     if (coloringAttribute === "density") {
-        drawDensityScatter(ctx, drawOrder, colorMatrix);
+        drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
     } else {
         drawBaseCanvas(ctx, data, coloringAttribute);
     }
