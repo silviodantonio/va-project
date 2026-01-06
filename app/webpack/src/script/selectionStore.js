@@ -19,9 +19,16 @@ export function updateSelection(source, data) {
 }
 
 export function computeActiveSelection(store) {
-    const sets = Object.values(store).filter(
-        s => s && s.size > 0
-    );
+    const sets = Object.values(store)
+        .map(s => {
+            if (!s) return null;
+            // if s is a Set, keep as is
+            if (s instanceof Set) return s;
+            // if s is an object with ids property, return its Set
+            if (s.ids && s.ids instanceof Set) return s.ids;
+            return null;
+        })
+        .filter(s => s && s.size > 0);
 
     if (sets.length === 0) return null;
 

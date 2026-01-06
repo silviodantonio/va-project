@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import * as topojson from "topojson-client";
 import { REGION_LIST } from './constants.js';
+import { selectionStore, updateSelection, computeActiveSelection } from "./selectionStore.js";
 
 export default function main() {
     const container = document.getElementById('map-container');
@@ -23,23 +24,35 @@ export default function main() {
         const it = itJson;
         const accidents = d3.csvParse(csvText);
 
-        // Rollup sum of accidents per region
-        const valuemap = d3.rollup(
-            accidents,
-            v => d3.sum(v, d => +d.observation),
-            d => REGION_LIST[+d.region - 1]
-        );
+        // assign global sequential id
+        accidents.forEach((d, i) => {
+            d.__id = i;
+        });
 
-        const values = Array.from(valuemap.values()).filter(v => v != null);
-        const maxValue = d3.max(values);
+        // Rollup sum of accidents per region
+        function computeValueMap(data) {
+            return d3.rollup(
+                data,
+                v => d3.sum(v, d => +d.observation),
+                d => REGION_LIST[+d.region - 1]
+            );
+        }
+
+        let activeData = accidents;
+        let valuemap = computeValueMap(activeData);
 
         const nSteps = 9;
-
-        // QUANTIZE scale (linear bins)
-        const color = d3.scaleQuantize()
-            .domain([0, maxValue])
+        let color = d3.scaleQuantize()
             .range(d3.schemeBlues[nSteps]);
 
+        function updateColorScale(valuemap) {
+            const values = Array.from(valuemap.values()).filter(v => v != null);
+            const maxValue = values.length ? d3.max(values) : 0;
+            color.domain([0, maxValue]);
+            return maxValue;
+        }
+
+        let maxValue = updateColorScale(valuemap);
         const regions = topojson.feature(it, it.objects.regions);
 
         // Use container dimensions instead of fixed values
@@ -85,36 +98,41 @@ export default function main() {
             .attr("transform", `translate(${(width - legendWidth)/2}, ${legendHeight*2})`);
 
 
-        color.range().forEach((c, i) => {
-            legendG.append("rect")
-                .attr("x", i * boxWidth)
-                .attr("y", 10)
-                .attr("width", boxWidth)
-                .attr("height", legendHeight)
-                .attr("stroke", "black")
-                .attr("fill", c);
-        });
+        function updateLegend(maxValue) {
+            legendG.selectAll("*").remove();
 
-        // Linear ticks
-        const tickValues = d3.range(nSteps + 1)
-            .map(i => 0 + i * (maxValue - 0) / nSteps);
+            color.range().forEach((c, i) => {
+                legendG.append("rect")
+                    .attr("x", i * boxWidth)
+                    .attr("y", 10)
+                    .attr("width", boxWidth)
+                    .attr("height", legendHeight)
+                    .attr("stroke", "black")
+                    .attr("fill", c);
+            });
 
-        tickValues.forEach((t, i) => {
+            const tickValues = d3.range(nSteps + 1)
+                .map(i => i * maxValue / nSteps);
+
+            tickValues.forEach((t, i) => {
+                legendG.append("text")
+                    .attr("x", i * boxWidth)
+                    .attr("y", legendHeight + legendFontSize + 10)
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", legendFontSize * 0.8)
+                    .text(d3.format(".2s")(t));
+            });
+
             legendG.append("text")
-                .attr("x", i * boxWidth)
-                .attr("y", legendHeight + legendFontSize + 10)
+                .attr("x", legendWidth / 2)
+                .attr("y", -6)
                 .attr("text-anchor", "middle")
-                .attr("font-size", legendFontSize * 0.8)
-                .text(d3.format(".2s")(t));
-        });
+                .attr("font-weight", "bold")
+                .attr("font-size", legendFontSize)
+                .text("Numero di incidenti");
+        }
 
-        legendG.append("text")
-            .attr("x", legendWidth / 2)
-            .attr("y", -6)
-            .attr("text-anchor", "middle")
-            .attr("font-weight", "bold")
-            .attr("font-size", legendFontSize)
-            .text("Numero di incidenti");
+        updateLegend(maxValue);
 
         /* ------------------ MAP LAYERS ------------------ */
         const baseG = mapLayer.append("g")
@@ -154,28 +172,22 @@ export default function main() {
             .attr("height", height)
             .attr("fill", "transparent")   // invisible but captures clicks
             .on("click", function() {
-                // Clear selection
                 clippedG.selectAll("path")
                     .classed("clicked-region", false)
-                    .transition().duration(100)
                     .attr("transform", "translate(0,0)")
                     .attr("stroke", "black")
                     .attr("stroke-width", 1);
 
-                // Notify deselection
-                document.dispatchEvent(
-                    new CustomEvent("region-click", {
-                        detail: { regionName: null }
-                    })
-                );
-        });
+                updateSelection("region", null);
+            });
 
         clippedG.selectAll("path")
             .data(regions.features)
             .join("path")
             .attr("fill", d => {
-                const v = valuemap.get(d.properties.reg_name);
-                return v != null ? color(v) : "#eee";
+                const v = valuemap.get(d.properties.reg_name) ?? 0;
+                return color(v);
+
             })
             .attr("stroke", "black")
             .attr("stroke-width", 1)
@@ -272,30 +284,60 @@ export default function main() {
             .on("click", function (event, d) {
                 event.stopPropagation();
 
-                // Reset all regions
-                clippedG.selectAll("path")
-                    .classed("clicked-region", false)
-                    .transition().duration(100)
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 1);
+                const regionName = d.properties.reg_name;
 
-                // Mark this region as selected
-                d3.select(this)
-                    .classed("clicked-region", true)
-                    .raise()
-                    .transition().duration(100)
-                    .attr("stroke", "LightSalmon")
-                    .attr("stroke-width", 3);
+                const selectedIDs = new Set(
+                    accidents
+                        .filter(a => REGION_LIST[+a.region - 1] === regionName)
+                        .map(a => a.__id)
+                );
 
-                // Dispatch event
-                const regionClickEvent = new CustomEvent("region-click", {
-                    detail: { regionName: d.properties.reg_name }
-                });
-                document.dispatchEvent(regionClickEvent);
+                updateSelection("region", { region: regionName, ids: selectedIDs });
+
+                document.dispatchEvent(new CustomEvent("selection-changed", {
+                    detail: { source: "region", store: selectionStore }
+                }));
+
             });
 
         container.append(svg.node());
+
+        document.addEventListener("selection-changed", () => {
+            if (!clippedG) return; // map not ready yet
+
+            const activeIDs = computeActiveSelection(selectionStore);
+
+            activeData = activeIDs
+                ? accidents.filter(d => activeIDs.has(d.__id))
+                : accidents;
+
+            valuemap = computeValueMap(activeData);
+            const maxValue = updateColorScale(valuemap);
+            updateLegend(maxValue);
+
+            // recolor regions
+            const paths = clippedG.selectAll("path");
+
+            // Recolor with transition
+            paths.transition()
+                .duration(300)
+                .attr("fill", d => {
+                    const v = valuemap.get(d.properties.reg_name) ?? 0;
+                    return color(v);
+                });
+
+            // Update class and stroke immediately (no transition)
+            paths.classed("clicked-region", d =>
+                selectionStore.region?.region === d.properties.reg_name
+            )
+            .attr("stroke", d =>
+                selectionStore.region?.region === d.properties.reg_name ? "LightSalmon" : "black"
+            )
+            .attr("stroke-width", d =>
+                selectionStore.region?.region === d.properties.reg_name ? 3 : 1
+            );
+        });
+
     })
-    
     .catch(err => console.error(err));
 }

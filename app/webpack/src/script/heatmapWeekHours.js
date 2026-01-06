@@ -138,7 +138,7 @@ export default async function main() {
   function computeHeatmapData(sourceData) {
     const valuemap = d3.rollup(
       sourceData,
-      v => v.length,
+      v => d3.sum(v, d => +d.observation),
       d => WEEK_DAY_LIST[+d.week_day - 1],
       d => HOUR_LIST[+d.hour - 1]
     );

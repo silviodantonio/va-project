@@ -87,7 +87,7 @@ function drawHeatmap(rawData, width, height, svg){
   function computeHeatmapData(sourceData) {
     const valuemap = d3.rollup(
       sourceData,
-      v => v.length,
+      v => d3.sum(v, d => +d.observation),
       d => MONTH_LIST[+d.month - 1],
       d => WEEK_DAY_LIST[+d.week_day - 1]
     );
