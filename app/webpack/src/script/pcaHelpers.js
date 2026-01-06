@@ -157,7 +157,6 @@ export function drawCircle(ctx, x, y, r) {
  * Uses different colors for every value in coloringAttribute.
  * Requires data to have an attribute named `x` and `y`.
  **/
-
 export function drawPoints({
     ctx,
     data,
