@@ -139,26 +139,27 @@ export function drawCircle(ctx, x, y, r) {
  * Uses different colors for every value in coloringAttribute.
  * Requires data to have an attribute named `x` and `y`.
  **/
-export function drawBaseCanvas(ctx, data, coloringAttribute) {
-
-    // Draw new content
+export function drawPoints({
+    ctx,
+    data,
+    coloringAttribute,
+    colorMatrix,
+    saturated = true,
+    mode = "categorical" // or "density"
+}) {
     for (const d of data) {
-        ctx.fillStyle = catColors(d[coloringAttribute]);
+        if (mode === "density") {
+            const cls = colorMatrix[d.xBin][d.yBin];
+            ctx.fillStyle = saturated
+                ? seqColors[cls]
+                : seqColorsDesat[cls];
+        } else {
+            ctx.fillStyle = saturated
+                ? catColors(d[coloringAttribute])
+                : catColorsDesat(d[coloringAttribute]);
+        }
+
         drawCircle(ctx, d.x, d.y, 3);
         ctx.fill();
-    }
-
-    console.log('New canvas drawn');
-}
-
-export function drawDensityScatter(ctx, data, colorMatrix, desaturated = false) {
-
-    const palette = desaturated ? seqColorsDesat : seqColors;
-
-    for (const d of data) {
-            const cls = colorMatrix[d.xBin][d.yBin];
-            ctx.fillStyle = palette[cls];
-            drawCircle(ctx, d.x, d.y, 3);
-            ctx.fill();
     }
 }

@@ -1,14 +1,11 @@
 import * as d3 from "d3";
 import {labels, REGION_LIST, WEEK_DAY_LIST, MONTH_LIST,HOUR_LIST, DEADLY_LIST} from './constants.js';
-import { updateSelection } from "./selectionStore.js";
+import { updateSelection, selectionStore, computeActiveSelection } from "./selectionStore.js";
 import {
     initializeDensityScatter,
     drawLegends, 
-    drawBaseCanvas,
-    drawCircle,
-    drawDensityScatter,
-    catColors, catColorsDesat, 
-    seqColors, seqColorsDesat
+    drawPoints,
+    catColors
 } from "./pcaHelpers.js";
 
 /* ============================
@@ -28,6 +25,8 @@ async function main() {
         bottom: 30,
         left: 40
     };
+
+    const POINT_RADIUS = 3;
 
     // Load data
     let data = await d3.csv(
@@ -114,237 +113,158 @@ async function main() {
 
     const coloringSelector = document.querySelector('#colorSelector');
     let coloringAttribute = coloringSelector.value;
-    if (coloringAttribute === 'density') {
-        drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
+    if (coloringAttribute !== "density") {
+        drawLegends(
+            svg,
+            margin.left + 20,
+            margin.top + 20,
+            labels[coloringAttribute],
+            catColors
+        );
     }
-    else {
-        drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
-        drawBaseCanvas(ctx, data, coloringAttribute);
-    }
+    updatePCA(data, null);
 
     // Event listener for recoloring when changing selected attribute
     coloringSelector.addEventListener('change', (e) => {
-        // Get new attribute for coloring new value
         coloringAttribute = e.target.value;
 
-        // Clear previous brushing selection
-        svg.select('.brush').call(brush.move, null);
+        // Remove old legend
+        svg.selectAll(".legend").remove();
 
-        // Clear canvas
-        ctx.clearRect(0, 0, width, height);
-        
-        // Redraw using new colors
-        console.log(`Recoloring using ${coloringAttribute}`);
-
-        if (coloringAttribute == "density") {
-            const dataSortedByDensity = d3.sort(data, d => d.density);
-            drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
+        if (coloringAttribute !== "density") {
+            drawLegends(
+                svg,
+                margin.left + 20,
+                margin.top + 20,
+                labels[coloringAttribute],
+                catColors
+            );
         } else {
-            drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
-            drawBaseCanvas(ctx, data, coloringAttribute);
+            // For now remove the old legend
+            svg.selectAll(".legendDot").remove();
+            svg.selectAll(".legendLabel").remove();
         }
-    })
+
+        svg.select('.brush').call(brush.move, null);
+        updateSelection("pca", null);
+    });
 
 
     /* ============================
     //    Brushing
     // ============================ */
 
-    const brush = d3.brush()
-    .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
-    .on("start brush end", (event) => {
-        const { selection, type } = event;
+   const brush = d3.brush()
+        .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
+        .on("brush end", (event) => {
+            const { selection, type } = event;
 
-        // ---------- LIVE BRUSHING (fast visual feedback only)
-        if (selection) {
-            drawBrushFeedback(selection);
-            // return;
-        }
+            if (type === "start") {
+                // Clear heatmap selection once at the start of brushing
+                for (const key in selectionStore) {
+                    if (key !== "pca") {
+                        selectionStore[key] = null;
+                    }
+                }
+                document.dispatchEvent(new CustomEvent("selection-changed", {
+                    detail: { source: "pca", store: selectionStore }
+                }));
+            }
 
-        // ---------- BRUSH END (compute + broadcast once)
-        if (type === "brush" || type === "end") {
-            let brushedData = null;
             let selectedIds = null;
 
             if (selection) {
                 const [[x0, y0], [x1, y1]] = selection;
 
-                brushedData = data.filter(d =>
-                    d.x > x0 && d.x < x1 &&
-                    d.y > y0 && d.y < y1
+                selectedIds = new Set(
+                    data
+                        .filter(d =>
+                            d.x - POINT_RADIUS >= x0 &&
+                            d.x + POINT_RADIUS <= x1 &&
+                            d.y - POINT_RADIUS >= y0 &&
+                            d.y + POINT_RADIUS <= y1
+                        )
+                        .map(d => d.id)
                 );
-
-                selectedIds = new Set(brushedData.map(d => d.id));
+            }
+            // RESET all other selections
+            for (const key in selectionStore) {
+                if (key !== "pca") {
+                    selectionStore[key] = null;
+                }
             }
 
             updateSelection("pca", selectedIds);
+    });
+
+    function updatePCA(data, selectedIds = null) {
+        ctx.clearRect(0, 0, width, height);
+
+        const hasSelection = selectedIds && selectedIds.size > 0;
+        const mode = coloringAttribute === "density" ? "density" : "categorical";
+
+        const baseOrder =
+            mode === "density" ? dataSortedByDensity : data;
+
+        if (!hasSelection) {
+            drawPoints({
+                ctx,
+                data: baseOrder,
+                coloringAttribute,
+                colorMatrix,
+                saturated: true,
+                mode
+            });
+            return;
         }
 
-        // ---------- RESET
-        if (!selection) {
-            updateSelection("pca", null);
+        // Unselected (bottom)
+        drawPoints({
+            ctx,
+            data: baseOrder.filter(d => !selectedIds.has(d.id)),
+            coloringAttribute,
+            colorMatrix,
+            saturated: false,
+            mode
+        });
 
-            ctx.clearRect(0, 0, width, height);
-            if (coloringAttribute === "density") {
-                drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
-            } else {
-                drawBaseCanvas(ctx, data, coloringAttribute);
-            }
+        // Selected (top)
+        drawPoints({
+            ctx,
+            data: baseOrder.filter(d => selectedIds.has(d.id)),
+            coloringAttribute,
+            colorMatrix,
+            saturated: true,
+            mode
+        });
+    }
+
+    const brushG = svg.append('g').attr("class", "brush").call(brush);
+
+    /* ============================
+        React to selection changes
+    ============================ */
+
+    document.addEventListener("clear-pca-brush", () => {
+        if (selectionStore.pca != null) {
+            selectionStore.pca = null;
+            brushG.call(brush.move, null);
+            updatePCA(data, null);
         }
     });
 
-    function drawBrushFeedback([[x0, y0], [x1, y1]]) {
-        ctx.clearRect(0, 0, width, height);
+    document.addEventListener("selection-changed", (event) => {
+        const { store } = event.detail;
 
-        const drawOrder =
-            coloringAttribute === "density"
-                ? dataSortedByDensity
-                : data;
+        const activeSelection = computeActiveSelection(store);
 
-        for (const d of drawOrder) {
-            const selected =
-                d.x > x0 && d.x < x1 &&
-                d.y > y0 && d.y < y1;
-
-            if (!selected) {
-                if (coloringAttribute === "density") {
-                    const cls = colorMatrix[d.xBin][d.yBin];
-                    ctx.fillStyle = seqColorsDesat[cls];
-                } else {
-                    ctx.fillStyle = catColorsDesat(d[coloringAttribute]);
-                }
-            } else {
-                if (coloringAttribute === "density") {
-                    const cls = colorMatrix[d.xBin][d.yBin];
-                    ctx.fillStyle = seqColors[cls];
-                } else {
-                    ctx.fillStyle = catColors(d[coloringAttribute]);
-                }
-            }
-
-            drawCircle(ctx, d.x, d.y, 3);
-        }
-    }
-
-    svg.append('g').attr("class", "brush").call(brush);
+        updatePCA(data, activeSelection);
+    });
 
 
-/* ============================
-   Map-PCA connection
-============================ */
-
-document.addEventListener('region-click', function(event) {
-    const regionName = event.detail.regionName;
-    console.log("Region clicked:", regionName);
-    
-    // Get the region index from the region name
-    // const region_list = ["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
-    const regionIndex = REGION_LIST.indexOf(regionName) + 1; // +1 because your region codes start at 1
-
-    // reset della selezione della regione cliccata
-    ctx.clearRect(0, 0, width, height);
-
-    // Draw all points
-    if (coloringAttribute === "density") {
-        drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
-    } else {
-        drawBaseCanvas(ctx, data, coloringAttribute);
-    }
-
-    for (const d of data) {
-        if (+d.region === regionIndex){
-            ctx.fillStyle = "orange";
-            ctx.globalAlpha = 0.7;
-            drawCircle(ctx, d.x, d.y, 3);
-        }
-    }
-});
-
-/* ============================
-   HeatMap-PCA connection
-============================ */
-const selectionState = {
-    source: null, // 'week-hours' | 'month-weeks'
-    weekHours: null,
-    monthWeeks: null
-};
-function redrawPCA() {
-    ctx.clearRect(0, 0, width, height);
-
-    if (coloringAttribute === "density") {
-        drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
-    } else {
-        drawBaseCanvas(ctx, data, coloringAttribute);
-    }
-
-    ctx.globalAlpha = 0.9;
-    ctx.fillStyle = "orange";
-
-    if (selectionState.source === "week-hours" && selectionState.weekHours) {
-        const { days, hours } = selectionState.weekHours;
-
-        for (let i = 0; i < days.length; i++) {
-            const wdIndex = WEEK_DAY_LIST.indexOf(days[i]) + 1;
-            const hrIndex = HOUR_LIST.indexOf(hours[i]) + 1;
-
-            for (const d of data) {
-                if (+d.week_day === wdIndex && +d.hour === hrIndex) {
-                    drawCircle(ctx, d.x, d.y, 4);
-                }
-            }
-        }
-    }
-
-    if (selectionState.source === "month-weeks" && selectionState.monthWeeks) {
-        const { months, week_days } = selectionState.monthWeeks;
-
-        for (let i = 0; i < months.length; i++) {
-            const mIndex = MONTH_LIST.indexOf(months[i]) + 1;
-            const wdIndex = WEEK_DAY_LIST.indexOf(week_days[i]) + 1;
-
-            for (const d of data) {
-                if (+d.month === mIndex && +d.week_day === wdIndex) {
-                    drawCircle(ctx, d.x, d.y, 4);
-                }
-            }
-        }
-    }
-}
-
-document.addEventListener("heatmap_week-hours_multi-select", (event) => {
-
-    selectionState.source = "week-hours";
-    selectionState.weekHours = {
-        days: event.detail.days,
-        hours: event.detail.hours
-    };
-    selectionState.monthWeeks = null;
-
-    document.dispatchEvent(new CustomEvent("reset-month-weeks"));
-
-    redrawPCA();
-});
-
-document.addEventListener("heatmap_month-weeks_multi-select", (event) => {
-
-    selectionState.source = "month-weeks";
-    selectionState.monthWeeks = {
-        months: event.detail.months,
-        week_days: event.detail.week_days
-    };
-    selectionState.weekHours = null;
-
-    document.dispatchEvent(new CustomEvent("reset-week-hours"));
-
-    redrawPCA();
-});
-
-
-
-
-/* ============================
-    Mount layers
-============================ */
+    /* ============================
+        Mount layers
+    ============================ */
 
     container.appendChild(canvas);
     container.appendChild(svg.node());

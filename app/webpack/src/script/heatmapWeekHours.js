@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { WEEK_DAY_LIST, WEEK_DAY_DICTIONARY, HOUR_LIST } from './constants.js';
+import { selectionStore, updateSelection, computeActiveSelection } from "./selectionStore.js";
 
 export default async function main() {
   const margin = { top: 35, right: 45, bottom: 15, left: 55 },
@@ -88,44 +89,48 @@ export default async function main() {
       );
   }
 
-  function dispatchMultiSelection() {
-    const selected = Array.from(selectedCells.values());
-    document.dispatchEvent(
-      new CustomEvent("heatmap_week-hours_multi-select", {
-        detail: {
-          cells: selected,
-          days: selected.map(d => d.week_day),
-          hours: selected.map(d => d.hour)
+  function dispatchSelectionToStore() {
+    if (selectedCells.size === 0) {
+      updateSelection("heatmap_week_hours", null);
+      return;
+    }
+
+    const ids = new Set();
+
+    for (const cell of selectedCells.values()) {
+      for (const d of rawData) {
+        if (
+          WEEK_DAY_LIST[+d.week_day - 1] === cell.week_day &&
+          HOUR_LIST[+d.hour - 1] === cell.hour
+        ) {
+          ids.add(d.id);
         }
-      })
-    );
+      }
+    }
+
+    updateSelection("heatmap_week_hours", ids);
   }
 
   const cellClicked = function(event, d) {
     event.stopPropagation();
+
+    if (selectionStore.pca != null) {
+        document.dispatchEvent(new CustomEvent("clear-pca-brush"));
+    }
     const key = cellKey(d);
 
     if (selectedCells.has(key)) selectedCells.delete(key);
     else selectedCells.set(key, d);
 
     updateSelectionStyles();
-    dispatchMultiSelection();
+    dispatchSelectionToStore();
   };
-
-  document.addEventListener("reset-week-hours", () => {
-    selectedCells.clear();
-    updateSelectionStyles();
-  });
 
   d3.select("#heatmap-week-hours").on("click", (event) => {
     if (!event.target.classList.contains("heatmap-cell-WeekHours")) {
       selectedCells.clear();
       updateSelectionStyles();
-      document.dispatchEvent(
-        new CustomEvent("heatmap_week-hours_multi-select", {
-          detail: { cells: [], days: [], hours: [] }
-        })
-      );
+      updateSelection("heatmap_week_hours", null);
     }
   });
 
@@ -201,12 +206,20 @@ export default async function main() {
       .style("fill", d => myColor(d.value));
   }
 
-  // -------------------- LISTEN TO PCA --------------------
+  // -------------------- REACT TO SELECTION --------------------
   document.addEventListener("selection-changed", (event) => {
     const { store } = event.detail;
 
-    if (store.pca && store.pca.size > 0) {
-      updateHeatmap(rawData.filter(d => store.pca.has(d.id)));
+    // Reset local UI only if the store says this selection is null
+    if (store.heatmap_week_hours === null) {
+      selectedCells.clear();
+      updateSelectionStyles();
+    }
+
+    const activeSelection = computeActiveSelection(store);
+
+    if (activeSelection && activeSelection.size > 0) {
+      updateHeatmap(rawData.filter(d => activeSelection.has(d.id)));
     } else {
       updateHeatmap(rawData);
     }
