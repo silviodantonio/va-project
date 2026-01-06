@@ -70,7 +70,7 @@ async function main() {
     console.log(data[0]);
     const dataSortedByDensity = d3.sort(data, d => d.density);
 
-    const densityLabels = ['0', '', '', '0.5', '', '', '1'];
+    const densityLabels = ['0', '', '', '', '0.5', '', '', '', '1'];
 
     /* ============================
        SVG layer (axes only)
@@ -132,15 +132,6 @@ async function main() {
     coloringSelector.addEventListener('change', (e) => {
         coloringAttribute = e.target.value;
 
-        // Remove old legend
-        svg.selectAll(".legend").remove();
-
-        // Remove old legends
-        svg.selectAll('.legendDecor').remove();
-        svg.selectAll('.legendLabel').remove();
-        svg.selectAll('.legendDensityDecor').remove();
-        svg.selectAll('.legendDensityLabel').remove();
-        
         // Redraw using new colors
         console.log(`Recoloring using ${coloringAttribute}`);
 
