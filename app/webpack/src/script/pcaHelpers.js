@@ -157,44 +157,32 @@ export function drawCircle(ctx, x, y, r) {
  * Uses different colors for every value in coloringAttribute.
  * Requires data to have an attribute named `x` and `y`.
  **/
-export function drawBaseCanvas(ctx, data, coloringAttribute, colorScale) {
 
-    // Draw new content
+export function drawPoints({
+    ctx,
+    data,
+    coloringAttribute,
+    saturated = true,
+    mode = "categorical" // or "density"
+}) {
     for (const d of data) {
-        ctx.fillStyle = colorScale(d[coloringAttribute]);
+        if (mode === "density") {
+            // const densityValue = d.density; // [0,1]
+            const idx = densityToIndex(d.density, seqColors.length);
+            ctx.fillStyle = saturated
+                ? seqColors[idx]
+                : seqColorsDesat[idx];
+        } else {
+            ctx.fillStyle = saturated
+                ? catColors(d[coloringAttribute])
+                : catColorsDesat(d[coloringAttribute]);
+        }
+
         drawCircle(ctx, d.x, d.y, 3);
         ctx.fill();
     }
 }
 
-export function drawBrushFeedback(ctx, data, selection, coloringAttribute) {
-
-    const [[x0, y0], [x1, y1]] = selection
-
-    const sortedData =
-        coloringAttribute === "density"
-            ? d3.sort(data, d => d.density)
-            : data;
-
-    for (const d of sortedData) {
-        const selected =
-            d.x > x0 && d.x < x1 &&
-            d.y > y0 && d.y < y1;
-
-        if (!selected) {
-            if (coloringAttribute === "density") {
-                ctx.fillStyle = densityColorsDesat(d.density);
-            } else {
-                ctx.fillStyle = catColorsDesat(d[coloringAttribute]);
-            }
-        } else {
-            if (coloringAttribute === "density") {
-                ctx.fillStyle = densityColors(d.density);
-            } else {
-                ctx.fillStyle = catColors(d[coloringAttribute]);
-            }
-        }
-
-        drawCircle(ctx, d.x, d.y, 3);
-    }
+function densityToIndex(density, n) {
+  return Math.min(n - 1, Math.floor(density * n));
 }
