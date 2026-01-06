@@ -229,7 +229,9 @@ const myColor = d3.scaleQuantize()
     
     // Update color domain if needed
     const maxValue = d3.max(newHeatmapData, d => d.value);
-    myColor.domain([0, maxValue]);
+    const minValue = d3.min(newHeatmapData, d => d.value);
+
+    myColor.domain([minValue, maxValue]);
     
     // Update all rectangles
     svg.selectAll(".heatmap-cell-MonthWeeks")
