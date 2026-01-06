@@ -24,12 +24,54 @@ export const seqColors = Array.from({ length: n }, (_, i) =>
 // build array of Desaturated colors
 export const seqColorsDesat = seqColors.map((color) => desatAndLighten(color, 0.3, 0.7));
 
+export const densityColors = d3.scaleSequential([0, 1], d3.interpolateInferno)
+export const densityColorsDesat = d3.scaleSequential([0, 1], d => 
+    desatAndLighten(d3.color(d3.interpolateInferno(d)).formatHex(), 0.3, 0.7)
+)
+
+export function drawSeqLegends(svg, xPos, yPos, labels, colorScale) {
+
+    const colorStep = 1 / labels.length;
+    const rectWidth = 20;
+    const rectHeight = 20;
+
+    // Remove legends of "categorical" scatterplots
+    svg.selectAll('.legendDecor').remove()
+    svg.selectAll('.legendLabel').remove()
+
+    svg.selectAll(".legendDensityDecor")
+        .data(labels)
+        .enter()
+        .append("rect")
+        .attr("x", xPos)
+        .attr("y", (_ , i) => yPos + i*rectHeight)
+        .attr("width", rectWidth)
+        .attr("height", rectHeight)
+        .style("fill", (_, i) => colorScale(i*colorStep))
+        .attr("class", "legendDensityDecor");
+
+    svg.selectAll(".legendDensityLabel")
+        .data(labels)
+        .enter()
+        .append("text")
+        .attr("x", xPos + rectWidth + 8)
+        .attr("y", (_, i) => yPos - 4 + (i + 1)*rectHeight)
+        .style("fill", "black")
+        .text(d => d)
+        .attr("text-anchor", "left")
+        .attr("class", "legendDensityLabel");
+}
+
 export function drawLegends(svg, xPos, yPos, labels, colorScale) {
 
     console.log(`Add labels for: ${labels}`)
     const circleRadius = 5;
 
-    svg.selectAll(".legendDot")
+    // Remove legends of density scatterplot
+    svg.selectAll('.legendDensityDecor').remove()
+    svg.selectAll('.legendDensityLabel').remove()
+
+    svg.selectAll(".legendDecor")
         .data(labels)
         .join(
             enter => enter
@@ -38,7 +80,7 @@ export function drawLegends(svg, xPos, yPos, labels, colorScale) {
                 .attr("cy", (_ , i) => yPos + i*20)
                 .attr("r", circleRadius)
                 .style("fill", (_, i) => colorScale(i))
-                .attr("class", "legendDot"),
+                .attr("class", "legendDecor"),
             update => update
                 .style("fill", (_, i) => colorScale(i)),
             exit => exit.remove(),
@@ -54,7 +96,7 @@ export function drawLegends(svg, xPos, yPos, labels, colorScale) {
                 .style("fill", "black")
                 .text(d => d)
                 .attr("text-anchor", "left")
-                .style("alignment-baseline", "center")
+                .style("alignment-baseline", "middle")
                 .attr("class", "legendLabel"),
             update => update
                 .text(d => d),
@@ -62,7 +104,7 @@ export function drawLegends(svg, xPos, yPos, labels, colorScale) {
         )
 }
 
-export function initializeDensityScatter(data, quantizeX, quantizeY) {
+export function attachDensityIndex(data, quantizeX, quantizeY) {
 
     const densityMatrix = Array.from(
         { length: quantizeX },
@@ -79,9 +121,7 @@ export function initializeDensityScatter(data, quantizeX, quantizeY) {
     const binSizeX = (xMax - xMin) / quantizeX;
     const binSizeY = (yMax - yMin) / quantizeY;
 
-    /* -------------------------
-       Build density matrix
-    ------------------------- */
+    // Counting the number of data points for each block
     for (const d of data) {
         const xBin = Math.floor((d.x_pca - xMin) / binSizeX);
         const yBin = Math.floor((d.y_pca - yMin) / binSizeY);
@@ -89,43 +129,21 @@ export function initializeDensityScatter(data, quantizeX, quantizeY) {
         densityMatrix[xBin][yBin]++;
     }
 
-    /* -------------------------
-       Annotate points
-    ------------------------- */
-    for (const d of data) {
-        d.xBin = Math.floor((d.x_pca - xMin) / binSizeX);
-        d.yBin = Math.floor((d.y_pca - yMin) / binSizeY);
+    // A factor that transforms density to a value between 0 and 1.
+    // Needed for sequential color scales
+    const normalizingFactor = 1 / d3.max(densityMatrix.flat());
 
-        d.density = densityMatrix[d.xBin][d.yBin];
-    }
+    // Build new data with density value attached to each element
+    const newData = data.map(d => {
 
-    /* -------------------------
-       Color matrix
-    ------------------------- */
-    const maxDensity = d3.max(densityMatrix.flat());
+        const xBin = Math.floor((d.x_pca - xMin) / binSizeX);
+        const yBin = Math.floor((d.y_pca - yMin) / binSizeY);
+        const density = densityMatrix[xBin][yBin] * normalizingFactor;
 
-    const densityToClass = d3.scaleQuantize()
-        .domain([0, maxDensity])
-        .range(d3.range(seqColors.length));
+        return {...d, density: density}
+    });
 
-    const colorMatrix = densityMatrix.map(row =>
-        row.map(d => densityToClass(d))
-    );
-
-    /* -------------------------
-       Return everything needed
-    ------------------------- */
-    return {
-        colorMatrix,
-        binning: {
-            xMin,
-            yMin,
-            binSizeX,
-            binSizeY,
-            quantizeX,
-            quantizeY
-        }
-    };
+    return newData;
 }
 
 export function drawCircle(ctx, x, y, r) {
@@ -139,26 +157,44 @@ export function drawCircle(ctx, x, y, r) {
  * Uses different colors for every value in coloringAttribute.
  * Requires data to have an attribute named `x` and `y`.
  **/
-export function drawBaseCanvas(ctx, data, coloringAttribute) {
+export function drawBaseCanvas(ctx, data, coloringAttribute, colorScale) {
 
     // Draw new content
     for (const d of data) {
-        ctx.fillStyle = catColors(d[coloringAttribute]);
+        ctx.fillStyle = colorScale(d[coloringAttribute]);
         drawCircle(ctx, d.x, d.y, 3);
         ctx.fill();
     }
-
-    console.log('New canvas drawn');
 }
 
-export function drawDensityScatter(ctx, data, colorMatrix, desaturated = false) {
+export function drawBrushFeedback(ctx, data, selection, coloringAttribute) {
 
-    const palette = desaturated ? seqColorsDesat : seqColors;
+    const [[x0, y0], [x1, y1]] = selection
 
-    for (const d of data) {
-            const cls = colorMatrix[d.xBin][d.yBin];
-            ctx.fillStyle = palette[cls];
-            drawCircle(ctx, d.x, d.y, 3);
-            ctx.fill();
+    const sortedData =
+        coloringAttribute === "density"
+            ? d3.sort(data, d => d.density)
+            : data;
+
+    for (const d of sortedData) {
+        const selected =
+            d.x > x0 && d.x < x1 &&
+            d.y > y0 && d.y < y1;
+
+        if (!selected) {
+            if (coloringAttribute === "density") {
+                ctx.fillStyle = densityColorsDesat(d.density);
+            } else {
+                ctx.fillStyle = catColorsDesat(d[coloringAttribute]);
+            }
+        } else {
+            if (coloringAttribute === "density") {
+                ctx.fillStyle = densityColors(d.density);
+            } else {
+                ctx.fillStyle = catColors(d[coloringAttribute]);
+            }
+        }
+
+        drawCircle(ctx, d.x, d.y, 3);
     }
 }

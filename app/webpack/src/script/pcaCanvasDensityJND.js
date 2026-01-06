@@ -2,13 +2,15 @@ import * as d3 from "d3";
 import {labels, REGION_LIST, WEEK_DAY_LIST, MONTH_LIST,HOUR_LIST, DEADLY_LIST} from './constants.js';
 import { updateSelection } from "./selectionStore.js";
 import {
-    initializeDensityScatter,
+    attachDensityIndex,
     drawLegends, 
+    drawSeqLegends,
     drawBaseCanvas,
+    drawBrushFeedback,
     drawCircle,
-    drawDensityScatter,
     catColors, catColorsDesat, 
-    seqColors, seqColorsDesat
+    seqColors, seqColorsDesat,
+    densityColors, densityColorsDesat,
 } from "./pcaHelpers.js";
 
 /* ============================
@@ -64,8 +66,12 @@ async function main() {
         d.y = y(d.y_pca);
     });
 
-    const { colorMatrix } = initializeDensityScatter(data, 600, 420);
+    console.log(data[0]);
+    data = attachDensityIndex(data, 600, 420);
+    console.log(data[0]);
     const dataSortedByDensity = d3.sort(data, d => d.density);
+
+    const densityLabels = ['0', '', '', '0.5', '', '', '1'];
 
     /* ============================
        SVG layer (axes only)
@@ -115,11 +121,12 @@ async function main() {
     const coloringSelector = document.querySelector('#colorSelector');
     let coloringAttribute = coloringSelector.value;
     if (coloringAttribute === 'density') {
-        drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
+        drawSeqLegends(svg, margin.left + 20, margin.top + 20, densityLabels, densityColors)
+        drawBaseCanvas(ctx, dataSortedByDensity, coloringAttribute, densityColors);
     }
     else {
         drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
-        drawBaseCanvas(ctx, data, coloringAttribute);
+        drawBaseCanvas(ctx, data, coloringAttribute, catColors);
     }
 
     // Event listener for recoloring when changing selected attribute
@@ -138,10 +145,11 @@ async function main() {
 
         if (coloringAttribute == "density") {
             const dataSortedByDensity = d3.sort(data, d => d.density);
-            drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
+            drawSeqLegends(svg, margin.left + 20, margin.top + 20, densityLabels, densityColors)
+            drawBaseCanvas(ctx, dataSortedByDensity, coloringAttribute, densityColors);
         } else {
             drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
-            drawBaseCanvas(ctx, data, coloringAttribute);
+            drawBaseCanvas(ctx, data, coloringAttribute, catColors);
         }
     })
 
@@ -157,7 +165,8 @@ async function main() {
 
         // ---------- LIVE BRUSHING (fast visual feedback only)
         if (selection) {
-            drawBrushFeedback(selection);
+            ctx.clearRect(0, 0, width, height);
+            drawBrushFeedback(ctx, data, selection, coloringAttribute);
             // return;
         }
 
@@ -186,45 +195,13 @@ async function main() {
 
             ctx.clearRect(0, 0, width, height);
             if (coloringAttribute === "density") {
-                drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
+                drawBaseCanvas(ctx, dataSortedByDensity, coloringAttribute, densityColors);
             } else {
-                drawBaseCanvas(ctx, data, coloringAttribute);
+                drawBaseCanvas(ctx, data, coloringAttribute, catColors);
             }
         }
     });
 
-    function drawBrushFeedback([[x0, y0], [x1, y1]]) {
-        ctx.clearRect(0, 0, width, height);
-
-        const drawOrder =
-            coloringAttribute === "density"
-                ? dataSortedByDensity
-                : data;
-
-        for (const d of drawOrder) {
-            const selected =
-                d.x > x0 && d.x < x1 &&
-                d.y > y0 && d.y < y1;
-
-            if (!selected) {
-                if (coloringAttribute === "density") {
-                    const cls = colorMatrix[d.xBin][d.yBin];
-                    ctx.fillStyle = seqColorsDesat[cls];
-                } else {
-                    ctx.fillStyle = catColorsDesat(d[coloringAttribute]);
-                }
-            } else {
-                if (coloringAttribute === "density") {
-                    const cls = colorMatrix[d.xBin][d.yBin];
-                    ctx.fillStyle = seqColors[cls];
-                } else {
-                    ctx.fillStyle = catColors(d[coloringAttribute]);
-                }
-            }
-
-            drawCircle(ctx, d.x, d.y, 3);
-        }
-    }
 
     svg.append('g').attr("class", "brush").call(brush);
 
@@ -246,9 +223,10 @@ document.addEventListener('region-click', function(event) {
 
     // Draw all points
     if (coloringAttribute === "density") {
-        drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
+        // drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
+        drawBaseCanvas(ctx, dataSortedByDensity, coloringAttribute, densityColors);
     } else {
-        drawBaseCanvas(ctx, data, coloringAttribute);
+        drawBaseCanvas(ctx, data, coloringAttribute, catColors);
     }
 
     for (const d of data) {
@@ -272,9 +250,10 @@ function redrawPCA() {
     ctx.clearRect(0, 0, width, height);
 
     if (coloringAttribute === "density") {
-        drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
+        // drawDensityScatter(ctx, dataSortedByDensity, colorMatrix);
+        drawBaseCanvas(ctx, dataSortedByDensity, coloringAttribute, densityColors);
     } else {
-        drawBaseCanvas(ctx, data, coloringAttribute);
+        drawBaseCanvas(ctx, data, coloringAttribute, catColors);
     }
 
     ctx.globalAlpha = 0.9;
