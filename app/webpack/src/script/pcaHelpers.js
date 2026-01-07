@@ -126,7 +126,7 @@ export function attachDensityIndex(data, quantizeX, quantizeY) {
         const xBin = Math.floor((d.x_pca - xMin) / binSizeX);
         const yBin = Math.floor((d.y_pca - yMin) / binSizeY);
 
-        densityMatrix[xBin][yBin]++;
+        densityMatrix[xBin][yBin] += +d.observation;
     }
 
     // A factor that transforms density to a value between 0 and 1.
