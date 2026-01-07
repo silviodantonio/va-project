@@ -193,12 +193,11 @@ async function main() {
                         )
                         .map(d => d.id)
                 );
-                const percentage = getSelectionPercentage(selectedIds);
-                console.log("Percentuale:", percentage.toFixed(2), "%");
-                updatePercentageUI(percentage);
+                const {fraction, percentage} = getSelectionPercentage(selectedIds);
+                updatePercentageUI(fraction, percentage);
             }
             else{
-                updatePercentageUI(0);
+                updatePercentageUI(null,0);
             }
             // RESET all other selections
             for (const key in selectionStore) {
@@ -264,6 +263,8 @@ async function main() {
         const activeSelection = computeActiveSelection(store);
       
         updatePCA(data, activeSelection);
+        const {fraction, percentage} = getSelectionPercentage(activeSelection);
+        updatePercentageUI(fraction, percentage);
     });
 
 

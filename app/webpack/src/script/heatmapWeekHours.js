@@ -155,7 +155,10 @@ export default async function main() {
   // -------------------- INITIAL DRAW --------------------
   const initialHeatmapData = computeHeatmapData(rawData);
 
-  myColor.domain([0, d3.max(initialHeatmapData, d => d.value)]);
+  const minValue = 0;
+  let maxValue = d3.max(initialHeatmapData, d => d.value);
+
+  myColor.domain([minValue, maxValue]);
 
   svg.selectAll(".heatmap-cell-WeekHours")
     .data(initialHeatmapData, d => d.week_day + ":" + d.hour)
@@ -197,7 +200,10 @@ export default async function main() {
   function updateHeatmap(filteredData) {
     const heatmapData = computeHeatmapData(filteredData);
 
-    myColor.domain([0, d3.max(heatmapData, d => d.value)]);
+    const minValue = 0;
+    let maxValue = d3.max(heatmapData, d => d.value);
+
+    myColor.domain([minValue, maxValue ]);
 
     svg.selectAll(".heatmap-cell-WeekHours")
       .data(heatmapData, d => d.week_day + ":" + d.hour)
