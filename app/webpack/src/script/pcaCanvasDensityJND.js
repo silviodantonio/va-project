@@ -42,6 +42,7 @@ async function main() {
             accident_type: +d.accident_type - 1,
             deadly: +d.deadly,
             week_day: +d.week_day - 1,
+            observation: +d.observation
         })
     );
 
@@ -139,7 +140,7 @@ async function main() {
             drawSeqLegends(svg, margin.left + 20, margin.top + 20, densityLabels, densityColors)
         } else {
             drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
-        }
+        }selectedIds
 
         svg.select('.brush').call(brush.move, null);
         updateSelection("pca", null);
@@ -151,6 +152,7 @@ async function main() {
     /* ============================
     //    Brushing
     // ============================ */
+    const total_accidents_observation = 173234;
 
    const brush = d3.brush()
         .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
@@ -172,21 +174,34 @@ async function main() {
             }
 
             let selectedIds = null;
+            let selectedObservations = null;
+            let selected = [];
 
             if (selection) {
                 const [[x0, y0], [x1, y1]] = selection;
 
-                selectedIds = new Set(
-                    data
-                        .filter(d =>
+                 selected =data.filter(d =>
                             d.x - POINT_RADIUS >= x0 &&
                             d.x + POINT_RADIUS <= x1 &&
                             d.y - POINT_RADIUS >= y0 &&
                             d.y + POINT_RADIUS <= y1
-                        )
-                        .map(d => d.id)
-                );
+                        );
+
+                selectedIds = new Set(selected.map(d => d.id));
+                selectedObservations = selected.map(d => d.observation);
+
             }
+            console.log ("selected id:", selectedIds);
+            console.log ("selected obs:", selectedObservations);
+
+            // calcolo percentuale di observation:
+
+            const sumObservations = selectedObservations.reduce((accumulatore, valore) => accumulatore + valore, 0);
+            console.log("Somma osservazioni selezionate:", sumObservations)
+
+            const percentage = (sumObservations/total_accidents_observation) * 100 
+            //const percentage.append("%");
+
             // RESET all other selections
             for (const key in selectionStore) {
                 if (key !== "pca") {
