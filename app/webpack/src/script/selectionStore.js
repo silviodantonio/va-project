@@ -3,7 +3,7 @@ export const selectionStore = {
     region: null,
     heatmap_week_hours: null,
     heatmap_month_weeks: null,
-    bar_accident_type:null,
+    accident:null,
     intersection:null
 };
 

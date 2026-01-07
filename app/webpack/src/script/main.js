@@ -13,7 +13,7 @@ mainMapLin();
 // mainBars();
 // import mainCoordinated from './coordinated.js';
 // mainCoordinated();
-import mainCoordinated from './coordinatedComplete.js';
+import mainCoordinated from './barchart_dualLayer.js';
 mainCoordinated();
 
 // import pca from './pca.js';
