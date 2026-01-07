@@ -12,7 +12,7 @@ function desatAndLighten(color, desaturate, lighten) {
 export const catColors = d3.scaleOrdinal(d3.schemeCategory10);
 export const catColorsDesat = d3.scaleOrdinal(d3.schemeCategory10.map(d => desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)));
 
-const n = 9;
+const n = 20;
 export const seqColors = Array.from({ length: n }, (_, i) => 
   // d3.interpolateCividis(i / (n - 1))
   // d3.interpolatePuBu(i / (n - 1))
@@ -44,7 +44,7 @@ export function drawSeqLegends(svg, xPos, yPos, labels, colorScale) {
         .enter()
         .append("rect")
         .attr("x", xPos)
-        .attr("y", (_ , i) => yPos + i*rectHeight)
+        .attr("y", (_ , i) => yPos + (labels.length-1)*rectHeight - i*rectHeight)
         .attr("width", rectWidth)
         .attr("height", rectHeight)
         .style("fill", (_, i) => colorScale(i*colorStep))
@@ -55,7 +55,7 @@ export function drawSeqLegends(svg, xPos, yPos, labels, colorScale) {
         .enter()
         .append("text")
         .attr("x", xPos + rectWidth + 8)
-        .attr("y", (_, i) => yPos + (rectHeight/2) + i*rectHeight + 2)
+        .attr("y", (_, i) => yPos + (rectHeight/2) + (labels.length-1)*rectHeight + 2 - i*rectHeight)
         .attr('dominant-baseline', "middle")
         .style("fill", "black")
         .text(d => d)
