@@ -115,6 +115,11 @@ export default async function main() {
             .style('cursor', 'pointer')
             .on('click', (event, d) => {
                 event.stopPropagation();
+
+                if (selectionStore.pca != null) {
+                    document.dispatchEvent(new CustomEvent("clear-pca-brush"));
+                }
+                
                 const ids = new Set(rawData.filter(r => accessor(r) === d.key).map(r => r.id));
                 const current = selectionStore[filterKey];
                 const same = current && current.size === ids.size && [...ids].every(id => current.has(id));

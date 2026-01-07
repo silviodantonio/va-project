@@ -157,6 +157,8 @@ async function main() {
         .on("brush end", (event) => {
             const { selection, type } = event;
 
+            if (!event.sourceEvent) return;
+
             if (type === "start") {
                 // Clear heatmap selection once at the start of brushing
                 for (const key in selectionStore) {

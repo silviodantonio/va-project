@@ -171,7 +171,12 @@ export default function main() {
             .attr("width", width)
             .attr("height", height)
             .attr("fill", "transparent")   // invisible but captures clicks
-            .on("click", function() {
+            .on("click", function () {
+
+                if (selectionStore.pca != null) {
+                    document.dispatchEvent(new CustomEvent("clear-pca-brush"));
+                }
+
                 clippedG.selectAll("path")
                     .classed("clicked-region", false)
                     .attr("transform", "translate(0,0)")
@@ -283,6 +288,10 @@ export default function main() {
             })
             .on("click", function (event, d) {
                 event.stopPropagation();
+
+                if (selectionStore.pca != null) {
+                    document.dispatchEvent(new CustomEvent("clear-pca-brush"));
+                }
 
                 const regionName = d.properties.reg_name;
 
