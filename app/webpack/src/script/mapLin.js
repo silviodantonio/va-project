@@ -70,7 +70,7 @@ export default function main() {
 
         // Create SVG that fills the container
         const svg = d3.create("svg")
-            .attr("viewBox", `0 0 ${width} ${height + legendBlockHeight - 25}`)
+            .attr("viewBox", `0 0 ${width} ${height + legendBlockHeight}`)
             .attr("preserveAspectRatio", "xMidYMid meet")
             .style("width", "100%")
             .style("height", "100%")
@@ -91,11 +91,12 @@ export default function main() {
 
         /* ------------------ LEGEND ------------------ */
         const legendWidth = Math.min(width * 0.8, 420);
-        const legendHeight = 20;
+        // const legendHeight = 20;
+        const legendHeight = Math.min(height * 0.025, 20);
         const boxWidth = legendWidth / nSteps;
 
         const legendG = legendLayer.append("g")
-            .attr("transform", `translate(${(width - legendWidth)/2}, ${legendHeight*2})`);
+            .attr("transform", `translate(${(width - legendWidth)/2}, ${height * 0.15 - legendHeight*2})`);
 
 
         function updateLegend(maxValue) {

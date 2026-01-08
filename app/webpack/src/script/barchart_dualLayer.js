@@ -22,9 +22,11 @@ export default async function main() {
     );
 
     // ---------- DIMENSIONS ----------
-    const width = 350;
-    const height = 380;
+    // const width = 350;
+    // const height = 380;
     const margin = { top: 20, right: 15, bottom: 70, left: 50 };
+    const width = container.intersection.clientWidth - margin.left - margin.right;
+    const height = container.intersection.clientHeight - margin.top - margin.bottom;
 
     // ---------- SVGs ----------
     const svgIntersection = d3.create('svg')

@@ -4,16 +4,19 @@ import { selectionStore, updateSelection, computeActiveSelection } from "./selec
 import { drawSeqLegends } from './legendUtils.js';
 
 export default async function main() {
-  const margin = { top: 35, right: 65, bottom: 15, left: 55 },
-        width = 350 - margin.left - margin.right,
-        height = 350 - margin.top - margin.bottom;
+  const margin = { top: 25, right: 65, bottom: 35, left: 55 },
+        // width = 350 - margin.left - margin.right,
+        // height = 350 - margin.top - margin.bottom;
+        container = document.getElementById("heatmap-week-hours"),
+        width = container.clientWidth - margin.left - margin.right,
+        height = container.clientHeight - margin.top - margin.bottom;
 
   const svg = d3.select("#heatmap-week-hours")
     .append("svg")
     .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
     .attr("preserveAspectRatio", "xMidYMid meet")
     .style("width", "100%")
-    .style("height", "auto")
+    .style("height", "100%")
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
