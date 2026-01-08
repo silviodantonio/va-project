@@ -165,18 +165,6 @@ async function main() {
 
             if (!event.sourceEvent) return;
 
-            if (type === "start") {
-                // Clear heatmap selection once at the start of brushing
-                for (const key in selectionStore) {
-                    if (key !== "pca") {
-                        selectionStore[key] = null;
-                    }
-                }
-                document.dispatchEvent(new CustomEvent("selection-changed", {
-                    detail: { source: "pca", store: selectionStore }
-                }));
-            }
-
             let selectedIds = null;
 
             if (selection) {
@@ -204,6 +192,12 @@ async function main() {
                     selectionStore[key] = null;
                 }
             }
+            // This is to trigger other graph's update only at the end of the brush 
+            // if (type === "brush") {
+            //     updatePCA(data, selectedIds);
+            // } else {
+            //     updateSelection("pca", selectedIds);
+            // }
 
             updateSelection("pca", selectedIds);
     });

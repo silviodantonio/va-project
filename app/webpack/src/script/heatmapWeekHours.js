@@ -164,6 +164,7 @@ export default async function main() {
     .data(initialHeatmapData, d => d.week_day + ":" + d.hour)
     .join("rect")
     .attr("class", "heatmap-cell-WeekHours")
+    .style('cursor', 'pointer')
     .attr("x", d => x(d.week_day))
     .attr("y", d => y(d.hour))
     .attr("width", x.bandwidth())

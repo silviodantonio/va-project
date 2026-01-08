@@ -189,6 +189,7 @@ export default function main() {
         clippedG.selectAll("path")
             .data(regions.features)
             .join("path")
+            .style('cursor', 'pointer')
             .attr("fill", d => {
                 const v = valuemap.get(d.properties.reg_name) ?? 0;
                 return color(v);

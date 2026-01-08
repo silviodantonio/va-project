@@ -39,3 +39,10 @@ export function computeActiveSelection(store) {
         )
     );
 }
+
+export function extractIDs(selection) {
+    if (!selection) return null;
+    if (selection instanceof Set) return selection;
+    if (selection.ids instanceof Set) return selection.ids;
+    return null;
+}

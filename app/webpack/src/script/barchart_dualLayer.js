@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { INTERSECTION_LIST, ACCIDENT_TYPE_LIST, REGION_LIST } from './constants.js';
-import { updateSelection, selectionStore, computeActiveSelection } from "./selectionStore.js";
+import { updateSelection, selectionStore, computeActiveSelection, extractIDs } from "./selectionStore.js";
 
 export default async function main() {
     const container = {
@@ -44,6 +44,10 @@ export default async function main() {
         .attr("viewBox", `0 0 ${width} ${height}`)
         .attr("width", "100%")
         .attr("height", "100%");
+
+    svgIntersection.on('click', () => updateSelection('intersection', null));
+    svgAccidentType.on('click', () => updateSelection('accident_type', null));
+    svgRegion.on('click', () => updateSelection('region', null));
 
     // ---------- SCALES ----------
     const xIntersection = d3.scaleBand().range([margin.left, width - margin.right]).padding(0.2);
@@ -113,7 +117,27 @@ export default async function main() {
             .attr('y', d => y(d.value))
             .attr('width', x.bandwidth())
             .attr('height', d => y(0) - y(d.value))
-            .attr('fill', 'steelblue');
+            .attr('fill', 'steelblue')
+            .attr('stroke', d => {
+                const localSelection = extractIDs(selectionStore[filterKey]);
+                if (!localSelection) return 'none';
+
+                const ids = rawData
+                    .filter(r => accessor(r) === d.key)
+                    .map(r => r.id);
+
+                return ids.some(id => localSelection.has(id)) ? '#222' : 'none';
+            })
+            .attr('stroke-width', d => {
+                const localSelection = extractIDs(selectionStore[filterKey]);
+                if (!localSelection) return 0;
+
+                const ids = rawData
+                    .filter(r => accessor(r) === d.key)
+                    .map(r => r.id);
+
+                return ids.some(id => localSelection.has(id)) ? 2 : 0;
+            });
 
         fg.exit().remove();
 
