@@ -1,9 +1,10 @@
 import * as d3 from 'd3';
+import { drawSeqLegends } from './heatmapUtils.js';
 import {WEEK_DAY_LIST, WEEK_DAY_DICTIONARY, MONTH_LIST, REGION_LIST} from './constants.js';
 import { selectionStore, updateSelection, computeActiveSelection } from "./selectionStore.js";
 
 export default  async function main () {
-  const margin = { top: 35, right: 45, bottom: 35, left: 85 },
+  const margin = { top: 35, right: 65, bottom: 35, left: 85 },
         width = 350 - margin.left - margin.right,
         height = 260 - margin.top - margin.bottom;
 
@@ -223,6 +224,10 @@ const myColor = d3.scaleQuantize()
     })
     .on("click", cellClicked);
 
+    drawSeqLegends(svg, width + 15, 0,
+      minValue, maxValue, myColor.range().length,
+      myColor);
+
   /* -------------------- UPDATE FUNCTION -------------------- */
   function updateHeatmap(newData) {
     const newHeatmapData = computeHeatmapData(newData);
@@ -239,6 +244,11 @@ const myColor = d3.scaleQuantize()
       .transition()
       .duration(400)
       .style("fill", d => myColor(d.value));
+
+    // Update legends
+    drawSeqLegends(svg, width, 0,
+      minValue, maxValue, myColor.range().length,
+      myColor);
   }
 
   // -------------------- REACT TO SELECTION --------------------
