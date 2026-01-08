@@ -252,9 +252,7 @@ async function main() {
             selectionStore.pca = null;
             brushG.call(brush.move, null);
             updatePCA(data, null);
-            updatePercentageUI(0);
-
-            
+            updatePercentageUI(null, 0);
         }
     });
 
