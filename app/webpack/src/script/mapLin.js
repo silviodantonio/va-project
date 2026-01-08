@@ -73,7 +73,7 @@ export default function main() {
             .attr("viewBox", `0 0 ${width} ${height + legendBlockHeight - 25}`)
             .attr("preserveAspectRatio", "xMidYMid meet")
             .style("width", "100%")
-            .style("height", "auto")
+            .style("height", "100%")
             .style("overflow", "visible");
 
         const legendLayer = svg.append("g");
