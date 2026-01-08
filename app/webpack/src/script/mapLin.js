@@ -10,7 +10,7 @@ export default function main() {
 
         
     // Get container dimensions first
-    const containerWidth = container.clientWidth - 20;
+    const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
     
 
