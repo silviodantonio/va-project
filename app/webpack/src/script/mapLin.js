@@ -96,7 +96,8 @@ export default function main() {
         const boxWidth = legendWidth / nSteps;
 
         const legendG = legendLayer.append("g")
-            .attr("transform", `translate(${(width - legendWidth)/2}, ${height * 0.15 - legendHeight*2})`);
+            // .attr("transform", `translate(${(width - legendWidth)/2}, ${height * 0.15 - legendHeight*2})`);
+            .attr("transform", `translate(${(width - legendWidth)/2}, ${legendHeight*2})`);
 
 
         function updateLegend(maxValue) {
@@ -200,8 +201,7 @@ export default function main() {
             .attr("stroke-width", 1)
             .attr("d", path)
             .on("mouseenter", function(event, d) {
-                const v = valuemap.get(d.properties.reg_name);
-                if (v == null) return;
+                const v = valuemap.get(d.properties.reg_name) ?? 0;
                 
                 const [cx, cy] = path.centroid(d);
                 
@@ -214,8 +214,7 @@ export default function main() {
                     .attr("stroke-width",3);
             })
             .on("mousemove", function(event, d) {
-                const v = valuemap.get(d.properties.reg_name);
-                if (v == null) return;
+                const v = valuemap.get(d.properties.reg_name) ?? 0;
 
                 const [mx, myRaw] = d3.pointer(event, svg.node());
                 const my = myRaw - legendBlockHeight;
@@ -291,6 +290,9 @@ export default function main() {
             .on("click", function (event, d) {
                 event.stopPropagation();
 
+                d3.select(this)
+                    .raise();
+
                 if (selectionStore.pca != null) {
                     document.dispatchEvent(new CustomEvent("clear-pca-brush"));
                 }
@@ -303,7 +305,10 @@ export default function main() {
                         .map(a => a.__id)
                 );
 
-                updateSelection("region", { region: regionName, ids: selectedIDs });
+                // updateSelection("region", { region: regionName, ids: selectedIDs });
+                const current = selectionStore.region;
+                const same = current && current.region === regionName && current.ids.size === selectedIDs.size && [...selectedIDs].every(id => current.ids.has(id));
+                updateSelection("region", same ? null : { region: regionName, ids: selectedIDs });
 
                 document.dispatchEvent(new CustomEvent("selection-changed", {
                     detail: { source: "region", store: selectionStore }
