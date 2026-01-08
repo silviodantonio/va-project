@@ -1,10 +1,9 @@
 import * as d3 from "d3";
 import {labels, REGION_LIST, WEEK_DAY_LIST, MONTH_LIST,HOUR_LIST, DEADLY_LIST} from './constants.js';
 import { updateSelection, selectionStore, computeActiveSelection } from "./selectionStore.js";
+import { drawPcaDensityLegends, drawCatLegends } from "./legendUtils.js";
 import {
     attachDensityIndex,
-    drawLegends,
-    drawSeqLegends,
     drawPoints,
     catColors,
     densityColors
@@ -72,12 +71,8 @@ async function main() {
         d.y = y(d.y_pca);
     });
 
-    console.log(data[0]);
     data = attachDensityIndex(data, 600, 420);
-    console.log(data[0]);
     const dataSortedByDensity = d3.sort(data, d => d.density);
-
-    const densityLabels = ['0', '', '', '', '0.5', '', '', '', '1'];
 
     /* ============================
        SVG layer (axes only)
@@ -128,10 +123,13 @@ async function main() {
     let coloringAttribute = coloringSelector.value;
 
     if (coloringAttribute === 'density') {
-        drawSeqLegends(svg, margin.left + 20, margin.top + 20, densityLabels, densityColors);
+        drawPcaDensityLegends(svg, margin.left + 20, margin.top + 10, 
+            0, 1, 7,
+            densityColors
+        );
     }
     else {
-        drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors);
+        drawCatLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors);
     }
     updatePCA(data, null);
 
@@ -143,9 +141,12 @@ async function main() {
         console.log(`Recoloring using ${coloringAttribute}`);
 
         if (coloringAttribute == "density") {
-            drawSeqLegends(svg, margin.left + 20, margin.top + 20, densityLabels, densityColors)
+            drawPcaDensityLegends(svg, margin.left + 15, margin.top + 10,
+                0, 1, 7,
+                densityColors
+            );
         } else {
-            drawLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
+            drawCatLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
         }
 
         svg.select('.brush').call(brush.move, null);

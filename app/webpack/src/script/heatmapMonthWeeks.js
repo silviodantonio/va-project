@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { drawSeqLegends } from './heatmapUtils.js';
+import { drawSeqLegends } from './legendUtils.js';
 import {WEEK_DAY_LIST, WEEK_DAY_DICTIONARY, MONTH_LIST, REGION_LIST} from './constants.js';
 import { selectionStore, updateSelection, computeActiveSelection } from "./selectionStore.js";
 

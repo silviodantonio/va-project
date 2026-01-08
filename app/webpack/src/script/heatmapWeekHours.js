@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { WEEK_DAY_LIST, WEEK_DAY_DICTIONARY, HOUR_LIST } from './constants.js';
 import { selectionStore, updateSelection, computeActiveSelection } from "./selectionStore.js";
-import { drawSeqLegends } from './heatmapUtils.js';
+import { drawSeqLegends } from './legendUtils.js';
 
 export default async function main() {
   const margin = { top: 35, right: 65, bottom: 15, left: 55 },
