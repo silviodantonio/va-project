@@ -1,11 +1,12 @@
 import * as d3 from 'd3';
-import { INTERSECTION_LIST, ACCIDENT_TYPE_LIST } from './constants.js';
+import { INTERSECTION_LIST, ACCIDENT_TYPE_LIST, REGION_LIST } from './constants.js';
 import { updateSelection, selectionStore, computeActiveSelection } from "./selectionStore.js";
 
 export default async function main() {
     const container = {
         intersection: document.getElementById('chart-intersection'),
-        accidentType: document.getElementById('chart-accident-type')
+        accidentType: document.getElementById('chart-accident-type'),
+        region: document.getElementById('extra-chart')
     };
 
     // ---------- LOAD DATA ----------
@@ -15,23 +16,34 @@ export default async function main() {
             id: i,
             intersection: INTERSECTION_LIST[+d.intersection - 1],
             accident_type: ACCIDENT_TYPE_LIST[+d.accident_type - 1],
+            region: REGION_LIST[+d.region - 1],
             observation: +d.observation
         })
     );
 
     // ---------- DIMENSIONS ----------
     const width = 350;
-    const height = 350;
+    const height = 380;
     const margin = { top: 20, right: 15, bottom: 70, left: 50 };
 
     // ---------- SVGs ----------
     const svgIntersection = d3.create('svg')
         .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", `0 0 ${width} ${height}`);
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("width", "100%")
+        .attr("height", "100%");
 
     const svgAccidentType = d3.create('svg')
         .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", `0 0 ${width} ${height}`);
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("width", "100%")
+        .attr("height", "100%");
+
+    const svgRegion = d3.create('svg')
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("width", "100%")
+        .attr("height", "100%");
 
     // ---------- SCALES ----------
     const xIntersection = d3.scaleBand().range([margin.left, width - margin.right]).padding(0.2);
@@ -40,12 +52,18 @@ export default async function main() {
     const xAccidentType = d3.scaleBand().range([margin.left, width - margin.right]).padding(0.2);
     const yAccidentType = d3.scaleLinear().range([height - margin.bottom, margin.top]);
 
+    const xRegion = d3.scaleBand().range([margin.left, width - margin.right]).padding(0.2);
+    const yRegion = d3.scaleLinear().range([height - margin.bottom, margin.top]);
+
     // ---------- AXES ----------
     const xAxisIntersection = svgIntersection.append('g').attr('transform', `translate(0,${height - margin.bottom})`);
     const yAxisIntersection = svgIntersection.append('g').attr('transform', `translate(${margin.left},0)`);
 
     const xAxisAccidentType = svgAccidentType.append('g').attr('transform', `translate(0,${height - margin.bottom})`);
     const yAxisAccidentType = svgAccidentType.append('g').attr('transform', `translate(${margin.left},0)`);
+
+    const xAxisRegion = svgRegion.append('g').attr('transform', `translate(0,${height - margin.bottom})`);
+    const yAxisRegion = svgRegion.append('g').attr('transform', `translate(${margin.left},0)`);
 
     // ---------- SUM DATA ----------
     function summedByDimension(data, accessor) {
@@ -167,6 +185,15 @@ export default async function main() {
             y: yAccidentType,
             xAxis: xAxisAccidentType,
             yAxis: yAxisAccidentType
+        }),
+        makeChart({
+            svg: svgRegion,
+            accessor: d => d.region,
+            filterKey: 'region',
+            x: xRegion,
+            y: yRegion,
+            xAxis: xAxisRegion,
+            yAxis: yAxisRegion
         })
     ];
 
@@ -178,4 +205,5 @@ export default async function main() {
     updateAll();
     container.intersection.append(svgIntersection.node());
     container.accidentType.append(svgAccidentType.node());
+    container.region.append(svgRegion.node());
 }
