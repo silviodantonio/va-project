@@ -1,9 +1,10 @@
 import * as d3 from 'd3';
 import { WEEK_DAY_LIST, WEEK_DAY_DICTIONARY, HOUR_LIST } from './constants.js';
 import { selectionStore, updateSelection, computeActiveSelection } from "./selectionStore.js";
+import { drawSeqLegends } from './heatmapUtils.js';
 
 export default async function main() {
-  const margin = { top: 35, right: 45, bottom: 15, left: 55 },
+  const margin = { top: 35, right: 65, bottom: 15, left: 55 },
         width = 350 - margin.left - margin.right,
         height = 350 - margin.top - margin.bottom;
 
@@ -156,8 +157,7 @@ export default async function main() {
   const initialHeatmapData = computeHeatmapData(rawData);
 
   const minValue = 0;
-  let maxValue = d3.max(initialHeatmapData, d => d.value);
-
+  const maxValue = d3.max(initialHeatmapData, d => d.value);
   myColor.domain([minValue, maxValue]);
 
   svg.selectAll(".heatmap-cell-WeekHours")
@@ -196,20 +196,29 @@ export default async function main() {
     })
     .on("click", cellClicked);
 
+  drawSeqLegends(svg, width + 15, 0,
+    minValue, maxValue, myColor.range().length,
+    myColor
+  )
+
   // -------------------- UPDATE (NO JOIN) --------------------
   function updateHeatmap(filteredData) {
     const heatmapData = computeHeatmapData(filteredData);
 
     const minValue = 0;
-    let maxValue = d3.max(heatmapData, d => d.value);
-
-    myColor.domain([minValue, maxValue ]);
+    const maxValue = d3.max(heatmapData, d => d.value);
+    myColor.domain([minValue, maxValue]);
 
     svg.selectAll(".heatmap-cell-WeekHours")
       .data(heatmapData, d => d.week_day + ":" + d.hour)
       .transition()
       .duration(400)
       .style("fill", d => myColor(d.value));
+
+    drawSeqLegends(svg, width + 15, 0,
+      minValue, maxValue, myColor.range().length,
+      myColor
+    )
   }
 
   // -------------------- REACT TO SELECTION --------------------
