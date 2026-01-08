@@ -149,9 +149,7 @@ async function main() {
             drawCatLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
         }
 
-        svg.select('.brush').call(brush.move, null);
-        updateSelection("pca", null);
-        // updatePCA(data, null); --------------- serve?????? ------------
+        updatePCA(data, selectionStore.pca); 
 
     });
 
