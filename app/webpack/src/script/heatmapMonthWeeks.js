@@ -20,6 +20,9 @@ export default  async function main () {
     .append("g")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
+
+
+
   let heatmapDataSource;
 
   let rawData = await d3.csv(
@@ -29,6 +32,15 @@ export default  async function main () {
   heatmapDataSource = rawData;
 
   drawHeatmap(rawData, width, height, svg);
+
+    svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", -5)  // Position above the chart (negative y moves up)
+    .attr("text-anchor", "middle")
+    .style("font-size", "14px")
+    .style("font-weight", "bold")
+    .style("fill", "#333")
+    .text("Accidents by Month and Weekday");
   // document.addEventListener("region-click", event => {
   //       const regionName = event.detail.regionName;
   

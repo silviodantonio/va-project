@@ -35,11 +35,34 @@ export default async function main() {
         .attr("width", "100%")
         .attr("height", "100%");
 
+    svgIntersection.append('text')
+        .attr('x', (width + margin.left + margin.right) / 2)
+        .attr('y', 20) // Position within the top margin
+        .attr('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .style('font-weight', 'bold')
+        .style('fill', '#333')
+        .style('pointer-events', 'none')
+        .text('Accidents by Intersection Type');
+
+
     const svgAccidentType = d3.create('svg')
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", `0 0 ${width} ${height}`)
         .attr("width", "100%")
         .attr("height", "100%");
+    
+    svgAccidentType.append('text')
+        .attr('x', (width + margin.left + margin.right) / 2)
+        .attr('y', 20) // Position within the top margin
+        .attr('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .style('font-weight', 'bold')
+        .style('fill', '#333')
+        .style('pointer-events', 'none')
+        .text('Accidents by Type');
+
+
 
     const svgRegion = d3.create('svg')
         .attr("preserveAspectRatio", "xMinYMin meet")
@@ -47,9 +70,22 @@ export default async function main() {
         .attr("width", "100%")
         .attr("height", "100%");
 
+    svgRegion.append('text')
+        .attr('x', (width + margin.left + margin.right) / 2)
+        .attr('y', 20) // Position within the top margin
+        .attr('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .style('font-weight', 'bold')
+        .style('fill', '#333')
+        .style('pointer-events', 'none')
+        .text('Accidents by Region');
+
+    
+
     svgIntersection.on('click', () => updateSelection('intersection', null));
     svgAccidentType.on('click', () => updateSelection('accident_type', null));
     svgRegion.on('click', () => updateSelection('region', null));
+    
 
     // ---------- SCALES ----------
     const xIntersection = d3.scaleBand().range([margin.left, width - margin.right]).padding(0.2);

@@ -26,6 +26,22 @@ export default async function main() {
     (d, i) => ({ ...d, id: i })
   );
 
+   drawHeatmap(rawData, width, height, svg);
+
+    svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", -5)  // Position above the chart (negative y moves up)
+    .attr("text-anchor", "middle")
+    .style("font-size", "14px")
+    .style("font-weight", "bold")
+    .style("fill", "#333")
+    .text("Accidents by Weekday and Hour");
+}
+
+
+function drawHeatmap(rawData, width, height, svg){
+  svg.selectAll("*").remove();
+
   // -------------------- FULL GRID --------------------
   const ALL_CELLS = [];
   for (const week_day of WEEK_DAY_LIST) {

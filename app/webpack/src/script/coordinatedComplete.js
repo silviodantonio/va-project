@@ -149,6 +149,8 @@ export default async function main () {
     // const yMonth = d3.scaleLinear()
     //     .range([height - marginBottom, marginTop]);
 
+    
+
     // ---------- AXES ----------
     // const xAxisRegion = svgRegion.append('g')
     //     .attr('transform', `translate(0,${height - marginBottom})`);
@@ -321,6 +323,8 @@ export default async function main () {
             xAxis: xAxisAccidentType,
             yAxis: yAxisAccidentType
         })
+
+
         // makeChart({
         //     svg: svgDeadly,
         //     accessor: d => d.deadly,
@@ -362,6 +366,8 @@ export default async function main () {
     function updateAll() {
         charts.forEach(c => c());
     }
+
+
 
     // ---------- INITIAL RENDER ----------
     updateAll();
