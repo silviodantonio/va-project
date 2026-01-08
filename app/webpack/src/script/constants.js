@@ -1,7 +1,7 @@
 // constants.js
 export const REGION_LIST = [
-    "Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia",
-    "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia",
+    "Piemonte", "Valle d'Aosta", "Liguria", "Lombardia",
+    "Trentino", "Veneto", "Friuli",
     "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo",
     "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"
 ];

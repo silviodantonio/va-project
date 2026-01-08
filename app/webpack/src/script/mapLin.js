@@ -17,7 +17,7 @@ export default function main() {
     // const region_list=["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
 
     Promise.all([
-        fetch("http://127.0.0.1:7000/limits_IT_regions.topo.json").then(res => res.json()),
+        fetch("http://127.0.0.1:7000/limits_IT_regions_cut.topo.json").then(res => res.json()),
         fetch("http://127.0.0.1:7000/accidents_regions_complete.csv").then(res => res.text())
     ])
     .then(([itJson, csvText]) => {
