@@ -29,3 +29,6 @@ mainHeatmap();
 
 import mainHeatmapWeekHours from './heatmapWeekHours.js';
 mainHeatmapWeekHours();
+
+import { initTopRevealButton } from './reset_button.js';
+initTopRevealButton();
