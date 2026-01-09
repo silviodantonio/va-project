@@ -109,7 +109,7 @@ export function drawCatLegends(svg, xPos, yPos, labels, colorScale) {
                 .attr("x", xPos + circleRadius + labelOffset)
                 .attr("y", (_, i) => yPos + i*20 + 1.5)
                 .style("fill", "black")
-                // .attr('font-size', `${fontSize}px`)
+                .attr('font-size', `${fontSize}px`)
                 .text(d => d)
                 .attr("text-anchor", "left")
                 .style("dominant-baseline", "middle")
