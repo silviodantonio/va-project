@@ -46,3 +46,20 @@ export function extractIDs(selection) {
     if (selection.ids instanceof Set) return selection.ids;
     return null;
 }
+export function resetAllSelections() {
+    const wasPcaActive = selectionStore["pca"] != null; // save current state
+        // Trigger PCA-specific event if needed
+    if (wasPcaActive) {
+        document.dispatchEvent(new CustomEvent("clear-pca-brush"));
+    }
+    // Reset all selections
+    Object.keys(selectionStore).forEach(key => {
+        selectionStore[key] = null;
+    });
+    // Trigger global selection-changed event
+    document.dispatchEvent(new CustomEvent("selection-changed", {
+        detail: { source: "reset", store: selectionStore }
+    }));
+}
+
+
