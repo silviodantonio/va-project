@@ -12,7 +12,10 @@ export default function main() {
     // Get container dimensions first
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
-    
+
+    // Initialize variables for mouse hovering
+    let hoveredRegion = null;
+    let lastMousePos = null;
 
     // const region_list=["Piemonte", "Valle d'Aosta / Vallée d'Aoste", "Liguria", "Lombardia", "Trentino Alto Adige / Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna", "Toscana", "Umbria", "Marche", "Lazio", "Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria", "Sicilia", "Sardegna"];
 
@@ -184,7 +187,7 @@ export default function main() {
                     .attr("transform", "translate(0,0)")
                     .attr("stroke", "black")
                     .attr("stroke-width", 1);
-
+                lastMousePos = null;
                 updateSelection("region", null);
             });
 
@@ -214,57 +217,12 @@ export default function main() {
                     .attr("stroke-width",3);
             })
             .on("mousemove", function(event, d) {
-                const v = valuemap.get(d.properties.reg_name) ?? 0;
-
-                const [mx, myRaw] = d3.pointer(event, svg.node());
-                const my = myRaw - legendBlockHeight;
-                const [rx, ry] = path.centroid(d);
-
-                const dx = mapCenter[0] - rx;
-                const dy = mapCenter[1] - ry;
-                const len = Math.hypot(dx, dy);
-                const offset = 70;
-
-                let ox = mx + dx / len * offset;
-                let oy = my + dy / len * offset;
-
-                ox = Math.max(40, Math.min(width - 40, ox));
-                oy = Math.max(40, Math.min(height - 40, oy));
-
-                overlayLine
-                    .attr("x1", mx)
-                    .attr("y1", my)
-                    .attr("x2", ox)
-                    .attr("y2", oy);
-
-                const rgb = d3.color(color(v));
-                const brightness = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
-                const textColor = brightness < 140 ? "white" : "black";
-
-                overlayText.selectAll("*").remove();
-                overlayText.append("tspan")
-                    .attr("x", ox)
-                    .attr("y", oy - 6)
-                    .attr("fill", textColor)
-                    .text(d.properties.reg_name);
-
-                overlayText.append("tspan")
-                    .attr("x", ox)
-                    .attr("y", oy + 16)
-                    .attr("fill", textColor)
-                    .text(v);
-
-                const bbox = overlayText.node().getBBox();
-                overlayRect
-                    .attr("x", bbox.x - 6)
-                    .attr("y", bbox.y - 4)
-                    .attr("width", bbox.width + 12)
-                    .attr("height", bbox.height + 8)
-                    .attr("fill", color(v));
-
-                hoverOverlay.style("visibility", "visible");
+                hoveredRegion = d;
+                lastMousePos = d3.pointer(event, svg.node());
+                renderTooltip(d);
             })
             .on("mouseleave", function () {
+                lastMousePos = null;
                 const sel = d3.select(this);
 
                 // If this region is selected, only reset transform
@@ -305,7 +263,6 @@ export default function main() {
                         .map(a => a.__id)
                 );
 
-                // updateSelection("region", { region: regionName, ids: selectedIDs });
                 const current = selectionStore.region;
                 const same = current && current.region === regionName && current.ids.size === selectedIDs.size && [...selectedIDs].every(id => current.ids.has(id));
                 updateSelection("region", same ? null : { region: regionName, ids: selectedIDs });
@@ -352,7 +309,63 @@ export default function main() {
             .attr("stroke-width", d =>
                 selectionStore.region?.region === d.properties.reg_name ? 3 : 1
             );
+            renderTooltip(hoveredRegion);
         });
+
+        function renderTooltip(d) {
+            if (!d || !lastMousePos) return;
+
+            const v = valuemap.get(d.properties.reg_name) ?? 0;
+
+            const [mx, myRaw] = lastMousePos;
+            const my = myRaw - legendBlockHeight;
+
+            const [rx, ry] = path.centroid(d);
+
+            const dx = mapCenter[0] - rx;
+            const dy = mapCenter[1] - ry;
+            const len = Math.hypot(dx, dy);
+            const offset = 70;
+
+            let ox = mx + dx / len * offset;
+            let oy = my + dy / len * offset;
+
+            ox = Math.max(40, Math.min(width - 40, ox));
+            oy = Math.max(40, Math.min(height - 40, oy));
+
+            overlayLine
+                .attr("x1", mx)
+                .attr("y1", my)
+                .attr("x2", ox)
+                .attr("y2", oy);
+
+            const rgb = d3.color(color(v));
+            const brightness = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
+            const textColor = brightness < 140 ? "white" : "black";
+
+            overlayText.selectAll("*").remove();
+            overlayText.append("tspan")
+                .attr("x", ox)
+                .attr("y", oy - 6)
+                .attr("fill", textColor)
+                .text(d.properties.reg_name);
+
+            overlayText.append("tspan")
+                .attr("x", ox)
+                .attr("y", oy + 16)
+                .attr("fill", textColor)
+                .text(v);
+
+            const bbox = overlayText.node().getBBox();
+            overlayRect
+                .attr("x", bbox.x - 6)
+                .attr("y", bbox.y - 4)
+                .attr("width", bbox.width + 12)
+                .attr("height", bbox.height + 8)
+                .attr("fill", color(v));
+
+            hoverOverlay.style("visibility", "visible");
+        }
 
     })
     .catch(err => console.error(err));
