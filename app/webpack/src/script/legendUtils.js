@@ -68,6 +68,7 @@ export function drawPcaDensityLegends(svg, xPos, yPos, minVal, maxVal, steps, co
     // Remove legends of "categorical" scatterplots
     svg.selectAll('.legendCatDecorator').remove()
     svg.selectAll('.legendCatLabel').remove()
+    svg.selectAll('.legendCatClickBox').remove()
 
     drawSeqLegends(svg, xPos, yPos, minVal, maxVal, steps, colorScale);
 
@@ -81,6 +82,9 @@ export function drawCatLegends(svg, xPos, yPos, labels, colorScale) {
 	const fontSize = 12;
 	// Space between label and decorator
 	const labelOffset = 4;
+
+    const maxLabelLen = d3.max(labels, d => d.length);
+    const clicBoxWidth = (fontSize*0.6) * maxLabelLen;
 
     // Remove legends of density scatterplot
     svg.selectAll('.legendSeqDecorator').remove()
@@ -101,6 +105,7 @@ export function drawCatLegends(svg, xPos, yPos, labels, colorScale) {
             exit => exit.remove(),
         );
 
+
     svg.selectAll(".legendCatLabel")
         .data(labels)
         .join(
@@ -118,4 +123,28 @@ export function drawCatLegends(svg, xPos, yPos, labels, colorScale) {
                 .text(d => d),
             exit => exit.remove(),
         )
+
+    svg.selectAll(".legendCatClickBox")
+        .data(labels)
+        .join(
+            enter => enter
+                .append("rect")
+                .attr("x", xPos - circleRadius)
+                .attr("y", (_, i) => yPos + i*20 - (2*circleRadius))
+                .attr("height", fontSize + 5)
+                .attr("width", clicBoxWidth)
+                .style("fill", "blue")
+                .style("opacity", 0.5)
+                .attr("class", "legendCatClickBox"),
+            update => update
+                .attr("width", clicBoxWidth),
+            exit => exit.remove(),
+        )
+
+    svg.selectAll('.legendCatClickBox')
+        .on('click', e => legendClicked(e));
+}
+
+function legendClicked(e) {
+    console.log(`Clicked on legend`);
 }

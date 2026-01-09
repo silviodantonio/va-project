@@ -32,7 +32,6 @@ async function main() {
         left: 40
     };
 
-    const POINT_RADIUS = 3;
 
     // Load data
     let data = await d3.csv(
@@ -83,7 +82,7 @@ async function main() {
     const dataSortedByObservation = d3.sort(data, d => d.observation);
 
     /* ============================
-       SVG layer (axes only)
+       SVG layer
     ============================ */
 
     const svg = d3.create("svg")
@@ -102,6 +101,36 @@ async function main() {
     svg.append("g")
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y));
+
+    /* ============================
+    //    Brushing
+    // ============================ */
+
+    const brush = d3.brush()
+        .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
+        .on("brush end", (event) => brushCallback(event, data))
+
+    const brushG = svg.append('g').attr("class", "brush").call(brush);
+
+    // Draw legends
+    const coloringSelector = document.querySelector('#colorSelector');
+    let coloringAttribute = coloringSelector.value;
+
+    if (coloringAttribute === 'density') {
+        drawPcaDensityLegends(svg, margin.left + 20, margin.top + 10, 
+            0, 1, 7,
+            densityColors
+        );
+    }
+    else if (coloringAttribute === "observation") {
+        drawPcaDensityLegends(svg, margin.left + 15, margin.top + 10,
+            obsMin, obsMax, 7,
+            observationColors
+        );
+    }
+    else {
+        drawCatLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors);
+    }
 
     /* ============================
        Canvas layer (points only)
@@ -127,25 +156,7 @@ async function main() {
     
     // Draw PCA for the first time
 
-    const coloringSelector = document.querySelector('#colorSelector');
-    let coloringAttribute = coloringSelector.value;
-
-    if (coloringAttribute === 'density') {
-        drawPcaDensityLegends(svg, margin.left + 20, margin.top + 10, 
-            0, 1, 7,
-            densityColors
-        );
-    }
-    else if (coloringAttribute === "observation") {
-        drawPcaDensityLegends(svg, margin.left + 15, margin.top + 10,
-            obsMin, obsMax, 7,
-            observationColors
-        );
-    }
-    else {
-        drawCatLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors);
-    }
-    updatePCA(data, null);
+    drawPCA(data, null);
 
     // Event listener for recoloring when changing selected attribute
     coloringSelector.addEventListener('change', (e) => {
@@ -170,60 +181,11 @@ async function main() {
             drawCatLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
         }
 
-        updatePCA(data, selectionStore.pca); 
+        drawPCA(data, selectionStore.pca); 
 
     });
 
-
-    /* ============================
-    //    Brushing
-    // ============================ */
-
-   const brush = d3.brush()
-        .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
-        .on("brush end", (event) => {
-            const { selection, type } = event;
-
-            if (!event.sourceEvent) return;
-
-            let selectedIds = null;
-
-            if (selection) {
-                const [[x0, y0], [x1, y1]] = selection;
-
-                selectedIds = new Set(
-                    data
-                        .filter(d =>
-                            d.x - POINT_RADIUS >= x0 &&
-                            d.x + POINT_RADIUS <= x1 &&
-                            d.y - POINT_RADIUS >= y0 &&
-                            d.y + POINT_RADIUS <= y1
-                        )
-                        .map(d => d.id)
-                );
-                const {fraction, percentage} = getSelectionPercentage(selectedIds);
-                updatePercentageUI(fraction, percentage);
-            }
-            else{
-                updatePercentageUI(null,0);
-            }
-            // RESET all other selections
-            for (const key in selectionStore) {
-                if (key !== "pca") {
-                    selectionStore[key] = null;
-                }
-            }
-            // This is to trigger other graph's update only at the end of the brush 
-            // if (type === "brush") {
-            //     updatePCA(data, selectedIds);
-            // } else {
-            //     updateSelection("pca", selectedIds);
-            // }
-
-            updateSelection("pca", selectedIds);
-    });
-
-    function updatePCA(data, selectedIds = null) {
+    function drawPCA(data, selectedIds = null) {
         ctx.clearRect(0, 0, width, height);
 
         const hasSelection = selectedIds && selectedIds.size > 0;
@@ -259,7 +221,6 @@ async function main() {
         });
     }
 
-    const brushG = svg.append('g').attr("class", "brush").call(brush);
 
     /* ============================
         React to selection changes
@@ -269,7 +230,7 @@ async function main() {
         if (selectionStore.pca != null) {
             selectionStore.pca = null;
             brushG.call(brush.move, null);
-            updatePCA(data, null);
+            drawPCA(data, null);
             updatePercentageUI(null, 0);
         }
     });
@@ -279,7 +240,7 @@ async function main() {
 
         const activeSelection = computeActiveSelection(store);
       
-        updatePCA(data, activeSelection);
+        drawPCA(data, activeSelection);
         const {fraction, percentage} = getSelectionPercentage(activeSelection);
         updatePercentageUI(fraction, percentage);
     });
@@ -291,6 +252,45 @@ async function main() {
 
     container.appendChild(canvas);
     container.appendChild(svg.node());
+}
+
+function brushCallback(event, data) {
+
+    const POINT_RADIUS = 3;
+
+    const { selection, type } = event;
+    if (!event.sourceEvent) return;
+
+    let selectedIds = null;
+
+    if (selection) {
+        const [[x0, y0], [x1, y1]] = selection;
+
+        selectedIds = new Set(
+            data
+                .filter(d =>
+                    d.x - POINT_RADIUS >= x0 &&
+                    d.x + POINT_RADIUS <= x1 &&
+                    d.y - POINT_RADIUS >= y0 &&
+                    d.y + POINT_RADIUS <= y1
+                )
+                .map(d => d.id)
+        );
+        const {fraction, percentage} = getSelectionPercentage(selectedIds);
+        updatePercentageUI(fraction, percentage);
+    }
+    else {
+        updatePercentageUI(null,0);
+    }
+
+    // RESET all other selections
+    for (const key in selectionStore) {
+        if (key !== "pca") {
+            selectionStore[key] = null;
+        }
+    }
+    updateSelection("pca", selectedIds);
+
 }
 
 export default main;
