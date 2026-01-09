@@ -215,7 +215,7 @@ export default async function main() {
     // ---------- MAKE CHART ----------
     function makeChart({ svg, accessor, filterKey, x, y, xAxis, yAxis }) {
         return function update() {
-            const data = summedByDimension(rawData, accessor);
+            const data = summedByDimension(rawData, accessor).sort((a,b)=>d3.descending(a.value,b.value));
 
             x.domain(data.map(d => d.key));
             y.domain([0, d3.max(data, d => d.value)]); // Fixed axes
