@@ -15,7 +15,7 @@ export function drawSeqLegends(svg, xPos, yPos, minVal, maxVal, steps, colorScal
     const labels = new Array(steps).fill('');
     labels[0] = minVal;
     labels[steps - 1] = maxVal
-    const midVal = Math.trunc((maxVal + minVal) / 2);
+    const midVal = (maxVal === 1 ? (maxVal + minVal) / 2 : Math.trunc((maxVal + minVal) / 2));
     labels[Math.trunc(steps / 2)] = midVal;
 
 	// Shorten labels
@@ -29,7 +29,7 @@ export function drawSeqLegends(svg, xPos, yPos, minVal, maxVal, steps, colorScal
     const colorStep = (maxVal - minVal) / steps;
 
     // Draw squares for color scale
-    svg.selectAll(".legendDecorator")
+    svg.selectAll(".legendSeqDecorator")
         .data(labels)
         .join(
           enter => enter
@@ -39,13 +39,13 @@ export function drawSeqLegends(svg, xPos, yPos, minVal, maxVal, steps, colorScal
             .attr("width", rectWidth)
             .attr("height", rectHeight)
             .style("fill", (_, i) => colorScale(minVal + i*colorStep))
-            .attr("class", "legendDecorator"),
+            .attr("class", "legendSeqDecorator"),
           update => update,
           exit => exit,
         )
 
     // Draw text labels
-    svg.selectAll(".legendLabel")
+    svg.selectAll(".legendSeqLabel")
         .data(labels)
         .join(
           enter => enter
@@ -56,7 +56,7 @@ export function drawSeqLegends(svg, xPos, yPos, minVal, maxVal, steps, colorScal
             .style("fill", "black")
 			.style("font-size", `${fontSize}px`)
             .text(d => d)
-            .attr("class", "legendLabel"),
+            .attr("class", "legendSeqLabel"),
           update => update
             .text(d => d),
           exit => exit
@@ -65,62 +65,28 @@ export function drawSeqLegends(svg, xPos, yPos, minVal, maxVal, steps, colorScal
 
 export function drawPcaDensityLegends(svg, xPos, yPos, minVal, maxVal, steps, colorScale) {
 
-	// Variables that manage the styling
-    const rectWidth = 15;
-    const rectHeight = 15;
-
-	const fontSize = 15;
-	// Space between label and decorator
-	const labelOffset = 6;
-
-    // Build array for labels.
-    // It will contain only labels for min, max and middle value.
-    const labels = new Array(steps).fill('');
-    labels[0] = minVal;
-    labels[steps - 1] = maxVal
-    const midVal = (maxVal + minVal) / 2;
-    labels[Math.trunc(steps / 2)] = midVal;
-
-    const colorStep = (maxVal - minVal) / steps;
-
     // Remove legends of "categorical" scatterplots
-    svg.selectAll('.legendDecor').remove()
-    svg.selectAll('.legendLabel').remove()
+    svg.selectAll('.legendCatDecorator').remove()
+    svg.selectAll('.legendCatLabel').remove()
 
-    svg.selectAll(".legendDensityDecor")
-        .data(labels)
-        .enter()
-        .append("rect")
-        .attr("x", xPos)
-        .attr("y", (_ , i) => yPos + (labels.length-1)*rectHeight - i*rectHeight)
-        .attr("width", rectWidth)
-        .attr("height", rectHeight)
-        .style("fill", (_, i) => colorScale(i*colorStep))
-        .attr("class", "legendDensityDecor");
+    drawSeqLegends(svg, xPos, yPos, minVal, maxVal, steps, colorScale);
 
-    svg.selectAll(".legendDensityLabel")
-        .data(labels)
-        .enter()
-        .append("text")
-        .attr("x", xPos + rectWidth + labelOffset)
-        .attr("y", (_, i) => yPos + (rectHeight/2) + (labels.length-1)*rectHeight + 2 - i*rectHeight)
-        .attr('dominant-baseline', "middle")
-        .style("fill", "black")
-		.style("font-size", `${fontSize}px`)
-        .text(d => d)
-        .attr("class", "legendDensityLabel");
 }
 
 export function drawCatLegends(svg, xPos, yPos, labels, colorScale) {
 
-    console.log(`Add labels for: ${labels}`)
-    const circleRadius = 5;
+    // Decorator cicle
+    const circleRadius = 4;
+
+	const fontSize = 12;
+	// Space between label and decorator
+	const labelOffset = 4;
 
     // Remove legends of density scatterplot
-    svg.selectAll('.legendDensityDecor').remove()
-    svg.selectAll('.legendDensityLabel').remove()
+    svg.selectAll('.legendSeqDecorator').remove()
+    svg.selectAll('.legendSeqLabel').remove()
 
-    svg.selectAll(".legendDecor")
+    svg.selectAll(".legendCatDecorator")
         .data(labels)
         .join(
             enter => enter
@@ -129,24 +95,25 @@ export function drawCatLegends(svg, xPos, yPos, labels, colorScale) {
                 .attr("cy", (_ , i) => yPos + i*20)
                 .attr("r", circleRadius)
                 .style("fill", (_, i) => colorScale(i))
-                .attr("class", "legendDecor"),
+                .attr("class", "legendCatDecorator"),
             update => update
                 .style("fill", (_, i) => colorScale(i)),
             exit => exit.remove(),
         );
 
-    svg.selectAll(".legendLabel")
+    svg.selectAll(".legendCatLabel")
         .data(labels)
         .join(
             enter => enter
                 .append("text")
-                .attr("x", xPos + circleRadius + 8)
-                .attr("y", (_, i) => yPos + i*20)
+                .attr("x", xPos + circleRadius + labelOffset)
+                .attr("y", (_, i) => yPos + i*20 + 1.5)
                 .style("fill", "black")
+                // .attr('font-size', `${fontSize}px`)
                 .text(d => d)
                 .attr("text-anchor", "left")
                 .style("dominant-baseline", "middle")
-                .attr("class", "legendLabel"),
+                .attr("class", "legendCatLabel"),
             update => update
                 .text(d => d),
             exit => exit.remove(),

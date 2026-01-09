@@ -29,6 +29,11 @@ export const densityColorsDesat = d3.scaleQuantize([0, 1], seqColors.map(d => {
     return desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)
 }));
 
+export const observationColors = d3.scaleQuantize(seqColors)
+export const observationColorsDesat = d3.scaleQuantize(seqColors.map(d => {
+    return desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)
+}));
+
 
 export function attachDensityIndex(data, quantizeX, quantizeY) {
 
@@ -88,14 +93,19 @@ export function drawPoints({
     data,
     coloringAttribute,
     saturated = true,
-    mode = "categorical" // or "density"
 }) {
     for (const d of data) {
-        if (mode === "density") {
+        if (coloringAttribute === "density") {
             ctx.fillStyle = saturated
                 ? densityColors(d[coloringAttribute])
                 : densityColorsDesat(d[coloringAttribute]);
-        } else {
+        }
+        else if (coloringAttribute === "observation") {
+            ctx.fillStyle = saturated
+                ? observationColors(d[coloringAttribute])
+                : observationColorsDesat(d[coloringAttribute]);
+        }
+        else {
             ctx.fillStyle = saturated
                 ? catColors(d[coloringAttribute])
                 : catColorsDesat(d[coloringAttribute]);

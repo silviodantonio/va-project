@@ -6,7 +6,8 @@ import {
     attachDensityIndex,
     drawPoints,
     catColors,
-    densityColors
+    densityColors,
+    observationColors, observationColorsDesat,
 } from "./pcaHelpers.js";
 import { getSelectionPercentage, initIdMap, updatePercentageUI } from "./percentage.js";
 
@@ -65,6 +66,11 @@ async function main() {
         .nice()
         .range([height - margin.bottom, margin.top]);
 
+    // Set domain for observation color scales
+    const [obsMin, obsMax] = d3.extent(data, d => d.observation);
+    observationColors.domain([obsMin, obsMax]);
+    observationColorsDesat.domain([obsMin, obsMax]);
+
     // Precompute element positions
     data.forEach(d => {
         d.x = x(d.x_pca);
@@ -73,6 +79,8 @@ async function main() {
 
     data = attachDensityIndex(data, 600, 420);
     const dataSortedByDensity = d3.sort(data, d => d.density);
+
+    const dataSortedByObservation = d3.sort(data, d => d.observation);
 
     /* ============================
        SVG layer (axes only)
@@ -128,6 +136,12 @@ async function main() {
             densityColors
         );
     }
+    else if (coloringAttribute === "observation") {
+        drawPcaDensityLegends(svg, margin.left + 15, margin.top + 10,
+            obsMin, obsMax, 7,
+            observationColors
+        );
+    }
     else {
         drawCatLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors);
     }
@@ -145,7 +159,14 @@ async function main() {
                 0, 1, 7,
                 densityColors
             );
-        } else {
+        }
+        else if (coloringAttribute === "observation") {
+            drawPcaDensityLegends(svg, margin.left + 15, margin.top + 10,
+                obsMin, obsMax, 7,
+                observationColors
+            );
+        }
+        else {
             drawCatLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
         }
 
@@ -206,30 +227,35 @@ async function main() {
         ctx.clearRect(0, 0, width, height);
 
         const hasSelection = selectedIds && selectedIds.size > 0;
-        const mode = coloringAttribute === "density" ? "density" : "categorical";
-        const baseOrder = mode === "density" ? dataSortedByDensity : data;
+
+        // Sort data for drawing points in an orderly manner
+        let canvasData = data;
+        if (coloringAttribute === 'density') {
+            canvasData = dataSortedByDensity;
+        }
+        else if(coloringAttribute === 'observation') {
+            canvasData = dataSortedByObservation;
+        }
 
         if (!hasSelection) {
-            drawPoints({ ctx, data: baseOrder, coloringAttribute, saturated: true, mode });
+            drawPoints({ ctx, data: canvasData, coloringAttribute, saturated: true});
             return;
         }
 
         // Draw unselected (bottom)
         drawPoints({
             ctx,
-            data: baseOrder.filter(d => !selectedIds.has(d.id)),
+            data: canvasData.filter(d => !selectedIds.has(d.id)),
             coloringAttribute,
             saturated: false,
-            mode
         });
 
         // Draw selected (top)
         drawPoints({
             ctx,
-            data: baseOrder.filter(d => selectedIds.has(d.id)),
+            data: canvasData.filter(d => selectedIds.has(d.id)),
             coloringAttribute,
             saturated: true,
-            mode
         });
     }
 
