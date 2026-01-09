@@ -51,8 +51,13 @@ export default function main() {
         function updateColorScale(valuemap) {
             const values = Array.from(valuemap.values()).filter(v => v != null);
             const maxValue = values.length ? d3.max(values) : 0;
-            color.domain([0, maxValue]);
-            return maxValue;
+            if (maxValue == 0) {
+                    color.domain([0, 1]); // domain > 0 but no actual data
+                } else {
+                    color.domain([0, maxValue]);
+                }
+
+                return maxValue;
         }
 
         let maxValue = updateColorScale(valuemap);
