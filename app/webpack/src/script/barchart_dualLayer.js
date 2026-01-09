@@ -98,6 +98,9 @@ export default async function main() {
     const yRegion = d3.scaleLinear().range([height - margin.bottom, margin.top]);
 
     // ---------- AXES ----------
+
+    // Format numbers with SI suffixes (10k, 1M, etc.)
+
     const xAxisIntersection = svgIntersection.append('g').attr('transform', `translate(0,${height - margin.bottom})`);
     const yAxisIntersection = svgIntersection.append('g').attr('transform', `translate(${margin.left},0)`);
 
@@ -216,13 +219,17 @@ export default async function main() {
 
             x.domain(data.map(d => d.key));
             y.domain([0, d3.max(data, d => d.value)]); // Fixed axes
+            const formatK = d3.format(".2~s");
 
             xAxis.call(d3.axisBottom(x))
                  .selectAll('text')
                  .attr('transform', 'rotate(-45)')
                  .attr('text-anchor', 'end');
 
-            yAxis.call(d3.axisLeft(y));
+            yAxis.call(d3.axisLeft(y)
+                .tickFormat(formatK)
+            );
+
 
             drawBars({ svg, data, x, y, accessor, filterKey });
         };
