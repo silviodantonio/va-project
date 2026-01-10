@@ -125,6 +125,8 @@ export default async function main() {
 
     // ---------- DRAW BARS ----------
     function drawBars({ svg, data, x, y, accessor, filterKey, horizontal }) {
+        const MIN_BAR_PX = 2.5;
+
         const activeSelection = computeActiveSelection(selectionStore);
 
         // --- Background bars (full data) ---
@@ -141,9 +143,17 @@ export default async function main() {
         } else {
             bg.enter().append('rect').attr('class', 'bar-bg').merge(bg)
                 .attr('x', d => x(d.key))
-                .attr('y', d => y(d.value))
+                .attr('y', d => {
+                    const h = y(0) - y(d.value);
+                    return d.value > 0
+                        ? y(0) - Math.max(h, MIN_BAR_PX)
+                        : y(0);
+                })
                 .attr('width', x.bandwidth())
-                .attr('height', d => y(0) - y(d.value))
+                .attr('height', d => {
+                    const h = y(0) - y(d.value);
+                    return d.value > 0 ? Math.max(h, MIN_BAR_PX) : 0;
+                })
                 .attr('fill', 'lightblue');
         }
 
@@ -191,9 +201,17 @@ export default async function main() {
             fg.enter().append('rect').attr('class', 'bar-fg').merge(fg)
             .transition().duration(300)
             .attr('x', d => x(d.key))
-            .attr('y', d => y(d.value))
+            .attr('y', d => {
+                const h = y(0) - y(d.value);
+                return d.value > 0
+                    ? y(0) - Math.max(h, MIN_BAR_PX)
+                    : y(0);
+            })
             .attr('width', x.bandwidth())
-            .attr('height', d => y(0) - y(d.value))
+            .attr('height', d => {
+                const h = y(0) - y(d.value);
+                return d.value > 0 ? Math.max(h, MIN_BAR_PX) : 0;
+            })
             .attr('fill', 'steelblue')
             .attr('stroke', d => {
                 const localSelection = extractIDs(selectionStore[filterKey]);
