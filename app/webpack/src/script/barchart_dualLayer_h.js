@@ -24,11 +24,11 @@ export default async function main() {
     // ---------- DIMENSIONS ----------
     // const width = 350;
     // const height = 380;
-    const margin = { top: 30, right: 15, bottom: 70, left: 50 };
+    const margin = { top: 30, right: 15, bottom: 60, left: 50 };
     const width = container.intersection.clientWidth - margin.left - margin.right;
     const height = container.intersection.clientHeight - margin.top - margin.bottom;
     // Size for region bar chart
-    const regionMargin = { top: 30, right: 20, bottom: 40, left: 90 };
+    const regionMargin = { top: 30, right: 20, bottom: 25, left: 30 };
     const regionWidth = container.region.clientWidth - regionMargin.left - regionMargin.right;
     const regionHeight = container.region.clientHeight - regionMargin.top - regionMargin.bottom;
 
@@ -98,7 +98,7 @@ export default async function main() {
     const xAccidentType = d3.scaleBand().range([margin.left, width - margin.right]).padding(0.2);
     const yAccidentType = d3.scaleLinear().range([height - margin.bottom, margin.top]);
 
-    const xRegion = d3.scaleLinear().range([regionMargin.left, regionWidth - regionMargin.right]);
+    const xRegion = d3.scaleLinear().range([regionMargin.left + 60, regionWidth - regionMargin.right]);
     const yRegion = d3.scaleBand().range([regionMargin.top, regionHeight - regionMargin.bottom]).padding(0.2);
 
     // ---------- AXES ----------
@@ -112,7 +112,7 @@ export default async function main() {
     const yAxisAccidentType = svgAccidentType.append('g').attr('transform', `translate(${margin.left},0)`);
 
     const xAxisRegion = svgRegion.append('g').attr('transform', `translate(0,${regionHeight - regionMargin.bottom})`);
-    const yAxisRegion = svgRegion.append('g').attr('transform', `translate(${regionMargin.left},0)`);
+    const yAxisRegion = svgRegion.append('g').attr('transform', `translate(${regionMargin.left + 60},0)`);
 
     // ---------- SUM DATA ----------
     function summedByDimension(data, accessor) {
@@ -284,7 +284,7 @@ export default async function main() {
                 y.domain([0, d3.max(data, d => d.value)]);
                 xAxis.call(d3.axisBottom(x))
                     .selectAll('text')
-                    .attr('transform', 'rotate(-40)')
+                    .attr('transform', 'rotate(-35)')
                     .attr('text-anchor', 'end');
                 yAxis.call(d3.axisLeft(y).tickFormat(formatK));
             }
