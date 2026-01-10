@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import { labels } from "./constants";
 
 export function drawSeqLegends(svg, xPos, yPos, minVal, maxVal, steps, colorScale) {
 
@@ -74,7 +75,7 @@ export function drawPcaDensityLegends(svg, xPos, yPos, minVal, maxVal, steps, co
 
 }
 
-export function drawCatLegends(svg, xPos, yPos, labels, colorScale) {
+export function drawCatLegends(svg, xPos, yPos, labels, colorScale, clickCallback) {
 
     // Decorator cicle
     const circleRadius = 4;
@@ -133,18 +134,13 @@ export function drawCatLegends(svg, xPos, yPos, labels, colorScale) {
                 .attr("y", (_, i) => yPos + i*20 - (2*circleRadius))
                 .attr("height", fontSize + 5)
                 .attr("width", clicBoxWidth)
-                .style("fill", "blue")
+                .style("fill", "transparent")
                 .style("opacity", 0.5)
-                .attr("class", "legendCatClickBox"),
+                .attr("class", "legendCatClickBox")
+                .on('click', (_, d) => clickCallback(d)),
             update => update
                 .attr("width", clicBoxWidth),
             exit => exit.remove(),
         )
 
-    svg.selectAll('.legendCatClickBox')
-        .on('click', e => legendClicked(e));
-}
-
-function legendClicked(e) {
-    console.log(`Clicked on legend`);
 }

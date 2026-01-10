@@ -3,16 +3,19 @@ import {labels, REGION_LIST, WEEK_DAY_LIST, MONTH_LIST,HOUR_LIST, DEADLY_LIST} f
 import { updateSelection, selectionStore, computeActiveSelection } from "./selectionStore.js";
 import { drawPcaDensityLegends, drawCatLegends } from "./legendUtils.js";
 import {
-    attachDensityIndex,
-    drawPoints,
+    dataSet,
+    drawPCA,
     catColors,
     densityColors,
     observationColors, observationColorsDesat,
 } from "./pcaHelpers.js";
 import { getSelectionPercentage, initIdMap, updatePercentageUI } from "./percentage.js";
 
+const data = dataSet.default
+const dataSortedByDensity = dataSet.densitySorted
+const dataSortedByObservation = dataSet.observationSorted;
 
-
+let ctxObj = null;
 
 /* ============================
    Main
@@ -31,23 +34,6 @@ async function main() {
         bottom: 30,
         left: 40
     };
-
-
-    // Load data
-    let data = await d3.csv(
-        "http://127.0.0.1:7000/accidents_region_pca.csv",
-        (d, i) => ({
-            ...d,
-            id: i,           // <-- generate unique ID based on row index
-            x_pca: +d.x_pca,
-            y_pca: +d.y_pca,
-            intersection: +d.intersection - 1,
-            accident_type: +d.accident_type - 1,
-            deadly: +d.deadly,
-            week_day: +d.week_day - 1,
-            observation: +d.observation,
-        })
-    );
 
     initIdMap(data);
 
@@ -70,16 +56,11 @@ async function main() {
     observationColors.domain([obsMin, obsMax]);
     observationColorsDesat.domain([obsMin, obsMax]);
 
-    // Precompute element positions
+    // Precompute element positions on PCA
     data.forEach(d => {
         d.x = x(d.x_pca);
         d.y = y(d.y_pca);
     });
-
-    data = attachDensityIndex(data, 600, 420);
-    const dataSortedByDensity = d3.sort(data, d => d.density);
-
-    const dataSortedByObservation = d3.sort(data, d => d.observation);
 
     /* ============================
        SVG layer
@@ -129,7 +110,8 @@ async function main() {
         );
     }
     else {
-        drawCatLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors);
+        drawCatLegends(svg, margin.left + 20, margin.top + 20, 
+            labels[coloringAttribute], catColors, legendClicked);
     }
 
     /* ============================
@@ -153,10 +135,16 @@ async function main() {
 
     ctx.scale(dpr, dpr);
     ctx.globalAlpha = 0.7;
+
+    ctxObj = {
+        ctx: ctx,
+        width: canvas.width,
+        height: canvas.height,
+    };
     
     // Draw PCA for the first time
 
-    drawPCA(data, null);
+    drawPCA(ctxObj, data, null, coloringAttribute, null);
 
     // Event listener for recoloring when changing selected attribute
     coloringSelector.addEventListener('change', (e) => {
@@ -178,48 +166,14 @@ async function main() {
             );
         }
         else {
-            drawCatLegends(svg, margin.left + 20, margin.top + 20, labels[coloringAttribute], catColors)
+            drawCatLegends(svg, margin.left + 20, margin.top + 20, 
+                labels[coloringAttribute], catColors, legendClicked)
         }
 
-        drawPCA(data, selectionStore.pca); 
+        drawPCA(ctxObj, data, selectionStore.pca, coloringAttribute, null); 
 
     });
 
-    function drawPCA(data, selectedIds = null) {
-        ctx.clearRect(0, 0, width, height);
-
-        const hasSelection = selectedIds && selectedIds.size > 0;
-
-        // Sort data for drawing points in an orderly manner
-        let canvasData = data;
-        if (coloringAttribute === 'density') {
-            canvasData = dataSortedByDensity;
-        }
-        else if(coloringAttribute === 'observation') {
-            canvasData = dataSortedByObservation;
-        }
-
-        if (!hasSelection) {
-            drawPoints({ ctx, data: canvasData, coloringAttribute, saturated: true});
-            return;
-        }
-
-        // Draw unselected (bottom)
-        drawPoints({
-            ctx,
-            data: canvasData.filter(d => !selectedIds.has(d.id)),
-            coloringAttribute,
-            saturated: false,
-        });
-
-        // Draw selected (top)
-        drawPoints({
-            ctx,
-            data: canvasData.filter(d => selectedIds.has(d.id)),
-            coloringAttribute,
-            saturated: true,
-        });
-    }
 
 
     /* ============================
@@ -230,7 +184,7 @@ async function main() {
         if (selectionStore.pca != null) {
             selectionStore.pca = null;
             brushG.call(brush.move, null);
-            drawPCA(data, null);
+            drawPCA(ctxObj, data, null, coloringAttribute, null);
             updatePercentageUI(null, 0);
         }
     });
@@ -240,7 +194,7 @@ async function main() {
 
         const activeSelection = computeActiveSelection(store);
       
-        drawPCA(data, activeSelection);
+        drawPCA(ctxObj, data, activeSelection, coloringAttribute, null);
         const {fraction, percentage} = getSelectionPercentage(activeSelection);
         updatePercentageUI(fraction, percentage);
     });
@@ -291,6 +245,13 @@ function brushCallback(event, data) {
     }
     updateSelection("pca", selectedIds);
 
+}
+
+function legendClicked(d) {
+    let coloringAttribute = document.querySelector('#colorSelector').value;
+    let valueIndex = labels[coloringAttribute].indexOf(d);
+    console.log(`Clicked on index ${valueIndex} of attribute ${coloringAttribute}`);
+    drawPCA(ctxObj, data, selectionStore.pca, coloringAttribute, valueIndex);
 }
 
 export default main;

@@ -1,41 +1,35 @@
 import * as d3 from "d3";
 
-function desatAndLighten(color, desaturate, lighten) {
-  const hcl = d3.hcl(color);
-  hcl.c *= desaturate;
-  // hcl.l += (99 - hcl.l) * lighten;
-  const adjustedLight = hcl.l + (99 - hcl.l) * lighten * (1 - hcl.l / 100);
-  hcl.l = Math.min(99, adjustedLight);
-  return hcl.formatHex();
-}
+// ----------------------------------
+// Data objects and data manipulation
+// ----------------------------------
 
-export const catColors = d3.scaleOrdinal(d3.schemeCategory10);
-export const catColorsDesat = d3.scaleOrdinal(d3.schemeCategory10.map(d => desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)));
-
-const n = 20;
-export const seqColors = Array.from({ length: n }, (_, i) => 
-  // d3.interpolateCividis(i / (n - 1))
-  // d3.interpolatePuBu(i / (n - 1))
-  // d3.interpolateBlues(i / (n - 1))
-  d3.interpolateInferno(i / (n - 1))
-  // d3.interpolateViridis(i / (n - 1))
+const rawData = await d3.csv(
+    "http://127.0.0.1:7000/accidents_region_pca.csv",
+    (d, i) => ({
+        ...d,
+        id: i,           // <-- generate unique ID based on row index
+        x_pca: +d.x_pca,
+        y_pca: +d.y_pca,
+        intersection: +d.intersection - 1,
+        accident_type: +d.accident_type - 1,
+        deadly: +d.deadly,
+        week_day: +d.week_day - 1,
+        observation: +d.observation,
+    })
 );
 
-// build array of Desaturated colors
-export const seqColorsDesat = seqColors.map((color) => desatAndLighten(color, 0.3, 0.7));
+const data = attachDensityIndex(rawData, 600, 420);
+const dataSortedByDensity = d3.sort(data, d => d.density);
+const dataSortedByObservation = d3.sort(data, d => d.observation);
 
-export const densityColors = d3.scaleQuantize([0, 1], seqColors)
-export const densityColorsDesat = d3.scaleQuantize([0, 1], seqColors.map(d => {
-    return desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)
-}));
+export const dataSet = {
+    default: data,
+    densitySorted: dataSortedByDensity,
+    observationSorted: dataSortedByObservation,
+}
 
-export const observationColors = d3.scaleQuantize(seqColors)
-export const observationColorsDesat = d3.scaleQuantize(seqColors.map(d => {
-    return desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)
-}));
-
-
-export function attachDensityIndex(data, quantizeX, quantizeY) {
+function attachDensityIndex(data, quantizeX, quantizeY) {
 
     const densityMatrix = Array.from(
         { length: quantizeX },
@@ -77,7 +71,50 @@ export function attachDensityIndex(data, quantizeX, quantizeY) {
     return newData;
 }
 
-export function drawCircle(ctx, x, y, r) {
+// -----------------------
+// Colors and color scales
+// -----------------------
+
+function desatAndLighten(color, desaturate, lighten) {
+  const hcl = d3.hcl(color);
+  hcl.c *= desaturate;
+  // hcl.l += (99 - hcl.l) * lighten;
+  const adjustedLight = hcl.l + (99 - hcl.l) * lighten * (1 - hcl.l / 100);
+  hcl.l = Math.min(99, adjustedLight);
+  return hcl.formatHex();
+}
+
+export const catColors = d3.scaleOrdinal(d3.schemeCategory10);
+export const catColorsDesat = d3.scaleOrdinal(d3.schemeCategory10.map(d => desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)));
+
+const n = 20;
+export const seqColors = Array.from({ length: n }, (_, i) => 
+  // d3.interpolateCividis(i / (n - 1))
+  // d3.interpolatePuBu(i / (n - 1))
+  // d3.interpolateBlues(i / (n - 1))
+  d3.interpolateInferno(i / (n - 1))
+  // d3.interpolateViridis(i / (n - 1))
+);
+
+// build array of Desaturated colors
+export const seqColorsDesat = seqColors.map((color) => desatAndLighten(color, 0.3, 0.7));
+
+export const densityColors = d3.scaleQuantize([0, 1], seqColors)
+export const densityColorsDesat = d3.scaleQuantize([0, 1], seqColors.map(d => {
+    return desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)
+}));
+
+export const observationColors = d3.scaleQuantize(seqColors)
+export const observationColorsDesat = d3.scaleQuantize(seqColors.map(d => {
+    return desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)
+}));
+
+
+// -----------------
+// Drawing on canvas
+// -----------------
+
+function drawCircle(ctx, x, y, r) {
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.fill();
@@ -88,7 +125,7 @@ export function drawCircle(ctx, x, y, r) {
  * Uses different colors for every value in coloringAttribute.
  * Requires data to have an attribute named `x` and `y`.
  **/
-export function drawPoints({
+function drawPoints({
     ctx,
     data,
     coloringAttribute,
@@ -114,4 +151,52 @@ export function drawPoints({
         drawCircle(ctx, d.x, d.y, 3);
         ctx.fill();
     }
+}
+
+export function drawPCA(ctxObj, data, selectedIds = null, coloringAttribute, raiseValue = null) {
+
+    const ctx = ctxObj.ctx
+    const width = ctxObj.width
+    const height = ctxObj.height
+
+    ctx.clearRect(0, 0, width, height);
+
+    const hasSelection = selectedIds && selectedIds.size > 0;
+
+    // Sort data for drawing points in an orderly manner
+    let canvasData = data;
+    if (coloringAttribute === 'density') {
+        canvasData = dataSortedByDensity;
+    }
+    else if(coloringAttribute === 'observation') {
+        canvasData = dataSortedByObservation;
+    }
+    // Move data elements that satisfy `d[coloringAttribute] == raiseValue` at the
+    // bottom of canvasData, so they will be drawn on top of all the others.
+    else if (raiseValue !== null) {
+        canvasData = data.filter(d => d[coloringAttribute] !== raiseValue)
+        // canvasData = canvasData.sort(d => d[coloringAttribute]);
+        canvasData = canvasData.concat(data.filter(d => d[coloringAttribute] == raiseValue))
+    }
+
+    if (!hasSelection) {
+        drawPoints({ ctx, data: canvasData, coloringAttribute, saturated: true});
+        return;
+    }
+
+    // Draw unselected (bottom)
+    drawPoints({
+        ctx,
+        data: canvasData.filter(d => !selectedIds.has(d.id)),
+        coloringAttribute,
+        saturated: false,
+    });
+
+    // Draw selected (top)
+    drawPoints({
+        ctx,
+        data: canvasData.filter(d => selectedIds.has(d.id)),
+        coloringAttribute,
+        saturated: true,
+    });
 }
