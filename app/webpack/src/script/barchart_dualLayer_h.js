@@ -267,7 +267,7 @@ export default async function main() {
     // ---------- MAKE CHART ----------
     function makeChart({ svg, accessor, filterKey, x, y, xAxis, yAxis, horizontal }) {
         return function update() {
-            const data = summedByDimension(rawData, accessor);
+            const data = summedByDimension(rawData, accessor).sort((a,b)=>d3.descending(a.value,b.value));
             const formatK = d3.format(".2~s");
 
             if (horizontal) {
