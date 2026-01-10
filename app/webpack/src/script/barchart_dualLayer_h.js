@@ -6,7 +6,7 @@ export default async function main() {
     const container = {
         intersection: document.getElementById('chart-intersection'),
         accidentType: document.getElementById('chart-accident-type'),
-        region: document.getElementById('extra-chart')
+        region: document.getElementById('chart-region')
     };
 
     // ---------- LOAD DATA ----------
@@ -24,9 +24,13 @@ export default async function main() {
     // ---------- DIMENSIONS ----------
     // const width = 350;
     // const height = 380;
-    const margin = { top: 20, right: 15, bottom: 70, left: 50 };
+    const margin = { top: 30, right: 15, bottom: 70, left: 50 };
     const width = container.intersection.clientWidth - margin.left - margin.right;
     const height = container.intersection.clientHeight - margin.top - margin.bottom;
+    // Size for region bar chart
+    const regionMargin = { top: 30, right: 20, bottom: 40, left: 90 };
+    const regionWidth = container.region.clientWidth - regionMargin.left - regionMargin.right;
+    const regionHeight = container.region.clientHeight - regionMargin.top - regionMargin.bottom;
 
     // ---------- SVGs ----------
     const svgIntersection = d3.create('svg')
@@ -66,12 +70,12 @@ export default async function main() {
 
     const svgRegion = d3.create('svg')
         .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("viewBox", `0 0 ${regionWidth} ${regionHeight}`)
         .attr("width", "100%")
         .attr("height", "100%");
 
     svgRegion.append('text')
-        .attr('x', (width + margin.left + margin.right) / 2)
+        .attr('x', (regionWidth ) / 2)
         .attr('y', 20) // Position within the top margin
         .attr('text-anchor', 'middle')
         .style('font-size', '12px')
@@ -94,8 +98,8 @@ export default async function main() {
     const xAccidentType = d3.scaleBand().range([margin.left, width - margin.right]).padding(0.2);
     const yAccidentType = d3.scaleLinear().range([height - margin.bottom, margin.top]);
 
-    const xRegion = d3.scaleLinear().range([margin.left, width - margin.right]);
-    const yRegion = d3.scaleBand().range([margin.top, height - margin.bottom]).padding(0.2);
+    const xRegion = d3.scaleLinear().range([regionMargin.left, regionWidth - regionMargin.right]);
+    const yRegion = d3.scaleBand().range([regionMargin.top, regionHeight - regionMargin.bottom]).padding(0.2);
 
     // ---------- AXES ----------
 
@@ -107,8 +111,8 @@ export default async function main() {
     const xAxisAccidentType = svgAccidentType.append('g').attr('transform', `translate(0,${height - margin.bottom})`);
     const yAxisAccidentType = svgAccidentType.append('g').attr('transform', `translate(${margin.left},0)`);
 
-    const xAxisRegion = svgRegion.append('g').attr('transform', `translate(0,${height - margin.bottom})`);
-    const yAxisRegion = svgRegion.append('g').attr('transform', `translate(${margin.left},0)`);
+    const xAxisRegion = svgRegion.append('g').attr('transform', `translate(0,${regionHeight - regionMargin.bottom})`);
+    const yAxisRegion = svgRegion.append('g').attr('transform', `translate(${regionMargin.left},0)`);
 
     // ---------- SUM DATA ----------
     function summedByDimension(data, accessor) {
@@ -280,7 +284,7 @@ export default async function main() {
                 y.domain([0, d3.max(data, d => d.value)]);
                 xAxis.call(d3.axisBottom(x))
                     .selectAll('text')
-                    .attr('transform', 'rotate(-45)')
+                    .attr('transform', 'rotate(-40)')
                     .attr('text-anchor', 'end');
                 yAxis.call(d3.axisLeft(y).tickFormat(formatK));
             }

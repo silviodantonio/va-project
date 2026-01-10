@@ -12,9 +12,9 @@ export const INTERSECTION_LIST = [
 ];
 
 export const ACCIDENT_TYPE_LIST = [
-    "accident between vehicles",
-    "vehicle-pedestrian accident",
-    "accidents involving a single vehicle"
+    "between vehicles",
+    "vehicle-pedestrian",
+    "single vehicle"
 ];
 
 export const WEEK_DAY_LIST = [

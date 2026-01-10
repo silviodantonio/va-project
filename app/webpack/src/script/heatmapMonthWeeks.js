@@ -4,7 +4,7 @@ import {WEEK_DAY_LIST, WEEK_DAY_DICTIONARY, MONTH_LIST, REGION_LIST} from './con
 import { selectionStore, updateSelection, computeActiveSelection } from "./selectionStore.js";
 
 export default  async function main () {
-  const margin = { top: 25, right: 65, bottom: 35, left: 85 },
+  const margin = { top: 25, right: 65, bottom: 35, left: 65 },
         // width = 350 - margin.left - margin.right,
         // height = 260 - margin.top - margin.bottom;
         container = document.getElementById("heatmap-month-week"),

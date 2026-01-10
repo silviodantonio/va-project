@@ -4,7 +4,7 @@ import { selectionStore, updateSelection, computeActiveSelection } from "./selec
 import { drawSeqLegends } from './legendUtils.js';
 
 export default async function main() {
-  const margin = { top: 25, right: 65, bottom: 35, left: 55 },
+  const margin = { top: 25, right: 65, bottom: 35, left: 65 },
         // width = 350 - margin.left - margin.right,
         // height = 350 - margin.top - margin.bottom;
         container = document.getElementById("heatmap-week-hours"),
