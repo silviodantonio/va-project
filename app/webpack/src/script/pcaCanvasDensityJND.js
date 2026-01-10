@@ -16,7 +16,7 @@ let ctxObj = null;
 function drawPCALegends(svg, xPos, yPos, coloringAttribute) {
 
     if (coloringAttribute === 'density') {
-        drawPcaDensityLegends(svg, xPos, yPos, 
+        drawPcaDensityLegends(svg, xPos, yPos,
             0, 1, 7,
             densityColors
         );
@@ -30,17 +30,14 @@ function drawPCALegends(svg, xPos, yPos, coloringAttribute) {
         );
     }
     else {
-        drawCatLegends(svg, xPos, yPos + 4, 
+        drawCatLegends(svg, xPos, yPos + 4,
             labels[coloringAttribute], catColors, legendClickedCallback);
     }
 
 }
 
-const data = dataSet.default;
-
-// Ordering of datapoints in raisedData will be changed by
-// legendClickedCallback()
-let raisedData = dataSet.default
+// Get data
+let data = dataSet.default
 
 /* ============================
    Main
@@ -61,7 +58,6 @@ async function main() {
     };
 
     initIdMap(data);
-
 
     /* ============================
        Scales (margins live HERE)
@@ -159,6 +155,8 @@ async function main() {
     // Event listener for recoloring when changing selected attribute
     coloringSelector.addEventListener('change', (e) => {
         coloringAttribute = e.target.value;
+        // revert all change to ordering that legendClickCallback might have introduced
+        data = dataSet.default;
 
         drawPCALegends(svg, margin.right + 40, margin.top + 20, coloringAttribute);
         drawPCA(ctxObj, data, selectionStore.pca, coloringAttribute);
@@ -243,10 +241,10 @@ function legendClickedCallback(d) {
     let raiseValue = labels[coloringAttribute].indexOf(d);
     console.log(`Clicked on index ${raiseValue} of attribute ${coloringAttribute}`);
 
-    let backroundData = raisedData.filter(d => d[coloringAttribute] !== raiseValue)
-    raisedData = backroundData.concat(data.filter(d => d[coloringAttribute] == raiseValue))
+    let backroundData = data.filter(d => d[coloringAttribute] !== raiseValue)
+    data = backroundData.concat(data.filter(d => d[coloringAttribute] == raiseValue))
 
-    drawPCA(ctxObj, raisedData, selectionStore.pca, coloringAttribute);
+    drawPCA(ctxObj, data, selectionStore.pca, coloringAttribute);
 }
 
 export default main;
