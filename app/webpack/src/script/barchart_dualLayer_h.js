@@ -24,7 +24,7 @@ export default async function main() {
     // ---------- DIMENSIONS ----------
     // const width = 350;
     // const height = 380;
-    const margin = { top: 30, right: 15, bottom: 60, left: 50 };
+    const margin = { top: 30, right: 15, bottom: 50, left: 50 };
     const width = container.intersection.clientWidth - margin.left - margin.right;
     const height = container.intersection.clientHeight - margin.top - margin.bottom;
     // Size for region bar chart
@@ -112,7 +112,7 @@ export default async function main() {
     const yAxisAccidentType = svgAccidentType.append('g').attr('transform', `translate(${margin.left},0)`);
 
     const xAxisRegion = svgRegion.append('g').attr('transform', `translate(0,${regionHeight - regionMargin.bottom})`);
-    const yAxisRegion = svgRegion.append('g').attr('transform', `translate(${regionMargin.left + 60},0)`);
+    const yAxisRegion = svgRegion.append('g').attr('transform', `translate(${regionMargin.left+60},0)`);
 
     // ---------- SUM DATA ----------
     function summedByDimension(data, accessor) {
@@ -268,6 +268,43 @@ export default async function main() {
         interaction.exit().remove();
     }
 
+//--------------DRAW LABEL---------------------------------
+function drawValueLabels({ svg, data, x, y, horizontal }) {
+    const formatK = d3.format(".2~s");
+
+    const labels = svg.selectAll('.bar-label')
+        .data(data, d => d.key);
+
+    labels.enter()
+        .append('text')
+        .attr('class', 'bar-label')
+        .merge(labels)
+        .text(d => d.value > 0 ? formatK(d.value) : '')
+        .transition()
+        .duration(300)
+        .attr('text-anchor', horizontal ? 'start' : 'middle')
+        .attr('font-size', horizontal ? '10px' : '12px')
+        .attr('x', d => {
+            if (horizontal) {
+                return x(d.value) + 3; // to the right of the bar
+            }
+            return x(d.key) + x.bandwidth() / 2;
+        })
+        .attr('y', d => {
+            if (horizontal) {
+                return y(d.key) + y.bandwidth() / 2 + 4;
+            }
+            const barHeight = y(0) - y(d.value);
+            return barHeight > 50
+                ? y(d.value) + 14
+                : y(d.value) - 12;
+        })
+        .attr('fill', '#333');
+
+    labels.exit().remove();
+    svg.selectAll('.bar-label').raise();
+}
+
     // ---------- MAKE CHART ----------
     function makeChart({ svg, accessor, filterKey, x, y, xAxis, yAxis, horizontal }) {
         return function update() {
@@ -290,8 +327,27 @@ export default async function main() {
             }
 
             drawBars({ svg, data, x, y, accessor, filterKey, horizontal });
-        };
+            const active = computeActiveSelection(selectionStore);
+
+            const labelData = active
+                ? data.map(d => {
+                    const ids = rawData
+                        .filter(r => accessor(r) === d.key)
+                        .map(r => r.id);
+
+                    const value = ids.reduce(
+                        (sum, id) => active.has(id) ? sum + rawData[id].observation : sum,
+                        0
+                    );
+
+                    return { key: d.key, value };
+                })
+                : data;
+
+            drawValueLabels({ svg, data: labelData, x, y,horizontal });
+        }
     }
+
 
     // ---------- CHARTS ----------
     const charts = [

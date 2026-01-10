@@ -7,14 +7,14 @@ export const REGION_LIST = [
 ];
 
 export const INTERSECTION_LIST = [
-    "crossroad", "traffic circle", "level crossing",
-    "straight stretch", "bend", "bump-slope-bottleneck", "tunnel"
+    "incrocio", "rotonda", "pass. a livello",
+    "rettilineo", "curva", "zone critiche", "tunnel"
 ];
 
 export const ACCIDENT_TYPE_LIST = [
-    "between vehicles",
-    "vehicle-pedestrian",
-    "single vehicle"
+    "tra veicoli",
+    "veicolo-pedone",
+    "singolo veicolo"
 ];
 
 export const WEEK_DAY_LIST = [
