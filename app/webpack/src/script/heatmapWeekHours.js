@@ -35,7 +35,7 @@ export default async function main() {
     .style("font-size", "14px")
     .style("font-weight", "bold")
     .style("fill", "#333")
-    .text("Accidents by Weekday and Hour");
+    .text("Incidenti per settimana/ora");
 }
 
 

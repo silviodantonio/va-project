@@ -40,7 +40,7 @@ export default  async function main () {
     .style("font-size", "14px")
     .style("font-weight", "bold")
     .style("fill", "#333")
-    .text("Accidents by Month and Weekday");
+    .text("Incidenti per mese/settimana");
   // document.addEventListener("region-click", event => {
   //       const regionName = event.detail.regionName;
   

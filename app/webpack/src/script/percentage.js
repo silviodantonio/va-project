@@ -27,7 +27,7 @@ export function getSelectionPercentage(selectedIds) {
 export function updatePercentageUI(fraction, percentage) {
     const percentEl = document.getElementById("selected-percentage");
     const fractionEl = document.getElementById("selected-fraction");
-    if (percentEl) percentEl.textContent = `Percentage: ${percentage.toFixed(2)}%`;
-    if (fractionEl) fractionEl.textContent = `Fraction: ${fraction}`;
+    if (percentEl) percentEl.textContent = `Selezionato: ${percentage.toFixed(0)}%`;
+    if (fractionEl) fractionEl.textContent = `(${fraction})`;
 }
 

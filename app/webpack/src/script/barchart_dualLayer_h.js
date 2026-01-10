@@ -47,7 +47,7 @@ export default async function main() {
         .style('font-weight', 'bold')
         .style('fill', '#333')
         .style('pointer-events', 'none')
-        .text('Accidents by Intersection Type');
+        .text('Incidenti per tratto stradale');
 
 
     const svgAccidentType = d3.create('svg')
@@ -64,7 +64,7 @@ export default async function main() {
         .style('font-weight', 'bold')
         .style('fill', '#333')
         .style('pointer-events', 'none')
-        .text('Accidents by Type');
+        .text('Incidenti per tipo');
 
 
 
@@ -82,7 +82,7 @@ export default async function main() {
         .style('font-weight', 'bold')
         .style('fill', '#333')
         .style('pointer-events', 'none')
-        .text('Accidents by Region');
+        .text('Incidenti per regione');
 
     
 
