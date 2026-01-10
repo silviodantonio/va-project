@@ -211,12 +211,44 @@ export default async function main() {
 
         interaction.exit().remove();
     }
+//--------------------- DRAW VALUE LABEL ---------------------------------------------------
+
+function drawValueLabels({ svg, data, x, y }) {
+    const formatK = d3.format(".2~s");
+
+    const labels = svg.selectAll('.bar-label')
+        .data(data, d => d.key);
+
+    labels.enter()
+        .append('text')
+        .attr('class', 'bar-label')
+        .attr('text-anchor', 'middle')
+        .attr('font-size', '12px')
+        .merge(labels)
+        .text(d => d.value > 0 ? formatK(d.value) : '')
+        .transition()
+        .duration(300)
+        .attr('x', d => x(d.key) + x.bandwidth() / 2)
+        .attr('y', d => {
+            const barHeight = y(0) - y(d.value); // altezza in pixel
+            return barHeight > 50
+                ? y(d.value) + 14   // inside bar
+                : y(d.value) - 12;   // above bar
+        })
+        .attr('fill', d => {
+            return  '#333';
+        });
+
+    labels.exit().remove();
+
+    svg.selectAll('.bar-label').raise();
+}
 
     // ---------- MAKE CHART ----------
     function makeChart({ svg, accessor, filterKey, x, y, xAxis, yAxis }) {
         return function update() {
             const data = summedByDimension(rawData, accessor).sort((a,b)=>d3.descending(a.value,b.value));
-
+            console.log(data)
             x.domain(data.map(d => d.key));
             y.domain([0, d3.max(data, d => d.value)]); // Fixed axes
             const formatK = d3.format(".2~s");
@@ -230,12 +262,30 @@ export default async function main() {
                 .tickFormat(formatK)
             );
 
-
             drawBars({ svg, data, x, y, accessor, filterKey });
-        };
+
+            const active = computeActiveSelection(selectionStore);
+
+            const labelData = active
+                ? data.map(d => {
+                    const ids = rawData
+                        .filter(r => accessor(r) === d.key)
+                        .map(r => r.id);
+
+                    const value = ids.reduce(
+                        (sum, id) => active.has(id) ? sum + rawData[id].observation : sum,
+                        0
+                    );
+
+                    return { key: d.key, value };
+                })
+                : data;
+
+            drawValueLabels({ svg, data: labelData, x, y });
+        }
     }
 
-    // ---------- CHARTS ----------
+                // ---------- CHARTS ----------
     const charts = [
         makeChart({
             svg: svgIntersection,
