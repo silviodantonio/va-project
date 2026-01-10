@@ -153,7 +153,7 @@ function drawPoints({
     }
 }
 
-export function drawPCA(ctxObj, data, selectedIds = null, coloringAttribute, raiseValue = null) {
+export function drawPCA(ctxObj, data, selectedIds = null, coloringAttribute) {
 
     const ctx = ctxObj.ctx
     const width = ctxObj.width
@@ -170,13 +170,6 @@ export function drawPCA(ctxObj, data, selectedIds = null, coloringAttribute, rai
     }
     else if(coloringAttribute === 'observation') {
         canvasData = dataSortedByObservation;
-    }
-    // Move data elements that satisfy `d[coloringAttribute] == raiseValue` at the
-    // bottom of canvasData, so they will be drawn on top of all the others.
-    else if (raiseValue !== null) {
-        canvasData = data.filter(d => d[coloringAttribute] !== raiseValue)
-        // canvasData = canvasData.sort(d => d[coloringAttribute]);
-        canvasData = canvasData.concat(data.filter(d => d[coloringAttribute] == raiseValue))
     }
 
     if (!hasSelection) {

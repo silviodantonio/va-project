@@ -11,9 +11,10 @@ import {
 } from "./pcaHelpers.js";
 import { getSelectionPercentage, initIdMap, updatePercentageUI } from "./percentage.js";
 
-const data = dataSet.default
-const dataSortedByDensity = dataSet.densitySorted
+const data = dataSet.default;
+const dataSortedByDensity = dataSet.densitySorted;
 const dataSortedByObservation = dataSet.observationSorted;
+let raisedData = dataSet.default;
 
 let ctxObj = null;
 
@@ -144,7 +145,7 @@ async function main() {
     
     // Draw PCA for the first time
 
-    drawPCA(ctxObj, data, null, coloringAttribute, null);
+    drawPCA(ctxObj, data, null, coloringAttribute);
 
     // Event listener for recoloring when changing selected attribute
     coloringSelector.addEventListener('change', (e) => {
@@ -170,7 +171,7 @@ async function main() {
                 labels[coloringAttribute], catColors, legendClicked)
         }
 
-        drawPCA(ctxObj, data, selectionStore.pca, coloringAttribute, null); 
+        drawPCA(ctxObj, dataSet.default, selectionStore.pca, coloringAttribute);
 
     });
 
@@ -184,7 +185,7 @@ async function main() {
         if (selectionStore.pca != null) {
             selectionStore.pca = null;
             brushG.call(brush.move, null);
-            drawPCA(ctxObj, data, null, coloringAttribute, null);
+            drawPCA(ctxObj, data, null, coloringAttribute);
             updatePercentageUI(null, 0);
         }
     });
@@ -194,7 +195,7 @@ async function main() {
 
         const activeSelection = computeActiveSelection(store);
       
-        drawPCA(ctxObj, data, activeSelection, coloringAttribute, null);
+        drawPCA(ctxObj, data, activeSelection, coloringAttribute);
         const {fraction, percentage} = getSelectionPercentage(activeSelection);
         updatePercentageUI(fraction, percentage);
     });
@@ -249,9 +250,13 @@ function brushCallback(event, data) {
 
 function legendClicked(d) {
     let coloringAttribute = document.querySelector('#colorSelector').value;
-    let valueIndex = labels[coloringAttribute].indexOf(d);
-    console.log(`Clicked on index ${valueIndex} of attribute ${coloringAttribute}`);
-    drawPCA(ctxObj, data, selectionStore.pca, coloringAttribute, valueIndex);
+    let raiseValue = labels[coloringAttribute].indexOf(d);
+    console.log(`Clicked on index ${raiseValue} of attribute ${coloringAttribute}`);
+
+    let backroundData = raisedData.filter(d => d[coloringAttribute] !== raiseValue)
+    raisedData = backroundData.concat(data.filter(d => d[coloringAttribute] == raiseValue))
+
+    drawPCA(ctxObj, raisedData, selectionStore.pca, coloringAttribute);
 }
 
 export default main;
