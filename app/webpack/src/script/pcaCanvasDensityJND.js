@@ -11,12 +11,36 @@ import {
 } from "./pcaHelpers.js";
 import { getSelectionPercentage, initIdMap, updatePercentageUI } from "./percentage.js";
 
-const data = dataSet.default;
-const dataSortedByDensity = dataSet.densitySorted;
-const dataSortedByObservation = dataSet.observationSorted;
-let raisedData = dataSet.default;
-
 let ctxObj = null;
+
+function drawPCALegends(svg, xPos, yPos, coloringAttribute) {
+
+    if (coloringAttribute === 'density') {
+        drawPcaDensityLegends(svg, xPos, yPos, 
+            0, 1, 7,
+            densityColors
+        );
+    }
+    else if (coloringAttribute === "observation") {
+        let obsMin = observationColors.domain()[0];
+        let obsMax = Math.max(...observationColors.domain())
+        drawPcaDensityLegends(svg, xPos, yPos,
+            obsMin, obsMax, 7,
+            observationColors
+        );
+    }
+    else {
+        drawCatLegends(svg, xPos, yPos + 4, 
+            labels[coloringAttribute], catColors, legendClickedCallback);
+    }
+
+}
+
+const data = dataSet.default;
+
+// Ordering of datapoints in raisedData will be changed by
+// legendClickedCallback()
+let raisedData = dataSet.default
 
 /* ============================
    Main
@@ -37,6 +61,7 @@ async function main() {
     };
 
     initIdMap(data);
+
 
     /* ============================
        Scales (margins live HERE)
@@ -94,26 +119,6 @@ async function main() {
 
     const brushG = svg.append('g').attr("class", "brush").call(brush);
 
-    // Draw legends
-    const coloringSelector = document.querySelector('#colorSelector');
-    let coloringAttribute = coloringSelector.value;
-
-    if (coloringAttribute === 'density') {
-        drawPcaDensityLegends(svg, margin.left + 20, margin.top + 10, 
-            0, 1, 7,
-            densityColors
-        );
-    }
-    else if (coloringAttribute === "observation") {
-        drawPcaDensityLegends(svg, margin.left + 15, margin.top + 10,
-            obsMin, obsMax, 7,
-            observationColors
-        );
-    }
-    else {
-        drawCatLegends(svg, margin.left + 20, margin.top + 20, 
-            labels[coloringAttribute], catColors, legendClicked);
-    }
 
     /* ============================
        Canvas layer (points only)
@@ -142,36 +147,21 @@ async function main() {
         width: canvas.width,
         height: canvas.height,
     };
+
+    // Get coloring attribute
+    const coloringSelector = document.querySelector('#colorSelector');
+    let coloringAttribute = coloringSelector.value;
     
     // Draw PCA for the first time
-
+    drawPCALegends(svg, margin.right + 40, margin.top + 20, coloringAttribute);
     drawPCA(ctxObj, data, null, coloringAttribute);
 
     // Event listener for recoloring when changing selected attribute
     coloringSelector.addEventListener('change', (e) => {
         coloringAttribute = e.target.value;
 
-        // Redraw using new colors
-        console.log(`Recoloring using ${coloringAttribute}`);
-
-        if (coloringAttribute == "density") {
-            drawPcaDensityLegends(svg, margin.left + 15, margin.top + 10,
-                0, 1, 7,
-                densityColors
-            );
-        }
-        else if (coloringAttribute === "observation") {
-            drawPcaDensityLegends(svg, margin.left + 15, margin.top + 10,
-                obsMin, obsMax, 7,
-                observationColors
-            );
-        }
-        else {
-            drawCatLegends(svg, margin.left + 20, margin.top + 20, 
-                labels[coloringAttribute], catColors, legendClicked)
-        }
-
-        drawPCA(ctxObj, dataSet.default, selectionStore.pca, coloringAttribute);
+        drawPCALegends(svg, margin.right + 40, margin.top + 20, coloringAttribute);
+        drawPCA(ctxObj, data, selectionStore.pca, coloringAttribute);
 
     });
 
@@ -248,7 +238,7 @@ function brushCallback(event, data) {
 
 }
 
-function legendClicked(d) {
+function legendClickedCallback(d) {
     let coloringAttribute = document.querySelector('#colorSelector').value;
     let raiseValue = labels[coloringAttribute].indexOf(d);
     console.log(`Clicked on index ${raiseValue} of attribute ${coloringAttribute}`);

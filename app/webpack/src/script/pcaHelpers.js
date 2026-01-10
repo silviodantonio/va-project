@@ -104,11 +104,12 @@ export const densityColorsDesat = d3.scaleQuantize([0, 1], seqColors.map(d => {
     return desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)
 }));
 
-export const observationColors = d3.scaleQuantize(seqColors)
-export const observationColorsDesat = d3.scaleQuantize(seqColors.map(d => {
+const [obsMin, obsMax] = d3.extent(data, d => d.observation);
+
+export const observationColors = d3.scaleQuantize([obsMin, obsMax], seqColors)
+export const observationColorsDesat = d3.scaleQuantize([obsMin, obsMax], seqColors.map(d => {
     return desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)
 }));
-
 
 // -----------------
 // Drawing on canvas
