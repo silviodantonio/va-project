@@ -64,7 +64,7 @@ export default function main() {
         const regions = topojson.feature(it, it.objects.regions);
 
         // Use container dimensions instead of fixed values
-        const legendBlockHeight = 70;
+        const legendBlockHeight = 50;
         const width = containerWidth;
         const height = containerHeight - legendBlockHeight;
         const mapCenter = [width / 2, height / 2];
@@ -135,7 +135,7 @@ export default function main() {
 
             legendG.append("text")
                 .attr("x", legendWidth / 2)
-                .attr("y", -6)
+                .attr("y", 0)
                 .attr("text-anchor", "middle")
                 .attr("font-weight", "bold")
                 .attr("font-size", legendFontSize)

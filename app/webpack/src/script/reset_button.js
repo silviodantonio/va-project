@@ -3,8 +3,8 @@ import { resetAllSelections } from "./selectionStore.js";
 
 export function initTopRevealButton(options = {}) {
     const {
-        label = 'Selection Reset',
-        revealOffset = 15
+        label = 'Reset',
+        revealOffset = 80
     } = options;
 
     const container = document.createElement('div');

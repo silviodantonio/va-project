@@ -57,7 +57,7 @@ body {
 
 
 /* Hidden top button container */
-#top-reveal-container {
+/* #top-reveal-container {
   position: fixed;
   top: -40px; 
   left: 50%;
@@ -65,16 +65,16 @@ body {
   z-index: 9999;
   transition: top 0.3s ease-in-out;
   pointer-events: none; 
-}
+} */
 
 /* Visible state */
-#top-reveal-container.visible {
+/* #top-reveal-container.visible {
   top: 0;
   pointer-events: auto;
-}
+} */
 
 /* Button styling */
-#top-reveal-btn {
+/* #top-reveal-btn {
   padding: 10px 24px;
   border-radius: 0 0 6px 6px;
   border: none;
@@ -82,13 +82,13 @@ body {
   color: #fff;
   font-weight: 600;
   cursor: pointer;
-}
+} */
 
 /* Small visible tab */
-#top-reveal-tab {
+/* #top-reveal-tab {
   height: 2px;
   background-color: maroon;
-}
+} */
 
 
 
@@ -97,33 +97,33 @@ body {
 
 /* RESET BUTTON CERCHIO */
 
-/*
+/* Hidden top button container */
+
 #top-reveal-container {
   position: fixed;
-  top: -40px;             
+  top: -45px;             
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
   transition: top 0.3s ease-in-out;
   pointer-events: none; 
 }
-*/
+
 
 /* Visible state: slide button down */
-/* #top-reveal-container.visible {
+#top-reveal-container.visible {
   top: 5px;           
   pointer-events: auto;
 }
-*/
+
 
 /* Circular Button styling */
-/*
 #top-reveal-btn {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   border: none;
-  background-color: maroon;
+  background-color: steelblue;
   color: #fff;
   font-weight: 600;
   cursor: pointer;
@@ -133,10 +133,9 @@ body {
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   font-size: 12px;
 }
-*/
+
 
 /* Remove the previous tab; the button itself shows half when hidden */
-/*
 #top-reveal-tab {
   display: none;
-} */
+}
