@@ -39,9 +39,9 @@ export default async function main() {
     const deadlyWidth = container.deadly.clientWidth;
     const deadlyHeight = container.deadly.clientHeight;
     // Size for region bar chart
-    const regionMargin = { top: 30, right: 20, bottom: 25, left: 30 };
-    const regionWidth = container.region.clientWidth - regionMargin.left - regionMargin.right;
-    const regionHeight = container.region.clientHeight - regionMargin.top - regionMargin.bottom;
+    const regionMargin = { top: 30, right: 30, bottom: 30, left: 90 };
+    const regionWidth = container.region.clientWidth;
+    const regionHeight = container.region.clientHeight;
 
     // ---------- SVGs ----------
     const svgIntersection = d3.create('svg')
@@ -97,8 +97,8 @@ export default async function main() {
     const svgRegion = d3.create('svg')
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", `0 0 ${regionWidth} ${regionHeight}`)
-        .attr("width", "100%")
-        .attr("height", "100%");
+        .attr("width", regionWidth)
+        .attr("height", regionHeight);
 
     svgRegion.append('text')
         .attr('x', (regionWidth) / 2)
@@ -128,7 +128,7 @@ export default async function main() {
     const xDeadly = d3.scaleBand().range([deadlyMargin.left, deadlyWidth - deadlyMargin.right]).padding(0.2);
     const yDeadly = d3.scaleLinear().range([deadlyHeight - deadlyMargin.bottom, deadlyMargin.top]);
 
-    const xRegion = d3.scaleLinear().range([regionMargin.left + 60, regionWidth - regionMargin.right]);
+    const xRegion = d3.scaleLinear().range([regionMargin.left, regionWidth - regionMargin.right]);
     const yRegion = d3.scaleBand().range([regionMargin.top, regionHeight - regionMargin.bottom]).padding(0.2);
 
     // ---------- AXES ----------
@@ -145,7 +145,7 @@ export default async function main() {
     const yAxisDeadly = svgDeadly.append('g').attr('transform', `translate(${deadlyMargin.left},0)`);
 
     const xAxisRegion = svgRegion.append('g').attr('transform', `translate(0,${regionHeight - regionMargin.bottom})`);
-    const yAxisRegion = svgRegion.append('g').attr('transform', `translate(${regionMargin.left+60},0)`);
+    const yAxisRegion = svgRegion.append('g').attr('transform', `translate(${regionMargin.left},0)`);
 
     // ---------- SUM DATA ----------
     function summedByDimension(data, accessor) {
