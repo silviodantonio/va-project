@@ -4,7 +4,7 @@ import { resetAllSelections } from "./selectionStore.js";
 export function initTopRevealButton(options = {}) {
     const {
         label = 'Reset',
-        revealOffset = 80
+        revealOffset = 40
     } = options;
 
     const container = document.createElement('div');
@@ -25,7 +25,16 @@ export function initTopRevealButton(options = {}) {
     document.body.appendChild(container);
 
     document.addEventListener('mousemove', (e) => {
-        if (e.clientY <= revealOffset) {
+        const rect = container.getBoundingClientRect();
+
+        const nearTop = e.clientY <= revealOffset;
+        const nearHorizontally =
+            e.clientX >= rect.left - 40 &&
+            e.clientX <= rect.right + 40 &&
+            e.clientY >= rect.top - 30 &&
+            e.clientY <= rect.bottom + 30;
+
+        if (nearTop && nearHorizontally) {
             container.classList.add('visible');
         } else {
             container.classList.remove('visible');

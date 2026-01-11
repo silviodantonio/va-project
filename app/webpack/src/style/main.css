@@ -101,19 +101,18 @@ body {
 
 #top-reveal-container {
   position: fixed;
-  top: -45px;             
+  top: -45px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
   transition: top 0.3s ease-in-out;
-  pointer-events: none; 
+  pointer-events: none; /* hidden = not interactive */
 }
 
-
-/* Visible state: slide button down */
+/* Visible state */
 #top-reveal-container.visible {
-  top: 5px;           
-  pointer-events: auto;
+  top: 5px;
+  pointer-events: auto; /* allow hover + click */
 }
 
 
@@ -126,16 +125,18 @@ body {
   background-color: steelblue;
   color: #fff;
   font-weight: 600;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   font-size: 12px;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 
 /* Remove the previous tab; the button itself shows half when hidden */
 #top-reveal-tab {
   display: none;
+   pointer-events: auto;
 }
