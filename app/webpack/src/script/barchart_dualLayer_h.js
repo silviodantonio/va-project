@@ -137,7 +137,10 @@ export default async function main() {
             bg.enter().append('rect').attr('class', 'bar-bg').merge(bg)
                 .attr('x', x(0))
                 .attr('y', d => y(d.key))
-                .attr('width', d => x(d.value) - x(0))
+                .attr('width', d => {
+                    const w = x(d.value) - x(0);
+                    return d.value > 0 ? Math.max(w, MIN_BAR_PX) : 0;
+                })
                 .attr('height', y.bandwidth())
                 .attr('fill', 'lightblue');
         } else {
@@ -174,7 +177,10 @@ export default async function main() {
             .transition().duration(300)
             .attr('x', x(0))
             .attr('y', d => y(d.key))
-            .attr('width', d => x(d.value) - x(0))
+            .attr('width', d => {
+                        const w = x(d.value) - x(0);
+                        return d.value > 0 ? Math.max(w, MIN_BAR_PX) : 0;
+                    })
             .attr('height', y.bandwidth())
             .attr('fill', 'steelblue')
             .attr('stroke', d => {
