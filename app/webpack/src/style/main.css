@@ -51,6 +51,20 @@ body {
   ry: 4px;
 }
 
+#slider {
+  --webkit-appearance: slider-vertical;
+  appearance: slider-vertical;
+  position: absolute;
+  width: 90px;
+  z-index: 999999;
+}
+
+@supports not (appearance: slider-vertical) {
+  #slider {
+    transform: rotate(-90deg);
+    transform-origin: left top;
+  }
+}
 
 
 /* RESET BUTTON RETTANGOLO */

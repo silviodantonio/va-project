@@ -13,13 +13,19 @@ import { getSelectionPercentage, initIdMap, updatePercentageUI } from "./percent
 
 let ctxObj = null;
 
+
 function drawPCALegends(svg, xPos, yPos, coloringAttribute) {
+
+    const slider = document.querySelector('#slider');
+    slider.style.top = `${yPos + 87}px`;
+    slider.style.left = `${xPos + 35}px`;
 
     if (coloringAttribute === 'density') {
         drawPcaDensityLegends(svg, xPos, yPos,
             0, 1, 7,
             densityColors
         );
+        slider.style.display = 'block';
     }
     else if (coloringAttribute === "observation") {
         let obsMin = observationColors.domain()[0];
@@ -28,10 +34,12 @@ function drawPCALegends(svg, xPos, yPos, coloringAttribute) {
             obsMin, obsMax, 7,
             observationColors
         );
+        slider.style.display = 'block';
     }
     else {
         drawCatLegends(svg, xPos, yPos + 4,
             labels[coloringAttribute], catColors, legendClickedCallback);
+        slider.style.display = 'none';
     }
 
 }
@@ -149,7 +157,7 @@ async function main() {
     let coloringAttribute = coloringSelector.value;
     
     // Draw PCA for the first time
-    drawPCALegends(svg, margin.right + 40, margin.top + 20, coloringAttribute);
+    drawPCALegends(svg, margin.left + 20, margin.top + 20, coloringAttribute);
     drawPCA(ctxObj, data, null, coloringAttribute);
 
     // Event listener for recoloring when changing selected attribute
@@ -158,7 +166,7 @@ async function main() {
         // revert all change to ordering that legendClickCallback might have introduced
         data = dataSet.default;
 
-        drawPCALegends(svg, margin.right + 40, margin.top + 20, coloringAttribute);
+        drawPCALegends(svg, margin.left + 20, margin.top + 20, coloringAttribute);
         drawPCA(ctxObj, data, selectionStore.pca, coloringAttribute);
 
     });
