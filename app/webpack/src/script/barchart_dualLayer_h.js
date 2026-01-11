@@ -180,7 +180,7 @@ export default async function main() {
             .attr('width', d => {
                         const w = x(d.value) - x(0);
                         return d.value > 0 ? Math.max(w, MIN_BAR_PX) : 0;
-                    })
+            })
             .attr('height', y.bandwidth())
             .attr('fill', 'steelblue')
             .attr('stroke', d => {
@@ -303,7 +303,7 @@ function drawValueLabels({ svg, data, x, y, horizontal }) {
         .append('text')
         .attr('class', 'bar-label')
         .merge(labels)
-        .text(d => d.value > 0 ? formatK(d.value) : '')
+        .text(d => d.value > 0 ? formatK(d.value) : '0')
         .transition()
         .duration(300)
         .attr('text-anchor', horizontal ? 'start' : 'middle')
@@ -316,7 +316,7 @@ function drawValueLabels({ svg, data, x, y, horizontal }) {
         })
         .attr('y', d => {
             if (horizontal) {
-                return y(d.key) + y.bandwidth() / 2 + 4;
+                return y(d.key) + y.bandwidth() / 2 + 3;
             }
             const barHeight = y(0) - y(d.value);
             return barHeight > 50
