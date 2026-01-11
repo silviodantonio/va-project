@@ -74,37 +74,19 @@ function drawHeatmap(rawData, width, height, svg){
     .domain(WEEK_DAY_LIST)
     .padding(0.05);
 
-  const xAxis = svg.append("g")
+  svg.append("g")
     .attr("transform", `translate(0, ${height})`)
-    .call(d3.axisBottom(x).tickSize(0));
-
-  xAxis.select(".domain").remove();
-
-  xAxis.selectAll(".tick text")
-    .style("cursor", "pointer")
-    .on("click", (event, week_day) => {
-      event.stopPropagation();
-      selectColumn(week_day);
-    });
-
+    .call(d3.axisBottom(x).tickSize(0))
+    .select(".domain").remove();
 
   const y = d3.scaleBand()
     .range([height, 0])
     .domain(MONTH_LIST)
     .padding(0.05);
 
-  const yAxis = svg.append("g")
-    .call(d3.axisLeft(y).tickSize(0));
-
-  yAxis.select(".domain").remove();
-
-  yAxis.selectAll(".tick text")
-    .style("cursor", "pointer")
-    .on("click", (event, month) => {
-      event.stopPropagation();
-      selectRow(month);
-    });
-
+  svg.append("g")
+    .call(d3.axisLeft(y).tickSize(0))
+    .select(".domain").remove();
 
   /* -------------------- TOOLTIP -------------------- */
   const tooltip = d3.select("#heatmap-month-week")
@@ -147,51 +129,24 @@ const myColor = d3.scaleQuantize()
 
 
 /* -------------------- MULTI-SELECTION -------------------- */
-  const selectedRows = new Set();     // months
-  const selectedColumns = new Set();  // week_days
   const selectedCells = new Map();
-
 
   function cellKey(d) {
     return `${d.month}|${d.week_day}`;
   }
 
   function updateSelectionStyles() {
-    const hasSelection = selectedCells.size > 0;
-
     svg.selectAll(".heatmap-cell-MonthWeeks")
       .style("opacity", d =>
-        !hasSelection || selectedCells.has(cellKey(d)) ? 0.9 : 0.25
+        selectedCells.size === 0 || selectedCells.has(cellKey(d)) ? 0.9 : 0.25
       )
       .style("stroke", d =>
-        hasSelection && selectedCells.has(cellKey(d)) ? "#000" : "none"
+        selectedCells.has(cellKey(d)) ? "#000" : "none"
       )
       .style("stroke-width", d =>
-        hasSelection && selectedCells.has(cellKey(d)) ? 2 : 0
+        selectedCells.has(cellKey(d)) ? 2 : 0
       );
   }
-
-
-  function recomputeSelectedCells() {
-    selectedCells.clear();
-
-    // Only compute selected cells if something is actually selected
-    if (selectedRows.size > 0 || selectedColumns.size > 0) {
-      heatmapData.forEach(d => {
-        const rowMatch = selectedRows.size === 0 || selectedRows.has(d.month);
-        const colMatch = selectedColumns.size === 0 || selectedColumns.has(d.week_day);
-
-        if (rowMatch && colMatch) {
-          selectedCells.set(cellKey(d), d);
-        }
-      });
-    }
-
-    updateSelectionStyles();
-    dispatchSelectionToStore();
-  }
-
-
 
   function dispatchSelectionToStore() {
     if (selectedCells.size === 0) {
@@ -214,54 +169,29 @@ const myColor = d3.scaleQuantize()
     updateSelection("heatmap_month_weeks", ids);
   }
 
-const cellClicked = function(event, d) {
-  event.stopPropagation();
+  const cellClicked = function(event, d) {
+    event.stopPropagation();
 
-  if (selectionStore.pca != null) {
-    document.dispatchEvent(new CustomEvent("clear-pca-brush"));
-  }
+    if (selectionStore.pca != null) {
+        document.dispatchEvent(new CustomEvent("clear-pca-brush"));
+    }
+    const key = cellKey(d);
+    
+    if (selectedCells.has(key)) selectedCells.delete(key);
+    else selectedCells.set(key, d);
 
-  // Toggle row
-  selectedRows.has(d.month)
-    ? selectedRows.delete(d.month)
-    : selectedRows.add(d.month);
+    updateSelectionStyles();
+    dispatchSelectionToStore();
+  };
 
-  // Toggle column
-  selectedColumns.has(d.week_day)
-    ? selectedColumns.delete(d.week_day)
-    : selectedColumns.add(d.week_day);
-
-  recomputeSelectedCells();
-};
-
-
-    d3.select("#heatmap-month-week").on("click", (event) => {
-      if (!event.target.classList.contains("heatmap-cell-MonthWeeks")) {
-        selectedRows.clear();
-        selectedColumns.clear();
-        selectedCells.clear();
-        updateSelectionStyles();   // now properly removes black borders
-        updateSelection("heatmap_month_weeks", null);
-      }
-    });
-
-
-  /*------------------LABEL SELECTION------------------*/
-  function selectColumn(week_day) {
-  selectedColumns.has(week_day)
-    ? selectedColumns.delete(week_day)
-    : selectedColumns.add(week_day);
-
-  recomputeSelectedCells();
-}
-
-function selectRow(month) {
-  selectedRows.has(month)
-    ? selectedRows.delete(month)
-    : selectedRows.add(month);
-
-  recomputeSelectedCells();
-}
+  // Listen for clicks on the container, but ignore clicks on cells
+  d3.select("#heatmap-month-week").on("click", (event) => {
+    if (!event.target.classList.contains("heatmap-cell-MonthWeeks")) {
+      selectedCells.clear();
+      updateSelectionStyles();
+      updateSelection("heatmap_month_weeks", null);
+    }
+  });
 
 
   /* -------------------- INITIAL DRAW -------------------- */
@@ -343,9 +273,7 @@ function selectRow(month) {
 
     // Reset local UI if selection comes from PCA
     if (selectionStore.heatmap_month_weeks === null) {
-        selectedRows.clear();
-        selectedColumns.clear();
-        selectedCells.clear();
+      selectedCells.clear();
       updateSelectionStyles();
     }
 
