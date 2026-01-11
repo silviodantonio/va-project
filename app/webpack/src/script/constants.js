@@ -39,7 +39,7 @@ export const HOUR_LIST = [
         "17", "18", "19", "20", "21", "22", "23", "24"
     ];
 
-export const DEADLY_LIST = ["Injured", "Dead"];
+export const DEADLY_LIST = ["con feriti", "mortale"];
 
 export const labels = {
     region: REGION_LIST,

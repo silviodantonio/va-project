@@ -1,11 +1,12 @@
 import * as d3 from 'd3';
-import { INTERSECTION_LIST, ACCIDENT_TYPE_LIST, REGION_LIST } from './constants.js';
+import { INTERSECTION_LIST, ACCIDENT_TYPE_LIST, REGION_LIST, DEADLY_LIST } from './constants.js';
 import { updateSelection, selectionStore, computeActiveSelection, extractIDs } from "./selectionStore.js";
 
 export default async function main() {
     const container = {
         intersection: document.getElementById('chart-intersection'),
         accidentType: document.getElementById('chart-accident-type'),
+        deadly: document.getElementById('chart-deadly'),
         region: document.getElementById('chart-region')
     };
 
@@ -16,6 +17,7 @@ export default async function main() {
             id: i,
             intersection: INTERSECTION_LIST[+d.intersection - 1],
             accident_type: ACCIDENT_TYPE_LIST[+d.accident_type - 1],
+            deadly: DEADLY_LIST[+d.deadly],
             region: REGION_LIST[+d.region - 1],
             observation: +d.observation
         })
@@ -24,9 +26,18 @@ export default async function main() {
     // ---------- DIMENSIONS ----------
     // const width = 350;
     // const height = 380;
-    const margin = { top: 30, right: 15, bottom: 50, left: 50 };
-    const width = container.intersection.clientWidth - margin.left - margin.right;
-    const height = container.intersection.clientHeight - margin.top - margin.bottom;
+    // Size for intersection bar chart
+    const margin = { top: 35, right: 25, bottom: 60, left: 40 };
+    const width = container.intersection.clientWidth;
+    const height = container.intersection.clientHeight;
+    // Size for accident bar chart
+    const accidentMargin = { top: 35, right: 25, bottom: 60, left: 40 };
+    const accidentWidth = container.accidentType.clientWidth;
+    const accidentHeight = container.accidentType.clientHeight;
+    // Size for deadly bar chart
+    const deadlyMargin = { top: 35, right: 45, bottom: 60, left: 50 };
+    const deadlyWidth = container.deadly.clientWidth;
+    const deadlyHeight = container.deadly.clientHeight;
     // Size for region bar chart
     const regionMargin = { top: 30, right: 20, bottom: 25, left: 30 };
     const regionWidth = container.region.clientWidth - regionMargin.left - regionMargin.right;
@@ -37,10 +48,10 @@ export default async function main() {
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", `0 0 ${width} ${height}`)
         .attr("width", "100%")
-        .attr("height", "100%");
+        .attr("height", height);
 
     svgIntersection.append('text')
-        .attr('x', (width + margin.left + margin.right) / 2)
+        .attr('x', (width) / 2)
         .attr('y', 20) // Position within the top margin
         .attr('text-anchor', 'middle')
         .style('font-size', '12px')
@@ -52,12 +63,12 @@ export default async function main() {
 
     const svgAccidentType = d3.create('svg')
         .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("viewBox", `0 0 ${accidentWidth} ${accidentHeight}`)
         .attr("width", "100%")
-        .attr("height", "100%");
+        .attr("height", accidentHeight);
     
     svgAccidentType.append('text')
-        .attr('x', (width + margin.left + margin.right) / 2)
+        .attr('x', (accidentWidth) / 2)
         .attr('y', 20) // Position within the top margin
         .attr('text-anchor', 'middle')
         .style('font-size', '12px')
@@ -67,6 +78,21 @@ export default async function main() {
         .text('Incidenti per tipo');
 
 
+    const svgDeadly = d3.create('svg')
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", `0 0 ${deadlyWidth} ${deadlyHeight}`)
+        .attr("width", "100%")
+        .attr("height", deadlyHeight);
+    
+    svgDeadly.append('text')
+        .attr('x', (deadlyWidth) / 2)
+        .attr('y', 20) // Position within the top margin
+        .attr('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .style('font-weight', 'bold')
+        .style('fill', '#333')
+        .style('pointer-events', 'none')
+        .text('Mortalità');
 
     const svgRegion = d3.create('svg')
         .attr("preserveAspectRatio", "xMinYMin meet")
@@ -75,7 +101,7 @@ export default async function main() {
         .attr("height", "100%");
 
     svgRegion.append('text')
-        .attr('x', (regionWidth ) / 2)
+        .attr('x', (regionWidth) / 2)
         .attr('y', 20) // Position within the top margin
         .attr('text-anchor', 'middle')
         .style('font-size', '12px')
@@ -88,6 +114,7 @@ export default async function main() {
 
     svgIntersection.on('click', () => updateSelection('intersection', null));
     svgAccidentType.on('click', () => updateSelection('accident_type', null));
+    svgDeadly.on('click', () => updateSelection('deadly', null));
     svgRegion.on('click', () => updateSelection('region', null));
     
 
@@ -95,8 +122,11 @@ export default async function main() {
     const xIntersection = d3.scaleBand().range([margin.left, width - margin.right]).padding(0.2);
     const yIntersection = d3.scaleLinear().range([height - margin.bottom, margin.top]);
 
-    const xAccidentType = d3.scaleBand().range([margin.left, width - margin.right]).padding(0.2);
-    const yAccidentType = d3.scaleLinear().range([height - margin.bottom, margin.top]);
+    const xAccidentType = d3.scaleBand().range([accidentMargin.left, accidentWidth - accidentMargin.right]).padding(0.2);
+    const yAccidentType = d3.scaleLinear().range([accidentHeight - accidentMargin.bottom, accidentMargin.top]);
+
+    const xDeadly = d3.scaleBand().range([deadlyMargin.left, deadlyWidth - deadlyMargin.right]).padding(0.2);
+    const yDeadly = d3.scaleLinear().range([deadlyHeight - deadlyMargin.bottom, deadlyMargin.top]);
 
     const xRegion = d3.scaleLinear().range([regionMargin.left + 60, regionWidth - regionMargin.right]);
     const yRegion = d3.scaleBand().range([regionMargin.top, regionHeight - regionMargin.bottom]).padding(0.2);
@@ -108,8 +138,11 @@ export default async function main() {
     const xAxisIntersection = svgIntersection.append('g').attr('transform', `translate(0,${height - margin.bottom})`);
     const yAxisIntersection = svgIntersection.append('g').attr('transform', `translate(${margin.left},0)`);
 
-    const xAxisAccidentType = svgAccidentType.append('g').attr('transform', `translate(0,${height - margin.bottom})`);
-    const yAxisAccidentType = svgAccidentType.append('g').attr('transform', `translate(${margin.left},0)`);
+    const xAxisAccidentType = svgAccidentType.append('g').attr('transform', `translate(0,${accidentHeight - accidentMargin.bottom})`);
+    const yAxisAccidentType = svgAccidentType.append('g').attr('transform', `translate(${accidentMargin.left},0)`);
+
+    const xAxisDeadly = svgDeadly.append('g').attr('transform', `translate(0,${deadlyHeight - deadlyMargin.bottom})`);
+    const yAxisDeadly = svgDeadly.append('g').attr('transform', `translate(${deadlyMargin.left},0)`);
 
     const xAxisRegion = svgRegion.append('g').attr('transform', `translate(0,${regionHeight - regionMargin.bottom})`);
     const yAxisRegion = svgRegion.append('g').attr('transform', `translate(${regionMargin.left+60},0)`);
@@ -396,6 +429,16 @@ function drawValueLabels({ svg, data, x, y, horizontal }) {
             horizontal: false
         }),
         makeChart({
+            svg: svgDeadly,
+            accessor: d => d.deadly,
+            filterKey: 'deadly',
+            x: xDeadly,
+            y: yDeadly,
+            xAxis: xAxisDeadly,
+            yAxis: yAxisDeadly,
+            horizontal: false
+        }),
+        makeChart({
             svg: svgRegion,
             accessor: d => d.region,
             filterKey: 'region',
@@ -415,5 +458,6 @@ function drawValueLabels({ svg, data, x, y, horizontal }) {
     updateAll();
     container.intersection.append(svgIntersection.node());
     container.accidentType.append(svgAccidentType.node());
+    container.deadly.append(svgDeadly.node());
     container.region.append(svgRegion.node());
 }
