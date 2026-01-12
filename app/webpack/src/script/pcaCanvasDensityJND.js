@@ -8,6 +8,7 @@ import {
     catColors,
     densityColors,
     observationColors, observationColorsDesat,
+    throttle
 } from "./pcaHelpers.js";
 import { getSelectionPercentage, initIdMap, updatePercentageUI } from "./percentage.js";
 
@@ -173,7 +174,7 @@ async function main() {
 
     const densitySlider = document.querySelector('#slider');
 
-    densitySlider.addEventListener('input', (e) => {
+    const throttledSliderUpdate = throttle((e) => {
 
         brushG.call(brush.move, null);
 
@@ -206,9 +207,9 @@ async function main() {
         selectedIds = new Set(filterData.map(d => d.id));
         updateSelection("pca", selectedIds);
         
-    });
+    }, 33);
 
-
+    densitySlider.addEventListener('input', throttledSliderUpdate);
 
     /* ============================
         React to selection changes

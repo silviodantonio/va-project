@@ -194,3 +194,24 @@ export function drawPCA(ctxObj, data, selectedIds = null, coloringAttribute) {
         saturated: true,
     });
 }
+
+export function throttle(fn, delay) {
+  let last = 0;
+  let timeout;
+
+  return function (...args) {
+    const now = Date.now();
+    const remaining = delay - (now - last);
+
+    if (remaining <= 0) {
+      last = now;
+      fn.apply(this, args);
+    } else {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        last = Date.now();
+        fn.apply(this, args);
+      }, remaining);
+    }
+  };
+}
