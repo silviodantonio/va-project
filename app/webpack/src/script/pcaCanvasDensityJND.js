@@ -165,9 +165,9 @@ async function main() {
         coloringAttribute = e.target.value;
         // revert all change to ordering that legendClickCallback might have introduced
         data = dataSet.default;
-
+        const activeSelection = computeActiveSelection(selectionStore);
         drawPCALegends(svg, margin.left + 20, margin.top + 20, coloringAttribute);
-        drawPCA(ctxObj, data, selectionStore.pca, coloringAttribute);
+        drawPCA(ctxObj, data, activeSelection, coloringAttribute);
 
     });
 
@@ -251,8 +251,8 @@ function legendClickedCallback(d) {
 
     let backroundData = data.filter(d => d[coloringAttribute] !== raiseValue)
     data = backroundData.concat(data.filter(d => d[coloringAttribute] == raiseValue))
-
-    drawPCA(ctxObj, data, selectionStore.pca, coloringAttribute);
+    const activeSelection = computeActiveSelection(selectionStore);
+    drawPCA(ctxObj, data, activeSelection, coloringAttribute);
 }
 
 export default main;

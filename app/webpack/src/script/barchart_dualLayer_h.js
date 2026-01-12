@@ -48,7 +48,7 @@ export default async function main() {
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", `0 0 ${width} ${height}`)
         .attr("width", "100%")
-        .attr("height", height);
+        .attr("height", "100%");
 
     svgIntersection.append('text')
         .attr('x', (width) / 2)
@@ -65,7 +65,7 @@ export default async function main() {
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", `0 0 ${accidentWidth} ${accidentHeight}`)
         .attr("width", "100%")
-        .attr("height", accidentHeight);
+        .attr("height", "100%");
     
     svgAccidentType.append('text')
         .attr('x', (accidentWidth) / 2)
@@ -82,7 +82,7 @@ export default async function main() {
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", `0 0 ${deadlyWidth} ${deadlyHeight}`)
         .attr("width", "100%")
-        .attr("height", deadlyHeight);
+        .attr("height", "100%");
     
     svgDeadly.append('text')
         .attr('x', (deadlyWidth) / 2)
@@ -97,8 +97,8 @@ export default async function main() {
     const svgRegion = d3.create('svg')
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", `0 0 ${regionWidth} ${regionHeight}`)
-        .attr("width", regionWidth)
-        .attr("height", regionHeight);
+        .attr("width", "100%")
+        .attr("height", "100%");
 
     svgRegion.append('text')
         .attr('x', (regionWidth) / 2)
