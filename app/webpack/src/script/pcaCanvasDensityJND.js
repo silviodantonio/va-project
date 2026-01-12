@@ -176,14 +176,12 @@ async function main() {
     // densitySlider.addEventListener('valuer', (e) => {
     densitySlider.addEventListener('change', (e) => {
 
-        console.log("Chaned slider value")
-
-        if (coloringAttribute !== "density" && coloringAttribute !== "observations") {
+        if (coloringAttribute !== "density" && coloringAttribute !== "observation") {
             return;
         }
 
         const filterValue = e.target.value;
-
+        let filterData = null
         let selectedIds = null;
 
         // RESET all other selections
@@ -197,14 +195,23 @@ async function main() {
         console.log(`filterValue is : ${filterValue}`);
         if (filterValue === 0) {
             drawPCA(ctxObj, data, null, coloringAttribute);
+            return;
         }
-        else {
-            const filterData = data.filter(d => d.density >= filterValue/100);
+
+        if (coloringAttribute === 'density') {
+            filterData = data.filter(d => d.density >= filterValue/100);
             console.log(`Filtered data len: ${filterData.length}`);
-            const selectedIds = new Set(filterData.map(d => d.id))
-            drawPCA(ctxObj, data, selectedIds, coloringAttribute);
-            updateSelection("pca", selectedIds);
         }
+        else if (coloringAttribute === 'observation') {
+            const obsMax = Math.max(...observationColors.domain());
+            filterData = data.filter(d => d.observation >= obsMax*(filterValue/100));
+        }
+
+        console.log(`Filtered data len: ${filterData.length}`);
+        selectedIds = new Set(filterData.map(d => d.id))
+        drawPCA(ctxObj, data, selectedIds, coloringAttribute);
+        updateSelection("pca", selectedIds);
+
     });
 
 
