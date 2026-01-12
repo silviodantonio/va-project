@@ -27,7 +27,7 @@ mainHeatmap();
 // import pcaAllCanvas from './pcaAllCanvas.js'
 // pcaAllCanvas();
 
-import mainHeatmapWeekHours from './heatmapWeekHours.js';
+import mainHeatmapWeekHours from './heatmapWeekHours_remake.js';
 mainHeatmapWeekHours();
 
 import { initTopRevealButton } from './reset_button.js';
