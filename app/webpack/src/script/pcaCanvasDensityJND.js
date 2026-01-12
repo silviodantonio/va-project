@@ -17,7 +17,7 @@ let ctxObj = null;
 function drawPCALegends(svg, xPos, yPos, coloringAttribute) {
 
     const slider = document.querySelector('#slider');
-    slider.style.top = `${yPos + 87}px`;
+    slider.style.top = `${yPos + 85}px`;
     slider.style.left = `${xPos + 35}px`;
 
     if (coloringAttribute === 'density') {
