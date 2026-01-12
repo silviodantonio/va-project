@@ -17,8 +17,8 @@ let ctxObj = null;
 function drawPCALegends(svg, xPos, yPos, coloringAttribute) {
 
     const slider = document.querySelector('#slider');
-    slider.style.top = `${yPos + 85}px`;
-    slider.style.left = `${xPos + 35}px`;
+    slider.style.top = `${yPos}px`;
+    slider.style.left = `${xPos + 55}px`;
 
     if (coloringAttribute === 'density') {
         drawPcaDensityLegends(svg, xPos, yPos,
@@ -182,7 +182,7 @@ async function main() {
             return;
         }
 
-        const filterValue = e.target.value;
+        const filterValue = 100 - e.target.value;
         let filterData = null
         let selectedIds = null;
 

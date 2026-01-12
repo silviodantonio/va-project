@@ -52,7 +52,7 @@ body {
 }
 
 #slider {
-  transform: rotate(-90deg);
+  transform: rotate(90deg);
   transform-origin: left top;
   position: absolute;
   width: 86px;
