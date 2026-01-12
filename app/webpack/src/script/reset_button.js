@@ -18,7 +18,10 @@ export function initTopRevealButton(options = {}) {
     button.textContent = label;
 
 
-    button.addEventListener('click', resetAllSelections);
+    button.addEventListener('click', () => {
+        resetAllSelections();
+        document.querySelector('#slider').value = 0;
+    });
 
     container.appendChild(tab);
     container.appendChild(button);
