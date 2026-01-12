@@ -163,12 +163,48 @@ async function main() {
     // Event listener for recoloring when changing selected attribute
     coloringSelector.addEventListener('change', (e) => {
         coloringAttribute = e.target.value;
-        // revert all change to ordering that legendClickCallback might have introduced
+        // revert all changes to ordering that legendClickCallback might have introduced
         data = dataSet.default;
         const activeSelection = computeActiveSelection(selectionStore);
         drawPCALegends(svg, margin.left + 20, margin.top + 20, coloringAttribute);
         drawPCA(ctxObj, data, activeSelection, coloringAttribute);
 
+    });
+
+    const densitySlider = document.querySelector('#slider');
+
+    // densitySlider.addEventListener('valuer', (e) => {
+    densitySlider.addEventListener('change', (e) => {
+
+        console.log("Chaned slider value")
+
+        if (coloringAttribute !== "density" && coloringAttribute !== "observations") {
+            return;
+        }
+
+        const filterValue = e.target.value;
+
+        let selectedIds = null;
+
+        // RESET all other selections
+        for (const key in selectionStore) {
+            if (key !== "pca") {
+                selectionStore[key] = null;
+            }
+        }
+        updateSelection("pca", selectedIds);
+
+        console.log(`filterValue is : ${filterValue}`);
+        if (filterValue === 0) {
+            drawPCA(ctxObj, data, null, coloringAttribute);
+        }
+        else {
+            const filterData = data.filter(d => d.density >= filterValue/100);
+            console.log(`Filtered data len: ${filterData.length}`);
+            const selectedIds = new Set(filterData.map(d => d.id))
+            drawPCA(ctxObj, data, selectedIds, coloringAttribute);
+            updateSelection("pca", selectedIds);
+        }
     });
 
 
