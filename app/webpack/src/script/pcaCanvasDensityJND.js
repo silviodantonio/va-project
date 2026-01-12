@@ -173,7 +173,6 @@ async function main() {
 
     const densitySlider = document.querySelector('#slider');
 
-    // densitySlider.addEventListener('valuer', (e) => {
     densitySlider.addEventListener('input', (e) => {
 
         brushG.call(brush.move, null);
@@ -218,7 +217,7 @@ async function main() {
     document.addEventListener("clear-pca-brush", () => {
         if (selectionStore.pca != null) {
             selectionStore.pca = null;
-            document.querySelector('#slider').value = 0;
+            document.querySelector('#slider').value = 100;
             brushG.call(brush.move, null);
             drawPCA(ctxObj, data, null, coloringAttribute);
             updatePercentageUI(null, 0);
@@ -279,7 +278,7 @@ function brushCallback(event, data) {
             selectionStore[key] = null;
         }
     }
-    document.querySelector('#slider').value = 0;
+    document.querySelector('#slider').value = 100;
     updateSelection("pca", selectedIds);
 
 }

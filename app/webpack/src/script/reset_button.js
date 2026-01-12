@@ -20,7 +20,7 @@ export function initTopRevealButton(options = {}) {
 
     button.addEventListener('click', () => {
         resetAllSelections();
-        document.querySelector('#slider').value = 0;
+        document.querySelector('#slider').value = 100;
     });
 
     container.appendChild(tab);
