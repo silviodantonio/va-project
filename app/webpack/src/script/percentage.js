@@ -1,5 +1,5 @@
-const TOTAL_OBSERVATIONS = 173234;
-const idToObservation = new Map();
+export const TOTAL_OBSERVATIONS = 173234;
+export const idToObservation = new Map();
 
 export function initIdMap(data) {
     data.forEach(d => {
