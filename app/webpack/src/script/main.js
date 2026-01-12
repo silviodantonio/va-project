@@ -22,12 +22,12 @@ mainCoordinated();
 import pcaCanvas from './pcaCanvasDensityJND.js'
 pcaCanvas();
 
-import mainHeatmap from './heatmapMonthWeeks_remake.js';
+import mainHeatmap from './heatmapMonthWeeks_rowColumn.js';
 mainHeatmap();
 // import pcaAllCanvas from './pcaAllCanvas.js'
 // pcaAllCanvas();
 
-import mainHeatmapWeekHours from './heatmapWeekHours_remake.js';
+import mainHeatmapWeekHours from './heatmapWeekHours_rowColumn.js';
 mainHeatmapWeekHours();
 
 import { initTopRevealButton } from './reset_button.js';
