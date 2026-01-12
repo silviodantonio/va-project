@@ -174,7 +174,9 @@ async function main() {
     const densitySlider = document.querySelector('#slider');
 
     // densitySlider.addEventListener('valuer', (e) => {
-    densitySlider.addEventListener('change', (e) => {
+    densitySlider.addEventListener('input', (e) => {
+
+        brushG.call(brush.move, null);
 
         if (coloringAttribute !== "density" && coloringAttribute !== "observation") {
             return;
@@ -190,28 +192,21 @@ async function main() {
                 selectionStore[key] = null;
             }
         }
-        updateSelection("pca", selectedIds);
 
-        console.log(`filterValue is : ${filterValue}`);
         if (filterValue === 0) {
-            drawPCA(ctxObj, data, null, coloringAttribute);
+            updateSelection("pca", null);
             return;
         }
 
         if (coloringAttribute === 'density') {
             filterData = data.filter(d => d.density >= filterValue/100);
-            console.log(`Filtered data len: ${filterData.length}`);
-        }
-        else if (coloringAttribute === 'observation') {
+        } else if (coloringAttribute === 'observation') {
             const obsMax = Math.max(...observationColors.domain());
             filterData = data.filter(d => d.observation >= obsMax*(filterValue/100));
         }
-
-        console.log(`Filtered data len: ${filterData.length}`);
-        selectedIds = new Set(filterData.map(d => d.id))
-        drawPCA(ctxObj, data, selectedIds, coloringAttribute);
+        selectedIds = new Set(filterData.map(d => d.id));
         updateSelection("pca", selectedIds);
-
+        
     });
 
 
@@ -223,6 +218,7 @@ async function main() {
     document.addEventListener("clear-pca-brush", () => {
         if (selectionStore.pca != null) {
             selectionStore.pca = null;
+            document.querySelector('#slider').value = 0;
             brushG.call(brush.move, null);
             drawPCA(ctxObj, data, null, coloringAttribute);
             updatePercentageUI(null, 0);
@@ -283,6 +279,7 @@ function brushCallback(event, data) {
             selectionStore[key] = null;
         }
     }
+    document.querySelector('#slider').value = 0;
     updateSelection("pca", selectedIds);
 
 }
