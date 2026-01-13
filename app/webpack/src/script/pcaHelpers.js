@@ -89,13 +89,13 @@ export const catColorsDesat = d3.scaleOrdinal(d3.schemeCategory10.map(d => desat
 
 const n = 20;
 export const seqColors = Array.from({ length: n }, (_, i) => 
-  // d3.interpolateCividis(i / (n - 1))
-  // d3.interpolatePuBu(i / (n - 1))
-  // d3.interpolateBlues(i / (n - 1))
+//   d3.interpolateCividis(i / (n - 1))
+//   d3.interpolatePuBu(1 - (i / (n - 1)))
+//   d3.interpolateBlues(1 - (i / (n - 1)))
   d3.interpolateInferno(i / (n - 1))
-  // d3.interpolateViridis(i / (n - 1))
+//   d3.interpolateViridis(i / (n - 1))
 );
-
+// export const seqColors = [...seqColorsNotInv].reverse();
 // build array of Desaturated colors
 export const seqColorsDesat = seqColors.map((color) => desatAndLighten(color, 0.3, 0.7));
 
@@ -134,23 +134,35 @@ function drawPoints({
 }) {
     for (const d of data) {
         if (coloringAttribute === "density") {
-            ctx.fillStyle = saturated
-                ? densityColors(d[coloringAttribute])
-                : densityColorsDesat(d[coloringAttribute]);
+            if (saturated) {
+                ctx.fillStyle = densityColors(d[coloringAttribute]);
+                ctx.strokeStyle = 'black';
+            } else {
+                ctx.fillStyle = densityColorsDesat(d[coloringAttribute]);
+                ctx.strokeStyle = 'grey';
+            }
         }
         else if (coloringAttribute === "observation") {
-            ctx.fillStyle = saturated
-                ? observationColors(d[coloringAttribute])
-                : observationColorsDesat(d[coloringAttribute]);
+            if (saturated) {
+                ctx.fillStyle = observationColors(d[coloringAttribute]);
+                ctx.strokeStyle = 'black';
+            } else {
+                ctx.fillStyle = observationColorsDesat(d[coloringAttribute]);
+                ctx.strokeStyle = 'grey';
+            }
+        } else {
+            if (saturated) {
+                ctx.fillStyle = catColors(d[coloringAttribute]);
+                ctx.strokeStyle = 'black';
+            } else {
+                ctx.fillStyle = catColorsDesat(d[coloringAttribute]);
+                ctx.strokeStyle = 'grey';
+            }
         }
-        else {
-            ctx.fillStyle = saturated
-                ? catColors(d[coloringAttribute])
-                : catColorsDesat(d[coloringAttribute]);
-        }
-
+        ctx.lineWidth = 0.1;
         drawCircle(ctx, d.x, d.y, 2);
         ctx.fill();
+        ctx.stroke();
     }
 }
 
