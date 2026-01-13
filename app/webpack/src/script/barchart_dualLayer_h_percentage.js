@@ -432,10 +432,13 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
             console.log("active", active);
             drawBars({ svg, data, x, y, accessor, filterKey, horizontal });
 
+    /* PERCENTAULE COMPLESSIVA SUL VALORE SINGOLA BARRA */
+
             // Compute label data with percentages
             let labelData;
 
             if (active && active.size > 0) {
+
                 // Per ogni barra del grafico
                 labelData = data.map(d => {
 
@@ -464,6 +467,35 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
                         percentage            // fraction of selection over bar total
                     };
                 });
+
+/* ================================PERCENTAULE COMPLESSIVA SUL GRAFICO =================================*/
+                //  const barName = d.key;
+                //     // All rows in this category/bar
+                //     const rowsForBar = rawData.filter(r => accessor(r) === d.key);
+                //     console.log("rows per Bar", rowsForBar);
+                //     // total accidents for this bar (baseline)
+                //     const totalPerBar = rowsForBar.reduce((sum, r) => sum + r.observation, 0);
+                //      console.log("totalPerBar", totalPerBar);
+
+                //     // total selected accidents in this bar
+                //     const selectedValue = rowsForBar.reduce(
+                //         (sum, r) => (active && active.has(r.id) ? sum + r.observation : sum),
+                //         0
+                //     );
+                //         console.log("selectedValue", selectedValue);
+
+                //     // percentage relative to this bar's total
+                //     const percentage = totalPerBar > 0 ? selectedValue / totalPerBar : 0;
+
+                //     return {
+                //         key: d.key,
+                //         value: selectedValue, // used for foreground bar
+                //         total: totalPerBar,   // baseline for background bar
+                //         percentage            // fraction of selection over bar total
+                //     };
+
+/*===================================================================================================================*/
+
             } else {
                 // Nessuna selezione: percentuale = 0
                 labelData = data.map(d => ({ ...d, value: d.value, percentage: 0, total: d.value }));
