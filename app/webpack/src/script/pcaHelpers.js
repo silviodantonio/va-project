@@ -149,7 +149,7 @@ function drawPoints({
                 : catColorsDesat(d[coloringAttribute]);
         }
 
-        drawCircle(ctx, d.x, d.y, 3);
+        drawCircle(ctx, d.x, d.y, 2);
         ctx.fill();
     }
 }

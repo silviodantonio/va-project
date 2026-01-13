@@ -163,12 +163,26 @@ async function main() {
 
     // Event listener for recoloring when changing selected attribute
     coloringSelector.addEventListener('change', (e) => {
-        coloringAttribute = e.target.value;
+
+        let newColoringAttribute = e.target.value;
         // revert all changes to ordering that legendClickCallback might have introduced
         data = dataSet.default;
-        const activeSelection = computeActiveSelection(selectionStore);
-        drawPCALegends(svg, margin.left + 20, margin.top + 20, coloringAttribute);
-        drawPCA(ctxObj, data, activeSelection, coloringAttribute);
+        let slider = document.querySelector('#slider')
+
+        if ( (coloringAttribute === 'density' || coloringAttribute === 'observation') &&
+            slider.value != 100) {
+                drawPCALegends(svg, margin.left + 20, margin.top + 20, newColoringAttribute);
+                updateSelection('pca', null);
+                slider.value = 100;
+        }
+        else {
+            // Draw new PCA. Keep brushing
+            const activeSelection = computeActiveSelection(selectionStore);
+            drawPCALegends(svg, margin.left + 20, margin.top + 20, newColoringAttribute);
+            updateSelection('pca', activeSelection);
+        }
+
+        coloringAttribute = newColoringAttribute;
 
     });
 
@@ -207,7 +221,7 @@ async function main() {
         selectedIds = new Set(filterData.map(d => d.id));
         updateSelection("pca", selectedIds);
         
-    }, 33);
+    }, 300);
 
     densitySlider.addEventListener('input', throttledSliderUpdate);
 
@@ -229,6 +243,7 @@ async function main() {
         const { store } = event.detail;
 
         const activeSelection = computeActiveSelection(store);
+        const coloringAttribute = document.querySelector('#colorSelector').value
       
         drawPCA(ctxObj, data, activeSelection, coloringAttribute);
         const {fraction, percentage} = getSelectionPercentage(activeSelection);
@@ -246,7 +261,7 @@ async function main() {
 
 function brushCallback(event, data) {
 
-    const POINT_RADIUS = 3;
+    const POINT_RADIUS = 2;
 
     const { selection, type } = event;
     if (!event.sourceEvent) return;
