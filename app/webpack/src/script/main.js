@@ -32,3 +32,6 @@ mainHeatmapWeekHours();
 
 import { initTopRevealButton } from './reset_button.js';
 initTopRevealButton();
+
+import mainBoxplot from './boxplot.js';
+mainBoxplot();
