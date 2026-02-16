@@ -56,14 +56,15 @@ function attachDensityIndex(data, quantizeX, quantizeY) {
 
     // A factor that transforms density to a value between 0 and 1.
     // Needed for sequential color scales
-    const normalizingFactor = 1 / d3.max(densityMatrix.flat());
+    // const normalizingFactor = 1 / d3.max(densityMatrix.flat());
 
     // Build new data with density value attached to each element
     const newData = data.map(d => {
 
         const xBin = Math.floor((d.x_pca - xMin) / binSizeX);
         const yBin = Math.floor((d.y_pca - yMin) / binSizeY);
-        const density = densityMatrix[xBin][yBin] * normalizingFactor;
+        // const density = densityMatrix[xBin][yBin] * normalizingFactor;
+        const density = densityMatrix[xBin][yBin];
 
         return {...d, density: density}
     });
@@ -99,8 +100,15 @@ export const seqColors = Array.from({ length: n }, (_, i) =>
 // build array of Desaturated colors
 export const seqColorsDesat = seqColors.map((color) => desatAndLighten(color, 0.3, 0.7));
 
-export const densityColors = d3.scaleQuantize([0, 1], seqColors)
-export const densityColorsDesat = d3.scaleQuantize([0, 1], seqColors.map(d => {
+// export const densityColors = d3.scaleQuantize([0, 1], seqColors)
+// export const densityColorsDesat = d3.scaleQuantize([0, 1], seqColors.map(d => {
+//     return desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)
+// }));
+
+const [densityMin, densityMax] = d3.extent(data, d => d.density);
+
+export const densityColors = d3.scaleQuantize([densityMin, densityMax], seqColors)
+export const densityColorsDesat = d3.scaleQuantize([densityMin, densityMax], seqColors.map(d => {
     return desatAndLighten(d3.color(d).formatHex(), 0.3, 0.7)
 }));
 

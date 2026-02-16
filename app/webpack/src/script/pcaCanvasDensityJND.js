@@ -22,8 +22,9 @@ function drawPCALegends(svg, xPos, yPos, coloringAttribute) {
     slider.style.left = `${xPos + 55}px`;
 
     if (coloringAttribute === 'density') {
+        const [densityMin, densityMax] = d3.extent(data, d => d.density);
         drawPcaDensityLegends(svg, xPos, yPos,
-            0, 1, 7,
+            densityMin, densityMax, 7,
             densityColors
         );
         slider.style.display = 'block';
