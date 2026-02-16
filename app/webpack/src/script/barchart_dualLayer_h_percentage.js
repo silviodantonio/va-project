@@ -333,7 +333,7 @@ export default async function main() {
 
 function drawValueLabels({ svg, data, x, y, horizontal, active }) {
     const formatK = d3.format(".2~s");
-    const formatPercent = d3.format(".0%");
+    const formatPercent = d3.format(".1%");
 
     // --- Value label ---
     const labels = svg.selectAll('.bar-label')
