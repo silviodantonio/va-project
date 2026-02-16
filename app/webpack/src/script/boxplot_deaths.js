@@ -4,7 +4,7 @@ import { updateSelection, selectionStore, computeActiveSelection, extractIDs } f
 
 export default async function main() {
 
-    const margin = { top: 25, right: 65, bottom: 35, left: 65 };
+    const margin = { top: 25, right: 45, bottom: 35, left: 45 };
     const container = document.getElementById("boxplot");
     const width = container.clientWidth - margin.left - margin.right;
     const height = container.clientHeight - margin.top - margin.bottom;
@@ -66,8 +66,8 @@ export default async function main() {
 
     // ---------- BOX ----------
     g.append("rect")
-        .attr("x", center - boxWidth / 2)
-        .attr("width", boxWidth)
+        .attr("x", center - boxWidth / 4)
+        .attr("width", boxWidth / 2)
         .attr("y", y(q3))
         .attr("height", y(q1) - y(q3))
         .attr("stroke", "black")
@@ -75,11 +75,11 @@ export default async function main() {
 
     // ---------- MEDIAN LINE ----------
     g.append("line")
-        .attr("x1", center - boxWidth / 2)
-        .attr("x2", center + boxWidth / 2)
+        .attr("x1", center - boxWidth / 4)
+        .attr("x2", center + boxWidth / 4)
         .attr("y1", y(median))
         .attr("y2", y(median))
-        .attr("stroke", "black");
+        .attr("stroke", "grey");
 
     // ---------- MIN & MAX CAPS ----------
     g.selectAll("whiskerCaps")
