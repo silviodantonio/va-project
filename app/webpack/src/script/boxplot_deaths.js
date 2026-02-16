@@ -13,16 +13,18 @@ export default async function main() {
 
     // ---------- LOAD DATA ----------
     const rawData = await d3.csv(
-        "http://127.0.0.1:7000/accidents_regions_complete.csv",
+        "http://127.0.0.1:7000/accidents_total_with_deaths.csv",
         (d, i) => ({
             id: i,
-            observation: +d.observation
+            deadly: +d.deadly,
+            deaths: Math.round(+d.deaths)
         })
     );
 
     // ---------- COMPUTE STATISTICS ----------
     const data_sorted = rawData
-        .map(d => d.observation)
+        .filter(d => d.deadly == 1)
+        .map(d => d.deaths)
         .sort(d3.ascending);
 
     const q1 = d3.quantile(data_sorted, 0.25);
