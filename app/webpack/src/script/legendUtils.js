@@ -163,7 +163,7 @@ export function drawTrendLegends(svg, xPos, yPos) {
         "description": "Lower than 1% over national average"
     },
     {
-        "symbol": "~",
+        "symbol": "\u223C",
         "color": "blue",
         "description": "Within 1% of national average"
     }

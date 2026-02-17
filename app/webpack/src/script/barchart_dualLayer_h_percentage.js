@@ -452,7 +452,7 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
                     return '\u25B2' // triangle pointed up
                 }
                 else {
-                    return '~'
+                    return '\u223C' // same as ~ but prettier
                 }
             }) 
             .transition()
