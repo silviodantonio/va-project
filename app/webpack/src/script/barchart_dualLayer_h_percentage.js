@@ -25,7 +25,7 @@ export default async function main() {
         })
     );
 
-
+    const totalObservations = d3.sum(rawData, d => d.observation);
 
     // ---------- DIMENSIONS ----------
     // const width = 350;
@@ -335,6 +335,13 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
     const formatK = d3.format(".2~s");
     const formatPercent = d3.format(".1%");
 
+    const barHeightTreshold = 60;
+    const barLengthTreshold = 80;
+
+    // if a trend is outsite +/- trendTolerance % it is marked as
+    // increasing or decreasing
+    const trendTolerance = 0.5
+
     // --- Value label ---
     const labels = svg.selectAll('.bar-label')
         .data(data, d => d.key);
@@ -354,13 +361,21 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
         .duration(300)
         .attr('text-anchor', horizontal ? 'start' : 'middle')
         .attr('font-size', horizontal ? '10px' : '14px')
-        .attr('x', d => horizontal ? x(d.value) + 4 : x(d.key) + x.bandwidth() / 2)
+        .attr('x', d => {
+                const barLen = x(d.value) - x(0);
+                if (horizontal) {
+                    return barLen > barLengthTreshold ? x(d.value) - 23 : x(d.value) + 4
+                }
+                else {
+                    return x(d.key) + x.bandwidth() / 2  
+                }
+            })
         .attr('y', d => {
             if (horizontal) {
                 return y(d.key) + y.bandwidth() / 2 + 3;
             }
             const barHeight = y(0) - y(d.value);
-            return barHeight > 50 ? y(d.value) + 25 : y(d.value) - 8;
+            return barHeight > barHeightTreshold ? y(d.value) + 23 : y(d.value) - 8;
         })
         .attr('fill', '#333');
 
@@ -385,22 +400,103 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
                     ? x(d.value) + 25
                     : x(d.key) + x.bandwidth() / 2
             )
+            .attr('x', d => {
+                const barLen = x(d.value) - x(0);
+                if (horizontal) {
+                    return barLen > barLengthTreshold ? x(d.value) - 78 : x(d.value) + 28
+                }
+                else {
+                    return x(d.key) + x.bandwidth() / 2  
+                }
+            })
             .attr('y', d => {
                 if (horizontal) {
                     return y(d.key) + y.bandwidth() / 2 + 3;
                 }
                 const barHeight = y(0) - y(d.value);
-                return barHeight > 50 ? y(d.value) + 50 : y(d.value) - 25;
+                return barHeight > barHeightTreshold ? y(d.value) + 56 : y(d.value) - 25;
             })
-        .attr('fill', 'blue');
+        .attr('fill', d => {
+            const barLen = x(d.value) - x(0);
+            const barHeight = y(0) - y(d.value);
+            if (horizontal) {
+                    return barLen > barLengthTreshold ? 'white': 'blue'
+                }
+                else {
+                    return barHeight > barHeightTreshold ? 'white': 'blue'
+                }
+        });
 
         percentLabels.exit().remove();
-    }else {
-   
-    svg.selectAll('.bar-percent').remove();
-}
 
-    
+        const trendLabels = svg.selectAll('.bar-trend')
+            .data(data, d => d.key);
+
+        const trendsSymbolsColorMap = {
+            '\u25BC': 'green',  // triangle pointed down
+            '\u25B2': 'red',    // triangle pointed up
+            '~': 'blue' 
+        };
+
+        for (const d of data) {
+            let categoryPercentage = Math.round(d.total / totalObservations * 100)
+            let selectionPercentage = Math.round(d.value / d.totalSelection * 100)
+            d.trend = categoryPercentage - selectionPercentage
+        }
+
+        // Trend labels
+        trendLabels.enter()
+            .append('text')
+            .attr('class', 'bar-trend')
+            .merge(trendLabels)
+            .text(d => {
+                if (d.trend > trendTolerance) {
+                    return '\u25BC' // triangle pointed down
+                }
+                else if (d.trend < -trendTolerance) {
+                    return '\u25B2' // triangle pointed up
+                }
+                else {
+                    return '~'
+                }
+            }) 
+            .transition()
+            .duration(300)
+            .attr('text-anchor', horizontal ? 'start' : 'middle')
+            .attr('font-size', horizontal ? '10px' : '12px')
+            .attr('x', d => {
+                const barLen = x(d.value) - x(0);
+                if (horizontal) {
+                    return barLen > barLengthTreshold ? x(d.value) - 40 : x(d.value) + 63
+                }
+                else {
+                    return x(d.key) + x.bandwidth() / 2  
+                }
+            })
+            .attr('y', d => {
+                if (horizontal) {
+                    return y(d.key) + y.bandwidth() / 2 + 3;
+                }
+                const barHeight = y(0) - y(d.value);
+                return barHeight > barHeightTreshold ? y(d.value) + 41 : y(d.value) - 40;
+            })
+        .attr('fill', d => {
+            if (d.trend > trendTolerance) {
+                    return 'limegreen' // triangle pointed down
+                }
+                else if (d.trend < -trendTolerance) {
+                    return 'red' // triangle pointed up
+                }
+                else {
+                    return 'blue'
+                }
+        });
+
+        trendLabels.exit().remove();
+
+    } else {
+        svg.selectAll('.bar-percent, .bar-trend').remove();
+    }
 
     svg.selectAll('.bar-label, .bar-percent').raise();
 }
@@ -432,7 +528,7 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
             console.log("active", active);
             drawBars({ svg, data, x, y, accessor, filterKey, horizontal });
 
-    /* PERCENTAULE COMPLESSIVA SUL VALORE SINGOLA BARRA */
+            /* PERCENTAULE COMPLESSIVA SUL VALORE SINGOLA BARRA */
 
             // Compute label data with percentages
             let labelData;
@@ -460,15 +556,23 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
                     // percentage relative to this bar's total
                     const percentage = totalPerBar > 0 ? selectedValue / totalPerBar : 0;
 
+                    let totalSelection = 0
+                    for (let d of rawData){
+                        if (active.has(d.id)){
+                            totalSelection += d.observation;
+                        }
+                    }
+
                     return {
                         key: d.key,
                         value: selectedValue, // used for foreground bar
                         total: totalPerBar,   // baseline for background bar
+                        totalSelection: totalSelection,
                         percentage            // fraction of selection over bar total
                     };
                 });
 
-/* ================================PERCENTAULE COMPLESSIVA SUL GRAFICO =================================*/
+                /* ================================PERCENTAULE COMPLESSIVA SUL GRAFICO =================================*/
                 //  const barName = d.key;
                 //     // All rows in this category/bar
                 //     const rowsForBar = rawData.filter(r => accessor(r) === d.key);
@@ -503,9 +607,9 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
 
 
 
-            drawValueLabels({ svg, data: labelData, x, y,horizontal, active });
-        }
-    }
+            drawValueLabels({ svg, data: labelData, x, y, horizontal, active });
+        } // close update()
+    } // close makeChart()
 
 
     // ---------- CHARTS ----------
