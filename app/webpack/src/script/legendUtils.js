@@ -144,3 +144,51 @@ export function drawCatLegends(svg, xPos, yPos, labels, colorScale, clickCallbac
         )
 
 }
+
+export function drawTrendLegends(svg, xPos, yPos) {
+
+	const fontSize = 12;
+	// Space between label and decorator
+	const labelOffset = 15;
+    const lineSpacing = 15;
+    const labels = [
+    {
+        "symbol": "\u25B2",
+        "color": "red",
+        "description": "Higher than 1% over national average"
+    },
+    {
+        "symbol": "\u25BC",
+        "color": "limegreen",
+        "description": "Lower than 1% over national average"
+    },
+    {
+        "symbol": "~",
+        "color": "blue",
+        "description": "Within 1% of national average"
+    }
+]
+
+    svg.selectAll(".legendTrendDecorator")
+        .data(labels)
+        .enter()
+        .append('text')
+        .attr("x", xPos)
+        .attr("y", (_ , i) => yPos + i*lineSpacing)
+        .text(d => d.symbol)
+        .attr('font-size', fontSize)
+        .attr("fill", d => d.color)
+        .attr("class", "legendTrendDecorator");
+
+    svg.selectAll(".legendTrendLabel")
+        .data(labels)
+        .enter()
+        .append('text')
+        .attr("x", xPos + labelOffset)
+        .attr("y", (_ , i) => yPos + i*lineSpacing)
+        .text(d => d.description)
+        .attr('font-size', fontSize)
+        .attr("fill", 'black')
+        .attr("class", "legendTrendDecorator");
+
+}

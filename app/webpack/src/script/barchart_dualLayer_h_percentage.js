@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import { INTERSECTION_LIST, ACCIDENT_TYPE_LIST, REGION_LIST, DEADLY_LIST } from './constants.js';
 import { updateSelection, selectionStore, computeActiveSelection, extractIDs } from "./selectionStore.js";
+import { drawTrendLegends } from './legendUtils.js';
 
 
 
@@ -432,12 +433,6 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
         const trendLabels = svg.selectAll('.bar-trend')
             .data(data, d => d.key);
 
-        const trendsSymbolsColorMap = {
-            '\u25BC': 'green',  // triangle pointed down
-            '\u25B2': 'red',    // triangle pointed up
-            '~': 'blue' 
-        };
-
         for (const d of data) {
             let categoryPercentage = Math.round(d.total / totalObservations * 100)
             let selectionPercentage = Math.round(d.value / d.totalSelection * 100)
@@ -662,8 +657,10 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
 
     // ---------- INITIAL RENDER ----------
     updateAll();
+    drawTrendLegends(svgIntersection, 180, 50);
     container.intersection.append(svgIntersection.node());
     container.accidentType.append(svgAccidentType.node());
     container.deadly.append(svgDeadly.node());
+    // drawTrendLegends(svgRegion, 20, 20);
     container.region.append(svgRegion.node());
 }
