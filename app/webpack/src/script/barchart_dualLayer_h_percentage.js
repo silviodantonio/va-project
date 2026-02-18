@@ -434,9 +434,9 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
             .data(data, d => d.key);
 
         for (const d of data) {
-            let categoryPercentage = Math.round(d.total / totalObservations * 100)
-            let selectionPercentage = Math.round(d.value / d.totalSelection * 100)
-            d.trend = categoryPercentage - selectionPercentage
+            let categoryPercentage = d.total / totalObservations * 100;
+            let selectionPercentage = d.value / d.totalSelection * 100;
+            d.trend = categoryPercentage - selectionPercentage;
         }
 
         // Trend labels
@@ -452,7 +452,7 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
                     return '\u25B2' // triangle pointed up
                 }
                 else {
-                    return '\u223C' // same as ~ but prettier
+                    return '\u2248' // same as ~ but prettier
                 }
             }) 
             .transition()
@@ -475,17 +475,30 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
                 const barHeight = y(0) - y(d.value);
                 return barHeight > barHeightTreshold ? y(d.value) + 41 : y(d.value) - 40;
             })
-        .attr('fill', d => {
-            if (d.trend > trendTolerance) {
-                    return 'limegreen' // triangle pointed down
-                }
-                else if (d.trend < -trendTolerance) {
-                    return 'red' // triangle pointed up
-                }
-                else {
-                    return 'blue'
-                }
-        });
+            .attr('fill', d => {
+                if (d.trend > trendTolerance) {
+                        return 'limegreen' // triangle pointed down
+                    }
+                    else if (d.trend < -trendTolerance) {
+                        return 'red' // triangle pointed up
+                    }
+                    else {
+                        return 'black'
+                    }
+            })
+            .attr('font-weight', d => {
+                if (d.trend > trendTolerance) {
+                        return 'normal'
+                    }
+                    else if (d.trend < -trendTolerance) {
+                        return 'normal'
+                    }
+                    else {
+                        return 'normal'
+                    }
+            })
+            .attr('stroke', "black")
+            .attr('stroke-width', 0.5);
 
         trendLabels.exit().remove();
 

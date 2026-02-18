@@ -154,18 +154,21 @@ export function drawTrendLegends(svg, xPos, yPos) {
     const labels = [
     {
         "symbol": "\u25B2",
+        "fontweight": "normal",
         "color": "red",
-        "description": "Higher than 1% over national average"
+        "description": "Higher than national trend"
     },
     {
         "symbol": "\u25BC",
+        "fontweight": "normal",
         "color": "limegreen",
-        "description": "Lower than 1% over national average"
+        "description": "Lower than national trend"
     },
     {
-        "symbol": "\u223C",
-        "color": "blue",
-        "description": "Within 1% of national average"
+        "symbol": "\u2248",
+        "fontweight": "normal",
+        "color": "black",
+        "description": "Within national trend"
     }
 ]
 
@@ -177,6 +180,9 @@ export function drawTrendLegends(svg, xPos, yPos) {
         .attr("y", (_ , i) => yPos + i*lineSpacing)
         .text(d => d.symbol)
         .attr('font-size', fontSize)
+        .attr('font-weight', d => d.fontweight)
+        .attr('stroke', "black")
+        .attr('stroke-width', 0.5)
         .attr("fill", d => d.color)
         .attr("class", "legendTrendDecorator");
 
