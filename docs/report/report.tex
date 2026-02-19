@@ -39,12 +39,77 @@
 \newpage
 
 \section{Introduction}
+
+According to the italian national news, road accidents are unfortunately
+becoming more and more frequent and they end up involving especially young
+drivers.
+
+Having considered this, we wanted to have a way to explore data about these
+accidents with the goal of attempting to extract some patterns in order to
+intervene on them for doing better prevention.
+We have developed a visual analytics system for doing exactly that.
+The natural intended users for this system are members of the Ministry of
+Infrastructures.
+
+The system has the purpose of giving both a high level overview and a
+detailed view of the types and characteristics of accidents, this is
+accomplished by using a high level of interactivity.
+Interactivity allows to do comparisons, extract details and search for patterns
+in the dataset.
+
+The dataset used was provided by ISTAT and is relative to the road accidents
+with injuries and deaths that occurred in italy during 2024 [add reference]
+
 \newpage
 
-\section{Background and related work}
+\section{Dataset description and preliminary work}
+
+\subsection{How the dataset is composed}
+
+The dataset in use contains details about vehicle accidents with injuries
+occurred in Italy during 2024. This dataset was extracted from the data
+published on the ISTAT website and comprises about 92.000 tuples for 8
+attributes.
+
+The attributes in the dataset are in summary: region and time (hour, weekday,
+month) of accident, road section where the accident occurred (traffic circle,
+intersection, etc...), type of accident (between vehicles,
+vehicle-pedestrian, etc...), deadliness of the accident, and number of
+accidents registered with the given characteristics.
+
+[ insert table here ]
+
+\subsection{How data was cleaned and manipulated}
+
+(before feeding it to the visual system)
+
+\subsection{Dimensionality reduction (?)}
+Before using the dataset for our visualization system, we wanted to use a
+dimensionality reduction approach for providing a way to group similar
+accidents and so to search for outliers.
+
+However, the fact that most of these attributes are categorical posed a
+challenge when we attempted to do so.
+
+We used PCA for doing that, a python script was used for computing it.
+
+\newpage
+
+\section{Related work}
+
+What we have seen in other papers
+
 \newpage
 
 \section{Visual analytics solution adopted}
+
+Section for dimensionality reduction
+Section for categorical attributes
+Section for temporal distribution
+Section for geographical distribution
+
+How these are connected -- interactivity
+
 \newpage
 
 \section{Discovered insights}
