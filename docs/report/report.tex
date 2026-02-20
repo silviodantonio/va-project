@@ -110,6 +110,61 @@ Section for geographical distribution
 
 How these are connected -- interactivity
 
+To effectively explore and interpret the ISTAT road accidents dataset, we first performed a data cleaning and optimization process. A key challenge was the dataset's granularity; to address this, we implemented a dimensionality reduction strategy, in particular, instead of working with verbose categorical strings, we pruned the tuples to retain only integer-based indices representing specific attributes. 
+By operating directly on these encoded indices, we significantly minimized the computational overhead and memory footprint. This choice ensured higher performance and responsiveness during the interactive exploration of the dataset.
+
+\subsection{Categorical Analysis through Bar Charts}
+Bar Charts are employed as the fundamental tool for representing categorical distributions. This choice is motivated by the fact that bar charts are highly effective for \textit{magnitude comparison}; they allow to easily compare the lengths of bars aligned to a common baseline, facilitating the identification of the most frequent accident scenarios. 
+Specifically:
+\begin{itemize}
+    \item \textbf{Mortality Analysis:} Comparison between fatal and non-fatal accidents.
+    
+    \item \textbf{Road Intersections:} Distribution across different roads intersections. This highlights which part of the roads are more prone to accidents.
+    
+    \item \textbf{Accident Type:} Classification by collision dynamics.
+    
+    \item \textbf{Regional Distribution:} A ranking of accidents by Italian regions to identify areas with higher incident volumes.
+\end{itemize}
+
+\subsection{Geospatial and Temporal Mapping}
+To visualize the geographical distribution of the accidents a \textbf{Choropleth Map} of Italy was implemented. In this visualization, the color intensity of each region is proportional to the number of accidents. This approach is ideal for identifying geographical clusters and macro-regional disparities that might be overlooked in tabular formats.
+
+Temporal patterns were explored through two distinct \textbf{Heatmaps} which are particularly effective since they leverage color encoding to represent density, making cyclical patterns immediately visible:
+\begin{itemize}
+    \item \textbf{Month vs. Weekday:} This matrix visualizes seasonal trends, allowing to observe if certain months or specific days show higher risk.
+    
+    \item \textbf{Weekday vs. Hour:} This higher-resolution heatmap identifies critical "peak hours" and night-time risks across the week.
+\end{itemize}
+
+\subsection{Dimensionality Reduction: PCA}
+Given the high dimensionality of the dataset, we applied \textbf{Principal Component Analysis (PCA)}. The purpose of PCA is to reduce the complexity of the data while preserving as much variance as possible, allowing us to project multidimensional observations into a 2D space. 
+We utilized PCA to represent:
+\begin{itemize}
+    \item \textbf{Data Density:} Visualizing clusters of observations that share similar characteristics.
+    
+    \item \textbf{Observation:} Mapping clusters based on the volume of incidents per tuple, allowing for the identification of high-density patterns.
+    
+    \item \textbf{Feature Correlation:} Mapping how mortality, accident type, and road stretches relate to each other.
+\end{itemize}
+
+Due to the significant volume of the data, the PCA visualization was rendered using a \textbf{Canvas-based approach} rather than SVG.
+
+
+\subsection{Interactive Analytics and Multi-modal Encoding}
+To enhance data legibility and support analytical tasks, we implemented a \textbf{dual encoding strategy} across all components. Every visualization is dynamically linked, ensuring that a selection in one view propagates a real-time filter across the entire dashboard.
+
+\begin{itemize}
+    \item \textbf{Global Selection Analytics:} To provide an immediate overview of the filtered subset, we implemented a global status indicator. This component displays the selection in the format: \textit{Selected: X\% (N / Total)}, where both the percentage and the fraction represent the proportion of incidents currently being analyzed relative to the entire dataset.
+
+    \item \textbf{Bar Charts:} Each bar displays the absolute number of accidents. Upon interaction, the system dynamically updates the textual labels to show the percentage of filtered data relative to each specific category. To provide a deeper statistical context, we introduced \textbf{trend indicators}. Using symbols ($\blacktriangle, \blacktriangledown, \approx$), the system compares the current selection's distribution against the national baseline, indicating whether a specific category is over-represented, under-represented, or stable.
+
+    \item \textbf{Geospatial and Temporal Feedback:} 
+    The \textbf{Choropleth Map} features dual encoding via hover interactions, displaying the region's name and its specific incident count. Similarly, the \textbf{Heatmaps} include tooltips that specify the temporal coordinates and the corresponding accident count. Every textual element is recomputed instantly based on the active selection to remove ambiguity from color-only interpretation.
+
+    \item \textbf{PCA Interaction and Brushing:} 
+    Interaction with the high-dimensional space is managed through \textbf{Brushing}. By selecting a sub-region of the PCA canvas, the user can isolate specific clusters of observations. This triggers a global update where all numerical values, percentages, and trend symbols in the dashboard are recalculated to reflect the characteristics of the brushed cluster.
+\end{itemize}
+
 \newpage
 
 \section{Discovered insights}
