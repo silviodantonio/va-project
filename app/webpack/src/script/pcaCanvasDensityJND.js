@@ -214,7 +214,8 @@ async function main() {
         }
 
         if (coloringAttribute === 'density') {
-            filterData = data.filter(d => d.density >= filterValue/100);
+            const densityMax = d3.max(data, d => d.density);
+            filterData = data.filter(d => d.density >= densityMax*(filterValue/100));
         } else if (coloringAttribute === 'observation') {
             const obsMax = Math.max(...observationColors.domain());
             filterData = data.filter(d => d.observation >= obsMax*(filterValue/100));
