@@ -6,6 +6,7 @@
 \usepackage{setspace}
 \usepackage[hidelinks]{hyperref}
 \usepackage[dvipsnames]{xcolor}
+\usepackage{tabularx}
 \usepackage{ragged2e}
 \usepackage{geometry}
 \usepackage{url}
@@ -28,6 +29,11 @@
 \colorlet{Comment}{Gray!80!black}
 
 % \urldef{\example}\url{https://www.intel.com/content/www/us/en/developer/articles/technical/advanced-encryption-standard-instructions-aes-ni.html}
+\urldef{\istatDataset}\url{https://esploradati.istat.it/databrowser/#/it/dw/categories/IT1,Z0810HEA,1.0/HEA_ROAD/IT1,41_270_DF_DCIS_MORTIFERITISTR1_1,1.0}
+\urldef{\firstPaper}\url{https://ieeexplore.ieee.org/abstract/document/10714304}
+\urldef{\secondPaper}\url{https://ieeexplore.ieee.org/document/9546339}
+\urldef{\thirdPaper}\url{https://www.sciencedirect.com/science/article/pii/S1877050915027507}
+\urldef{\fourthPaper}\url{https://ieeexplore.ieee.org/document/7779365}
 \begin{document}
 
 \author{Silvio d'Antonio 2145048\\ Riccardo Mearelli 1807331 \\Carlo Segreto 2168340}
@@ -39,26 +45,14 @@
 \newpage
 
 \section{Introduction}
+% <------------- README -------------> Press Alt+Z so that the text automatically adapts to your window size, don't use the Return button to break text lines in a static manner.
+According to the Italian national news, road accidents are unfortunately becoming more and more frequent and they end up involving especially young drivers.
 
-According to the italian national news, road accidents are unfortunately
-becoming more and more frequent and they end up involving especially young
-drivers.
+With this in mind, we aimed to develop an intuitive way to explore data on past accidents, with the goal of identifying patterns, which could support experts in making informed decisions in order to prevent new accidents. To this end, we developed a visual analytics system designed to address this purpose. The primary intended users of this solution are members of the Italian Ministry of Infrastructure and Transport. The project could be easily extended to support other countries as well, provided they have access to similarly structured national data.
 
-Having considered this, we wanted to have a way to explore data about these
-accidents with the goal of attempting to extract some patterns in order to
-intervene on them for doing better prevention.
-We have developed a visual analytics system for doing exactly that.
-The natural intended users for this system are members of the Ministry of
-Infrastructures.
+The system provides both a high level overview and a detailed view of the several types and characteristics of accidents. This is accomplished by using a high level of interactivity, which enables users to do comparisons, extract details and easily search for patterns in the dataset.
 
-The system has the purpose of giving both a high level overview and a
-detailed view of the types and characteristics of accidents, this is
-accomplished by using a high level of interactivity.
-Interactivity allows to do comparisons, extract details and search for patterns
-in the dataset.
-
-The dataset used was provided by ISTAT and is relative to the road accidents
-with injuries and deaths that occurred in italy during 2024 [add reference]
+The data used was provided by ISTAT and it's relative to the road accidents with injuries and deaths that occurred in Italy during 2024\footnote{\raggedright \istatDataset}.
 
 \newpage
 
@@ -68,8 +62,8 @@ with injuries and deaths that occurred in italy during 2024 [add reference]
 
 The dataset in use contains details about vehicle accidents with injuries
 occurred in Italy during 2024. This dataset was extracted from the data
-published on the ISTAT website and comprises about 92.000 tuples for 8
-attributes.
+published on the ISTAT website and comprises about 92.000 tuples of 8
+attributes each.
 
 The attributes in the dataset are in summary: region and time (hour, weekday,
 month) of accident, road section where the accident occurred (traffic circle,
@@ -77,7 +71,31 @@ intersection, etc...), type of accident (between vehicles,
 vehicle-pedestrian, etc...), deadliness of the accident, and number of
 accidents registered with the given characteristics.
 
-[ insert table here ]
+\begin{tabularx}{\textwidth} {| >{\bfseries}l | X |} 
+
+\hline
+Attribute & \textbf{Description} \\
+\hline\hline
+
+Area & ID of Region \\
+\hline
+Road section & Number identifying a road section. Identifies: tunnel, bend, crossroad, traffic circle, bump/slope or bottleneck, straight stretch, level crossing. \\
+\hline
+Accident type &  Number identifying the accident type. Identifies:
+accidents between vehicles, vehicle-pedestrian accidents and accidents involving
+a single vehicle. \\ 
+\hline
+Deadliness &  Boolean attribute that identifies if the accident involved death or only injury \\
+\hline
+Hour of accident &  Time of accident measured with hour resolution \\
+\hline
+Month &  Month number \\
+\hline
+Weekday & Number identifying the weekdays: monday, tuesday, wednesday, etc...\\
+\hline
+Observations &  Number of accidents occurred with the specified attributes \\
+\hline
+\end{tabularx}
 
 \subsection{How data was cleaned and manipulated}
 
@@ -171,6 +189,7 @@ To enhance data legibility and support analytical tasks, we implemented a \textb
 \newpage
 
 \section{References}
+\
 \newpage
 
 % Immagine centrata senza didascalia
