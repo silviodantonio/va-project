@@ -173,6 +173,38 @@ To maintain context during multi-modal exploration, a \textbf{global status indi
 \newpage
 
 \section{Discovered insights}
+
+The visual analytics process revealed several non-trivial patterns that distinguish fatal accidents from general road accidents based on seasonality, geography, and statistical density.
+
+\subsection{The June Weekend Anomaly}
+A significant peak occurs during the month of June. Contrary to the common perception that associates road risk with nighttime behavior, the data shows a different reality:
+\begin{itemize}
+    \item \textbf{Temporal Concentration:} Fatal accidents reach a critical peak during June weekends, accounting for $129$ mortal accidents out of a total of $2,856$ and so around  $5\% $ of the total.
+    \item \textbf{Diurnal Risk:} These events do not predominantly occur at night or in the early morning. Instead, they are concentrated between \textbf{12:00 and 21:00}, with specific spikes at \textbf{16:00} and \textbf{18:00}. 
+    \item \textbf{Insight:} This suggests that contrary to what is commonly believed, fatal accidents are more closely linked to leisure-related mobility and high-traffic daytime flows than to nocturnal hazards.
+\end{itemize}
+
+\subsection{ Northern Italy: Pedestrian Vulnerability}
+The Northern regions exhibit a behavior diametrically opposed to the national average regarding weekly distribution:
+\begin{itemize}
+    \item \textbf{Workweek vs. Weekend:} In Northern Italy, accidents are more frequent during the \textbf{workweek} rather than the weekend.
+    \item \textbf{Peak Hours:} Incidents are strictly correlated with commuting hours, specifically \textbf{08:00--09:00} and \textbf{18:00--19:00}.
+    \item \textbf{Pedestrian Trend:} These regions show a higher-than-average trend for \textbf{vehicle-pedestrian} accidents compared to the rest of the country, highlighting a specific vulnerability in urban mobility management.
+\end{itemize}
+
+\subsection{ Seasonal Inversion: Cold vs. Warm Months}
+Cross-referencing the time of year with the type of accident revealed a systematic trend reversal:
+\begin{itemize}
+    \item \textbf{Cold Months:} These months record a number of \textbf{vehicle-pedestrian} accidents significantly above the national average, while vehicle-to-vehicle collisions remain below average.
+    \item \textbf{Warm Months:} The pattern inverts completely. Summer months see a dominance of vehicle-to-vehicle collisions and a sharp decrease in pedestrian-involved fatalities.
+\end{itemize}
+
+\subsection{ PCA Analysis: The Statistical Uniqueness of Fatalities}
+The application of Principal Component Analysis (PCA) provided a fundamental insight into the nature of fatal accidents:
+\begin{itemize}
+    \item \textbf{Low Density:} Fatal accidents exhibit extremely low commonality. In the PCA projection, these events consistently show a \textbf{density of 1} and a \textbf{number of observations equal to 1}.
+    \item \textbf{Analytical Conclusion:} This indicates that fatal accidents are effectively statistical "outliers" or unique events. Unlike non-fatal accidents, which often cluster around repetitive patterns, each fatal incident is characterized by a unique combination of variables, suggesting that prevention requires a highly multifactorial approach.
+\end{itemize}
 \newpage
 
 \section{References}
