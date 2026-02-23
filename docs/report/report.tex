@@ -149,13 +149,13 @@ The distribution of accidents across Italian regions is represented through a \t
 \end{itemize}
 Through interaction with a region in the map, the region's name and exact incident count will be displayed, while clicking a region propagates a real-time filter across the entire dashboard.
 
-\subsection{Temporal Mapping and Cross-Filtering}
+\subsection{Temporal Mapping}
 Temporal patterns are explored through two \textbf{Heatmaps}, which leverage color encoding to make seasonal trends and peak hours immediately visible. To facilitate the analysis, the heatmaps support a \textbf{multi-level selection logic}:
 
 \begin{itemize}
     \item \textbf{Flexible Selection:} Users can interact with the matrix by selecting individual cells, entire rows, or full columns. This allows for the isolation of both specific temporal coordinates.
     
-    \item \textbf{Global Synchronization:} Any temporal selection propagates a real-time filter across the entire dashboard.
+    \item \textbf{Filtering:} Any temporal selection propagates a filter in real-time across the entire dashboard.
     
     \item \textbf{Dual encoding:} Each cell provide the exact incident counts and temporal coordinates, ensuring that the visual density of the heatmap is always backed by numerical data.
 \end{itemize}
@@ -164,7 +164,7 @@ Temporal patterns are explored through two \textbf{Heatmaps}, which leverage col
 To address the high dimensionality of the dataset, we employed \textbf{Principal Component Analysis (PCA)} to project multidimensional observations—incorporating mortality, accident types, and road characteristics—into a continuous 2D space. 
 Given the categorical nature of most attributes and the significant volume of the dataset, we implemented specific strategies to maintain visual clarity:
 \begin{itemize}
-    \item \textbf{Color Encoding and Overplotting:} To manage the presence of identical points we utilized \textbf{color intensity} as a quantitative measure. This approach effectively visualizes data density, revealing clusters that would otherwise be hidden by \textit{overplotting}.
+    \item \textbf{Color Encoding:} To manage the presence of identical points we utilized \textbf{color intensity} as a quantitative measure. This approach effectively visualizes data density, revealing clusters that would otherwise be hidden by \textit{overplotting}.
     
     \item \textbf{Performance Optimization:} To ensure fluid, real-time interaction, the PCA visualization is rendered using a \textbf{Canvas-based approach} rather than SVG. This allows the system to handle thousands of data points without compromising the responsiveness of the dashboard.
 \end{itemize}
@@ -212,7 +212,7 @@ Cross-referencing the time of year with the type of accident revealed a systemat
 The application of Principal Component Analysis (PCA) provided a fundamental insight into the nature of fatal accidents:
 \begin{itemize}
     \item \textbf{Low Density:} Fatal accidents exhibit extremely low commonality. In the PCA projection, these events consistently show a \textbf{density of 1} and a \textbf{number of observations equal to 1}.
-    \item \textbf{Analytical Conclusion:} This indicates that fatal accidents are effectively statistical "outliers" or unique events. Unlike non-fatal accidents, which often cluster around repetitive patterns, each fatal incident is characterized by a unique combination of variables, suggesting that prevention requires a highly multifactorial approach.
+    \item \textbf{Insight:} This indicates that fatal accidents are effectively statistical "outliers" or unique events. Unlike non-fatal accidents, which often cluster around repetitive patterns, each fatal incident is characterized by a unique combination of variables, suggesting that prevention requires a highly multifactorial approach.
 \end{itemize}
 \newpage
 
@@ -222,7 +222,7 @@ The application of Principal Component Analysis (PCA) provided a fundamental ins
 % \cite{firstPaper}
 % \cite{secondPaper}
 % \cite{thirdPaper}
-% \cite{fourthPaper}
+% \cite{fourthPaper}z
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
