@@ -9,3 +9,5 @@ docs/report/.devcontainer/devcontainer.json
 *.out
 *.synctex.gz
 *.toc
+*.bbl
+*.blg
