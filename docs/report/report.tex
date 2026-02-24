@@ -30,6 +30,9 @@
 \setlength\parindent{12pt}
 \colorlet{Special}{Turquoise!20!MidnightBlue!90!black}
 \colorlet{Comment}{Gray!80!black}
+\colorlet{greater}{red}
+\definecolor{limegreen}{RGB}{50,205,50}
+\colorlet{less}{limegreen}
 
 % \urldef{\example}\url{https://www.intel.com/content/www/us/en/developer/articles/technical/advanced-encryption-standard-instructions-aes-ni.html}
 \urldef{\istatDataset}\url{https://esploradati.istat.it/databrowser/#/it/dw/categories/IT1,Z0810HEA,1.0/HEA_ROAD/IT1,41_270_DF_DCIS_MORTIFERITISTR1_1,1.0}
@@ -55,23 +58,23 @@ With this in mind, we aimed to develop an intuitive way to explore data on past 
 
 The system provides both a high level overview and a detailed view of the several types and characteristics of accidents. This is accomplished by using a high level of interactivity, which enables users to do comparisons, extract details and easily search for patterns in the dataset.
 
-The data used was provided by ISTAT and it's relative to the road accidents with injuries and deaths that occurred in Italy during 2024\footnote{\raggedright \istatDataset}.
-
-\newpage
+The data used was provided by ISTAT and it's relative to the road accidents with injuries and deaths that occurred in Italy during 2024 \cite{dataset}.
 
 \section{Dataset description and preliminary work}
 
 \subsection{How the dataset is composed}
 
 The dataset in use contains details about vehicle accidents with injuries
-occurred in Italy during 2024. 
+occurred in Italy during 2024 \cite{dataset}. 
 The attributes in the dataset are in summary: region and time (hour, weekday,
 month) of accident, road section where the accident occurred (traffic circle,
 intersection, etc...), type of accident (between vehicles,
 vehicle-pedestrian, etc...), deadliness of the accident, and number of
 accidents registered with the given characteristics.
-\begin{center}
-    \noindent\begin{tabularx}{0.95\textwidth} {| >{\bfseries}l | X |} 
+\medbreak
+\begin{small}
+    \begin{center}
+    \noindent\begin{tabularx}{0.9\textwidth} {| >{\bfseries}l | X |} 
         \hline
         Attribute & \textbf{Description} \\
         \hline\hline
@@ -96,7 +99,7 @@ accidents registered with the given characteristics.
         \hline
     \end{tabularx}
 \end{center}
-
+\end{small}
 
 \subsection{How data was cleaned and manipulated}
 
@@ -109,36 +112,31 @@ In particular, the dataset cleaned and filtered from the data
 published on the ISTAT website is comprises of 92.000 tuples of 8
 attributes each.
 
-\newpage
-
 \section{Related work}
 
-Since our very first research on the dataset, we observed that in the scientific literature there weren't many examples of visualization on the topic of road accidents. Numerous studies have delt with the analysis of accidents either entirely omitting visualizations or neglecting the integration of maps into their analysis.
+Since our very first research on the dataset, we observed that in the scientific literature there weren't many examples of visualization on the topic of road accidents.
 
-The type of visualization that has proved to be very effective in other solutions, given the highly categorical nature of data \cite{firstPaper}, was the bar graph, which allowed to preserve an overview over the entire dataset while offering an easy way of performing data filtering. This type of visualization represented a fundamental aid to the interpretation of a map which was instead able to give the spacial distribution of the data at a glance, or to open up to completely dynamic insights \cite{firstPaper, thirdPaper}.
+The type of visualization that has proved to be very effective in other solutions, given the highly categorical nature of data \cite{firstPaper}, was the bar graph, which allowed to preserve an overview over the entire dataset while offering an easy way of performing data filtering. This type of visualization represented a fundamental aid to the interpretation of a map which was instead able to give the spacial distribution of the data at a glance, or to open up to completely dynamic insights. However, as one of the papers points out, numerous studies have delt with the analysis of accidents either entirely omitting visualizations or neglecting the integration of maps into their analysis. \cite{firstPaper, thirdPaper}.
 
-Other studies held their focus mainly on understanding which factors could be most likely to lead to a road accident \cite{secondPaper}. So we tried as best as we could to retrieve a dataset which could express those attributes in order to build a solution which could be as near as possible to a real world tool.
+Most of the studies mainly held their focus on understanding which factors could be most likely to lead to a road accident \cite{secondPaper}. So we tried as best as we could to retrieve a dataset which could express those attributes in order to build a solution which could be as near as possible to a real world tool.
 
 Despite a data analytics solution actually built a predictive model which could return possible suggestions in order to minimize risk of new accidents \cite{fourthPaper}, none of the solutions we were able to find in the literature actually exploited an interactive visual analytics solution, not allowing the user to choose what to see and to test possible correlations among different attributes of the dataset.
 
 This is why we tried to gather valuable information from these papers, but we tried to build our own way of presenting the data to our intended users in an interactive way, which we believe could be really helpful in the research of new accident preventing insights.
-\newpage
 
 \section{Visual analytics solution adopted}
-
-Section for dimensionality reduction
-Section for categorical attributes
-Section for temporal distribution
-Section for geographical distribution
-
-How these are connected -- interactivity
+% Section for dimensionality reduction
+% Section for categorical attributes
+% Section for temporal distribution
+% Section for geographical distribution
+% How these are connected -- interactivity
 
 \subsection{Categorical Analysis through Interactive Bar Charts}
 Bar Charts serve as the primary tool for representing categorical distributions, specifically for \textbf{Mortality Analysis}, \textbf{Regional accidents}, \textbf{Road Intersections}, and \textbf{Accident Types}. This choice leverages the human visual system's proficiency in \textit{magnitude comparison} along a common baseline, facilitating the immediate identification of the most frequent accident scenarios.
 These charts implement a \textbf{dynamic dual encoding}:
 \begin{itemize}
     \item \textbf{Visual Layering and Feedback:} Each bar displays the absolute number of accidents. Upon interaction, the system overlays a secondary bar representing the filtered subset, providing a direct visual comparison with the original distribution. Concurrently, textual labels update to show the precise percentage of the selection relative to the specific category.
-    \item \textbf{Trend Indicators:} To provide statistical context, we introduced symbolic indicators ($\blacktriangle, \blacktriangledown, \approx$). These compare the filtered subset's distribution against the national baseline, signaling whether a specific category is over-represented, under-represented, or stable.
+    \item \textbf{Trend Indicators:} To provide statistical context, we introduced symbolic indicators (\textcolor{greater}{$\blacktriangle$}, \textcolor{less}{$\blacktriangledown$}, $\approx$). These compare the filtered subset's distribution against the national baseline, signaling whether a specific category is over-represented, under-represented, or stable.
 \end{itemize}
 
 \subsection{Geospatial Mapping and Redundant Encoding}
@@ -179,8 +177,6 @@ Interaction with this latent space is managed through \textbf{Brushing}:
 \subsection{Global Selection Analytics}
 To maintain context during multi-modal exploration, a \textbf{global status indicator} provides an immediate overview of the active filters. It displays the selection in the format: \textit{Selected: X\% (N / Total)}, where both the percentage and the fraction represent the proportion of incidents currently analyzed relative to the entire dataset.
 
-\newpage
-
 \section{Discovered insights}
 
 The visual analytics process revealed several non-trivial patterns that distinguish fatal accidents from general road accidents based on seasonality, geography, and statistical density.
@@ -213,13 +209,15 @@ Cross-referencing the time of year with the type of accident revealed a systemat
 The application of Principal Component Analysis (PCA) provided a fundamental insight into the nature of fatal accidents:
 \begin{itemize}
     \item \textbf{Low Density:} Fatal accidents exhibit extremely low commonality. In the PCA projection, these events consistently show a \textbf{density of 1} and a \textbf{number of observations equal to 1}.
-    \item \textbf{Insight:} This indicates that fatal accidents are effectively statistical "outliers" or unique events. Unlike non-fatal accidents, which often cluster around repetitive patterns, each fatal incident is characterized by a unique combination of variables, suggesting that prevention requires a highly multifactorial approach.
+    \item \textbf{Analytical Conclusion:} This indicates that fatal accidents are effectively statistical ``outliers" or unique events. Unlike non-fatal accidents, which often cluster around repetitive patterns, each fatal incident is characterized by a unique combination of variables, suggesting that prevention requires a highly multifactorial approach.
 \end{itemize}
+\section{Conclusions and future work}
+To do.
 \newpage
 
 % \section{References}
 
-\nocite{*}
+% \nocite{*}
 % \cite{firstPaper}
 % \cite{secondPaper}
 % \cite{thirdPaper}
@@ -229,8 +227,6 @@ The application of Principal Component Analysis (PCA) provided a fundamental ins
 \bibliography{references}
 % If we want the references to be in the contents table just keep the following line, if that's not the case comment it.
 \addcontentsline{toc}{section}{References}
-
-\newpage
 
 % Immagine centrata senza didascalia
 % \begin{center}
