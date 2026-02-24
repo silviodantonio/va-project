@@ -1,4 +1,0 @@
-- Send project proposal
-- [ric] Study coordinated views
-- [sda] Study how selection over scatterplot works
-- Write service for computing k-means
