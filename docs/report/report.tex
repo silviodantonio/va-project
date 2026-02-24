@@ -1,4 +1,5 @@
 \documentclass[12pt]{article}
+% \documentclass[12pt]{sapthesis}
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{color}
@@ -13,6 +14,9 @@
 \usepackage{bm}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
 \usepackage[indent=0pt]{parskip}
 
 \geometry{
@@ -125,6 +129,11 @@ Despite a data analytics solution actually built a predictive model which could 
 This is why we tried to gather valuable information from these papers, but we tried to build our own way of presenting the data to our intended users in an interactive way, which we believe could be really helpful in the research of new accident preventing insights.
 
 \section{Visual analytics solution adopted}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{projectPreview}
+    \caption{Overview of the project.}
+\end{figure}
 % Section for dimensionality reduction
 % Section for categorical attributes
 % Section for temporal distribution
@@ -182,21 +191,52 @@ To maintain context during multi-modal exploration, a \textbf{global status indi
 The visual analytics process revealed several non-trivial patterns that distinguish fatal accidents from general road accidents based on seasonality, geography, and statistical density.
 
 \subsection{The June Weekend Anomaly}
-A significant peak occurs during the month of June. Contrary to the common perception that associates road risk with nighttime behavior, the data shows a different reality:
+A significant peak occurs during the month of June. Contrary to the common perception that associates road risk with nighttime, the data shows a different reality:
 \begin{itemize}
     \item \textbf{Temporal Concentration:} Fatal accidents reach a critical peak during June weekends, accounting for $129$ mortal accidents out of a total of $2,856$ and so around  $5\% $ of the total.
     \item \textbf{Diurnal Risk:} These events do not predominantly occur at night or in the early morning. Instead, they are concentrated between \textbf{12:00 and 21:00}, with specific spikes at \textbf{16:00} and \textbf{18:00}. 
     \item \textbf{Insight:} This suggests that contrary to what is commonly believed, fatal accidents are more closely linked to leisure-related mobility and high-traffic daytime flows than to nocturnal hazards.
 \end{itemize}
-
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=0.65\linewidth]{insight_1a.png} 
+        \caption{Month/weekday heatmap}
+    \end{subfigure}
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=0.46\linewidth]{insight_1b.png}
+        \caption{Weekday/hour heatmap}
+    \end{subfigure}
+    \caption{Distribution of deadly road accidents.}
+\end{figure}
 \subsection{ Northern Italy: Pedestrian Vulnerability}
 The Northern regions exhibit a behavior diametrically opposed to the national average regarding weekly distribution:
 \begin{itemize}
     \item \textbf{Workweek vs. Weekend:} In Northern Italy, accidents are more frequent during the \textbf{workweek} rather than the weekend. Incidents are strictly correlated with commuting hours, specifically \textbf{08:00--09:00} and \textbf{18:00--19:00}.
-    \item \textbf{Pedestrian Trend:} These regions show a higher-than-average trend for \textbf{vehicle-pedestrian} accidents compared to the rest of the country, highlighting a specific vulnerability in urban mobility management.
+    \item \textbf{Pedestrian Trend:} These regions show a higher-than-average trend for \textbf{vehicle - pedestrian} accidents compared to the rest of the country, highlighting a specific vulnerability in urban mobility management.
     \item \textbf{Insight:} The data suggests that in Northern Italy, road risk is an commuting hours byproduct rather than a leisure-related phenomenon. The fact that pedestrian risk is higher in the "rush hour" pressure, indicates that interventions should prioritize the de-confliction of pedestrian and vehicular flows during the peaks hours.
 \end{itemize}
-
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.30\textwidth}
+        \centering
+        \includegraphics[width=0.59\linewidth]{insight_2a} 
+        \caption{Weekend}
+    \end{subfigure}
+    \begin{subfigure}{0.30\textwidth}
+        \centering
+        \includegraphics[width=0.59\linewidth]{insight_2b}
+        \caption{Workweek}
+    \end{subfigure}
+    \begin{subfigure}{0.30\textwidth}
+        \centering
+        \includegraphics[width=0.85\linewidth]{insight_2c}
+        \caption{Workweek}
+    \end{subfigure}
+    \caption{Accident type distribution over weekends (a), over the workweek (b) and hour peaks of accidents occurring during the workweek (c).}
+\end{figure}
 \subsection{ Seasonal Inversion: Cold vs. Warm Months}
 Cross-referencing the time of year with the type of accident revealed a systematic trend reversal:
 \begin{itemize}
@@ -204,13 +244,32 @@ Cross-referencing the time of year with the type of accident revealed a systemat
     \item \textbf{Warm Months:} The pattern inverts completely. Summer months see a dominance of vehicle-to-vehicle collisions and a sharp decrease in pedestrian-involved fatalities.
     \item \textbf{Insight:} This inversion reflects that winter risk is concentrated in high-density urban commuting where visibility is lower, whereas summer shifts the risk toward long-distance travel and inter-city mobility, effectively transferring the danger from the sidewalk to the highway. 
 \end{itemize}
-
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{insight_3a} 
+        \caption{\footnotesize{Jun-Aug}}
+    \end{subfigure}
+    \bigbreak
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=0.95\linewidth]{insight_3b}
+        \caption{\footnotesize{Nov-Jan}}
+    \end{subfigure}
+    \caption{Variation of trends between a summer trimester June to August (a) and a winter trimester November to January (b).}
+\end{figure}
 \subsection{ PCA Analysis: The Statistical Uniqueness of Fatalities}
 The application of Principal Component Analysis (PCA) provided a fundamental insight into the nature of fatal accidents:
 \begin{itemize}
     \item \textbf{Low Density:} Fatal accidents exhibit extremely low commonality. In the PCA projection, these events consistently show a \textbf{density of 1} and a \textbf{number of observations equal to 1}.
-    \item \textbf{Analytical Conclusion:} This indicates that fatal accidents are effectively statistical ``outliers" or unique events. Unlike non-fatal accidents, which often cluster around repetitive patterns, each fatal incident is characterized by a unique combination of variables, suggesting that prevention requires a highly multifactorial approach.
+    \item \textbf{Analytical Conclusion:} This indicates that fatal accidents are indeed ``outliers" or unique events. Unlike non-fatal accidents, which often cluster around repetitive patterns, fatal incidents are characterized by a unique combination of variables, suggesting that prevention requires a highly multifactorial approach.
 \end{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{insight_4}
+    \caption{PCA dimensionality reduction graph on deadly road accidents selection}
+\end{figure}
 \section{Conclusions and future work}
 This project provides an analysis of road accidents, highlighting how temporal and geographical factors significantly influence accident typologies. To further enhance the current solution, even more functionalities can be adde, such as:
 
@@ -229,7 +288,7 @@ This project provides an analysis of road accidents, highlighting how temporal a
 % \cite{firstPaper}
 % \cite{secondPaper}
 % \cite{thirdPaper}
-% \cite{fourthPaper}z
+% \cite{fourthPaper}
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}

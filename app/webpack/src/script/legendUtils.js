@@ -156,19 +156,19 @@ export function drawTrendLegends(svg, xPos, yPos) {
         "symbol": "\u25B2",
         "fontweight": "normal",
         "color": "red",
-        "description": "Higher than national trend"
+        "description": "Maggiore dell'andamento nazionale"
     },
     {
         "symbol": "\u25BC",
         "fontweight": "normal",
         "color": "limegreen",
-        "description": "Lower than national trend"
+        "description": "Minore dell'andamento nazionale"
     },
     {
         "symbol": "\u2248",
         "fontweight": "normal",
         "color": "black",
-        "description": "Within national trend"
+        "description": "In linea con l'andamento nazionale"
     }
 ]
 

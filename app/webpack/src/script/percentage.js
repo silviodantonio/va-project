@@ -27,7 +27,21 @@ export function getSelectionPercentage(selectedIds) {
 export function updatePercentageUI(fraction, percentage) {
     const percentEl = document.getElementById("selected-percentage");
     const fractionEl = document.getElementById("selected-fraction");
-    if (percentEl) percentEl.textContent = `Selezionato: ${percentage.toFixed(0)}%`;
-    if (fractionEl) fractionEl.textContent = `(${fraction})`;
+    if (percentEl) {
+        if (percentage.toFixed(0) != 0) {
+            percentEl.textContent = `Selezionato: ${percentage.toFixed(0)}%`;
+        } else {
+            percentEl.textContent = "";
+        }
+        
+    }
+    if (fractionEl) {
+        if (fraction != `0 / ${TOTAL_OBSERVATIONS}`) {
+            fractionEl.textContent = `(${fraction})`;
+        } else {
+            fractionEl.textContent = "";
+        }
+        
+    }
 }
 

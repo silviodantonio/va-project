@@ -139,7 +139,7 @@ export default function main() {
                 .attr("text-anchor", "middle")
                 .attr("font-weight", "bold")
                 .attr("font-size", legendFontSize)
-                .text("Numero di incidenti");
+                .text("Distribuzione incidenti per regione");
         }
 
         updateLegend(maxValue);

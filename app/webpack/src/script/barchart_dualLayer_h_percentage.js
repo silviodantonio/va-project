@@ -361,7 +361,7 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
         .transition()
         .duration(300)
         .attr('text-anchor', horizontal ? 'start' : 'middle')
-        .attr('font-size', horizontal ? '10px' : '14px')
+        .attr('font-size', horizontal ? '10px' : '12px')
         .attr('x', d => {
                 const barLen = x(d.value) - x(0);
                 if (horizontal) {
@@ -378,7 +378,7 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
             const barHeight = y(0) - y(d.value);
             return barHeight > barHeightTreshold ? y(d.value) + 23 : y(d.value) - 8;
         })
-        .attr('fill', '#333');
+        .attr('fill', 'black');
 
     labels.exit().remove();
 
@@ -391,11 +391,21 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
             .append('text')
             .attr('class', 'bar-percent')
             .merge(percentLabels)
-            .text(d => `${formatPercent(d.percentage)}`||0)
+            .text(d => {
+                if (d.percentage == 0) {
+                    return `0%`;
+                } else if (d.percentage == 1) {
+                    return `100%`;
+                } else if (d.percentage != 0 &&  d.percentage != 1) {
+                    return `${formatPercent(d.percentage)}`;
+                } else {
+                    return `0%`;
+                }
+            })
             .transition()
             .duration(300)
             .attr('text-anchor', horizontal ? 'start' : 'middle')
-            .attr('font-size', horizontal ? '10px' : '12px')
+            .attr('font-size', horizontal ? '10px' : '9px')
             .attr('x', d =>
                 horizontal
                     ? x(d.value) + 25
@@ -670,7 +680,7 @@ function drawValueLabels({ svg, data, x, y, horizontal, active }) {
 
     // ---------- INITIAL RENDER ----------
     updateAll();
-    drawTrendLegends(svgIntersection, 180, 50);
+    drawTrendLegends(svgIntersection, 150, 50);
     container.intersection.append(svgIntersection.node());
     container.accidentType.append(svgAccidentType.node());
     container.deadly.append(svgDeadly.node());
