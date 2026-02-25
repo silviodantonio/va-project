@@ -47,7 +47,7 @@
 \begin{document}
 
 \author{Silvio d'Antonio 2145048\\ Riccardo Mearelli 1807331 \\Carlo Segreto 2168340}
-\title{Visual Analytics of Italian road accidents\medbreak \normalsize A Visual Analytics project}
+\title{ACCIVIS\medbreak \normalsize A visual analytics interactive visualization for Italian road accidents}
 \date{A.A. 2025/2026}
 \maketitle
 \newpage
@@ -58,7 +58,7 @@
 % <------------- README -------------> Press Alt+Z so that the text automatically adapts to your window size, don't use the Return button to break text lines in a static manner.
 According to the Italian national news, road accidents are unfortunately becoming more and more frequent and they end up involving especially young drivers.
 
-With this in mind, we aimed to develop an intuitive way to explore data on past accidents, with the goal of identifying patterns, which could support experts in making informed decisions in order to prevent new accidents. To this end, we developed a visual analytics system designed to address this purpose. The primary intended users of this solution are members of the Italian Ministry of Infrastructure and Transport. The project could be easily extended to support other countries as well, provided they have access to similarly structured national data.
+With this in mind, we aimed to develop an intuitive way of exploring data on past accidents, with the goal of identifying patterns, which could support experts in making informed decisions in order to prevent new accidents. To this end, we developed a visual analytics system designed to address this purpose. The primary intended users of this solution are members of the Italian Ministry of Infrastructure and Transport. The project could be easily extended to support other countries as well, provided they have access to similarly structured national data.
 
 The system provides both a high level overview and a detailed view of the several types and characteristics of accidents. This is accomplished by using a high level of interactivity, which enables users to do comparisons, extract details and easily search for patterns in the dataset.
 
@@ -68,13 +68,7 @@ The data used was provided by ISTAT and it's relative to the road accidents with
 
 \subsection{How the dataset is composed}
 
-The dataset in use contains details about vehicle accidents with injuries
-occurred in Italy during 2024 \cite{dataset}. 
-The attributes in the dataset are in summary: region and time (hour, weekday,
-month) of accident, road section where the accident occurred (traffic circle,
-intersection, etc...), type of accident (between vehicles,
-vehicle-pedestrian, etc...), deadliness of the accident, and number of
-accidents registered with the given characteristics.
+The dataset in use contains details about vehicle accidents with injuries occurred in Italy during 2024 \cite{dataset}. The attributes in the dataset are in summary: region and time (hour, weekday, month) of accident, road section where the accident occurred (traffic circle, intersection, etc...), type of accident (between vehicles, vehicle-pedestrian, etc...), deadliness of the accident, and number of accidents registered with the given characteristics.
 \medbreak
 \begin{small}
     \begin{center}
@@ -107,25 +101,21 @@ accidents registered with the given characteristics.
 
 \subsection{How data was cleaned and manipulated}
 
-To effectively explore and interpret this dataset, we first performed a data cleaning and optimization process. A key challenge was the dataset's attributes. In particular, instead of working with verbose categorical strings, we pruned the tuples to retain only integer-based indices representing specific attributes.
-By operating directly on these encoded indices, we significantly minimized the computational overhead. This choice ensured higher performance and responsiveness during the interactive exploration of the dataset.
-In particular, the original dataset was composed of 54 columns and 1599 rows, the dataset cleaned and filtered then
-is comprises of 92.402 tuples of 8
-attributes each.
+To effectively explore and interpret this dataset, we first performed a data cleaning and optimization process. A key challenge was the one regarding dataset's attributes. In particular, instead of working with verbose categorical strings, we pruned the tuples to only retain integer-based indices representing specific attributes.
+By operating directly on those encoded indices, we significantly minimized the computational overhead. This choice ensured higher performance and responsiveness during the interactive exploration of the dataset.
+In particular, the original dataset was composed of 54 columns and 1599 rows, while the cleaned and filtered dataset is composed of 92.402 tuples of 8 attributes each.
 
 \section{Related work}
 
-
-
 Since our very first research on the dataset, we observed that in the scientific literature there weren't many examples of visualization on the topic of road accidents.
 
-The type of visualization that has proved to be very effective in other solutions, given the highly categorical nature of data \cite{firstPaper}, was the selection of appropriate colors and bar graph, which allowed to preserve an overview over the entire dataset while offering an easy way of performing data filtering. This type of visualization represented a fundamental aid to the interpretation of a map which was instead able to give the spacial distribution of the data at a glance, or to open up to completely dynamic insights. However, as one of the papers points out, numerous studies have delt with the analysis of accidents either entirely omitting visualizations or neglecting the integration of maps into their analysis. \cite{firstPaper, thirdPaper}.
+The type of visualization that has proved to be very effective in other solutions, given the highly categorical nature of data \cite{firstPaper}, was the choice of appropriate colors and bar charts, which allowed to preserve an overview over the entire dataset while offering an easy way of performing data filtering. This type of visualization represented a fundamental aid to the interpretation of a map which was instead able to give the spacial distribution of the data at a glance, or to open up to completely dynamic insights. However, as one of the papers points out, numerous studies have delt with the analysis of accidents either entirely \textit{omitting visualizations or neglecting the integration of maps} into their analysis. \cite{firstPaper, thirdPaper}.
 
-Most of the studies mainly held their focus on understanding which factors could be most likely to lead to a road accident \cite{secondPaper}. So we tried as best as we could to retrieve a dataset which could express those attributes in order to build a solution which could be as near as possible to a real world tool.
+Most of the studies mainly held their focus on understanding which factors could be the most likely to lead to a road accident \cite{secondPaper}. So we tried to retrieve a dataset which could express the majority of those attributes in order to build a realistic and useful solution which could be as near as possible to a \textit{real world} usable tool.
 
-Despite a data analytics solution actually built a predictive model which could return possible suggestions in order to minimize risk of new accidents \cite{fourthPaper}, none of the solutions we were able to find in the literature actually exploited an interactive visual analytics solution, not allowing the user to choose what to see and to test possible correlations among different attributes of the dataset.
+Although a data analytics solution actually built a predictive model which could return possible suggestions in order to minimize risk of new accidents \cite{fourthPaper}, none of the solutions we were able to find in the literature actually exploited an \textbf{interactive} visual analytics solution, not allowing the user to choose what to see and to test possible correlations among different attributes of the dataset.
 
-This is why we tried to gather valuable information from these papers, but we tried to build our own way of presenting the data to our intended users in an interactive way, which we believe could be really helpful in the research of new accident preventing insights.
+This is why we tried to gather and exploit valuable information from these papers, however trying to build our own way of presenting the data to our intended users in an interactive way, which we believed could be really helpful in the research of new accident preventing insights.
 
 \section{Visual analytics solution adopted}
 \begin{figure}[H]
@@ -134,63 +124,57 @@ This is why we tried to gather valuable information from these papers, but we tr
     \caption{Overview of the project.}
 \end{figure}
 
-
 \subsection{Categorical analysis through interactive bar charts}
-Bar Charts serve as the primary tool for representing categorical attributes, specifically for \textbf{mortality analysis}, \textbf{regional accidents}, \textbf{road intersections}, and \textbf{accident types}. This choice leverages the human visual system's proficiency in \textit{magnitude comparison} along a common baseline, facilitating the immediate identification of the most frequent accident scenarios.
+Bar charts serve as the primary tool for representing categorical attributes, specifically for \textbf{mortality analysis}, \textbf{regional accidents}, \textbf{road intersections}, and \textbf{accident types}. This choice leverages the human visual system's proficiency in \textit{magnitude comparison} along a common baseline, facilitating the immediate identification of the most frequent accident scenarios.
 These charts implement a \textbf{dynamic dual encoding}:
 \begin{itemize}
-    \item \textbf{Visual layering and feedback:} Each bar displays the absolute number of accidents regarding the specific category. Upon interaction, the system overlays a secondary bar representing the filtered subset, providing a direct visual comparison with the original distribution. Concurrently, textual labels update to show the precise percentage of the selection relative to the specific category.
-    \item \textbf{Trend indicators:} To provide statistical context, we introduced symbolic indicators (\textcolor{greater}{$\blacktriangle$}, \textcolor{less}{$\blacktriangledown$}, $\approx$). These compare the filtered subset's distribution against the national baseline, signaling whether a specific category is over-represented, under-represented, or stable.
+    \item \textbf{Visual layering and feedback:} each bar displays the absolute number of accidents regarding the specific category. Upon interaction, the system overlays a secondary bar representing the filtered subset, providing a direct visual comparison with the original distribution. Concurrently, textual labels update to show the precise percentage of the selection relative to the specific category.
+    \item \textbf{Trend indicators:} to provide statistical context, we introduced symbolic indicators (\textcolor{greater}{$\blacktriangle$}, \textcolor{less}{$\blacktriangledown$}, $\approx$). These compare the filtered subset's distribution against the national baseline, signaling whether a specific category is over-represented, under-represented, or stable.
 \end{itemize}
 
 \subsection{Geospatial mapping and redundant encoding}
 The distribution of accidents across Italian regions is represented through a \textbf{choropleth map} complemented by the \textbf{regional bar chart}. This intentional \textit{redundant encoding} is designed to balance numerical accuracy with spatial intuition:
 \begin{itemize}
-    \item \textbf{Ranking and precision:} The bar chart provides a quantitative information, allowing for a more precise comparison between regions and the identification of numerical variances that color intensity alone might obscure.
-    \item \textbf{Geospatial context:} The choropleth map enables the identification of macro-regional clusters and spatial correlations, providing essential geographical context that a simple ranking fails to highlight.
+    \item \textbf{Ranking and precision:} the bar chart provides a quantitative information, allowing for a more precise comparison between regions and the identification of numerical variances that color intensity alone might obscure.
+    \item \textbf{Geospatial context:} the choropleth map enables the identification of macro-regional clusters and spatial correlations, providing essential geographical context that a simple ranking fails to highlight.
 \end{itemize}
-Through interaction with a region in the map, the region's name and exact incident count will be displayed in a label, while clicking a region propagates a real-time filter across the entire dashboard.
+Through interaction with a region on the map, the region's name and exact incident count will be displayed in a label, while clicking a region propagates a real-time filter across the entire dashboard.
 
 \subsection{Temporal mapping}
 Temporal patterns are explored through two \textbf{heatmaps}, which leverage color encoding to make seasonal trends and peak hours immediately visible. To facilitate the analysis, the heatmaps support a \textbf{multi-level selection logic}:
 
 \begin{itemize}
-    \item \textbf{Flexible selection:} Users can interact with the matrix by selecting individual cells, entire rows, or full columns. This allows for the isolation of specific temporal coordinates.
+    \item \textbf{Flexible selection:} users can interact with the matrix by selecting individual cells, entire rows or columns, allowing the isolation of specific temporal coordinates.
     
-    \item \textbf{Filtering:} Any temporal selection propagates a filter in real-time across the entire dashboard.
+    \item \textbf{Filtering:} any temporal selection propagates a filter in real-time across the entire dashboard.
     
-    \item \textbf{Dual encoding:} Each cell provide the exact incident counts and temporal coordinates, ensuring that the visual density of the heatmap is always backed by numerical data.
+    \item \textbf{Dual encoding:} each cell provides the exact incident counts and temporal coordinates, ensuring that the visual density of the heatmap is always backed by numerical data.
 \end{itemize}
 
-\subsection{Dimensionality Reduction and Brushing: PCA}
+\subsection{Dimensionality reduction and brushing: PCA}
 To address the high dimensionality of the dataset, we employed \textbf{principal component analysis (PCA)} to project multidimensional observations including mortality, accident types, and road characteristics into a continuous 2D space. 
 Given the categorical nature of most attributes and the significant volume of the dataset, we implemented specific strategies to maintain visual clarity:
 \begin{itemize}
-    \item \textbf{Color encoding:} To manage the presence of identical points we utilized \textbf{color intensity} as a quantitative measure. This approach effectively visualizes data density, revealing clusters that would otherwise be hidden by \textit{overplotting}.  \textbf{color} was used even as a quantitave measure when using the PCA to do the projection of categorical attributes, as it allowed to visually separate the different categories in the scatterplot, making it easier to identify clusters and patterns.
+    \item \textbf{Color encoding:} to manage the presence of identical points we utilized \textbf{color intensity} as a \textbf{quantitative measure}. This approach effectively visualizes data density, revealing clusters that would otherwise be hidden by \textit{overplotting}. Color was even used as a \textbf{qualitative measure} when using PCA to project categorical attributes, as it allowed to visually separate the different categories in the scatterplot, making it easier to identify \textbf{clusters and patterns}.
     
-    \item \textbf{Performance optimization:} To ensure fluid, real-time interaction, the PCA visualization is rendered using a \textbf{canvas approach} rather than SVG. This allows the system to handle thousands of data points without compromising the responsiveness of the dashboard.
+    \item \textbf{Performance optimization:} to ensure fluid, real-time interaction, the PCA visualization is rendered using a \textbf{canvas approach} rather than SVG. This allows the system to handle thousands of data points without compromising the responsiveness of the dashboard.
 \end{itemize}
 
-Interaction with the PCA is managed through \textbf{brushing}:
-\begin{itemize}
-    \item \textbf{Cluster isolation:} By selecting a sub-region of the PCA canvas, the user can analyze specific observations sharing similar underlying characteristics.
-    
-    \item \textbf{Filtering:} This interaction triggers a global update; all numerical values, percentages, and trend symbols in the other components are instantly recalculated to reflect the specific attributes of the data included in the brushing.
-\end{itemize}
+Interaction with the PCA is managed through \textbf{brushing}: by selecting a sub-region of the PCA canvas, the user can analyze specific observations sharing similar underlying characteristics and trigger a global update. Thus all numerical values, percentages, and trend symbols in the other components are instantly recalculated to reflect the specific attributes of the data included in the brushing.
 
 \subsection{Global selection analytics}
-To give an analytical overview during the interaction, a \textbf{global status indicator} provides an immediate overview of the quantity of selected incidents. It displays the selection in the format: \textit{Selected: X\% (N / Total)}, where both the percentage and the fraction represent the proportion of incidents currently analyzed relative to the entire dataset. In this way it is possible to understand at a glance how much a certain selection influence the overall dataset and how much impact a certain attribute has on the total number of accidents. 
+To give an analytical overview during the interaction, a \textbf{global status indicator} provides an immediate overview of the quantity of selected incidents. It displays the selection in the format: \textit{Selected: X\% (N / Total)}, where both the percentage and the fraction represent the proportion of incidents currently analyzed with respect to the entire dataset. This way, it's always clear at a glance how much a certain selection could be influencing the overall dataset. 
  
 \section{Discovered insights}
 
-The visual analytics process revealed several non-trivial patterns that distinguish fatal accidents from general road accidents based on seasonality, geography, and statistical density.
+The visual analytics process revealed several non-trivial patterns that distinguish fatal accidents from general road accidents based on several attributes.
 
 \subsection{The June weekend anomaly}
 A significant peak occurs during the month of June. Contrary to the common perception that associates road risk with nighttime, the data shows a different reality:
 \begin{itemize}
-    \item \textbf{Temporal concentration:} Fatal accidents reach a critical peak during June weekends, accounting for $129$ mortal accidents out of a total of $2,856$ and so around  $5\% $ of the total.
-    \item \textbf{Diurnal risk:} These events do not predominantly occur at night or in the early morning. Instead, they are concentrated between \textbf{12:00 and 21:00}, with specific spikes at \textbf{16:00} and \textbf{18:00}. 
-    \item \textbf{Insight:} This suggests that contrary to what is commonly believed, fatal accidents are more closely linked to leisure-related mobility and high-traffic daytime flows than to nocturnal hazards.
+    \item \textbf{Temporal concentration:} fatal accidents reach a critical peak during June weekends, accounting for $129$ mortal accidents out of a total of $2,856$ and so around  $5\% $ of the total.
+    \item \textbf{Diurnal risk:} these events are concentrated between \textbf{12:00 and 21:00}, with specific spikes at \textbf{16:00} and \textbf{18:00}. 
+    \item \textbf{Insight:} this suggests that contrary to common belief, fatal accidents are more closely linked to leisure-related mobility and high-traffic daytime flows.
     
 \end{itemize}
 \begin{figure}[H]
@@ -209,11 +193,11 @@ A significant peak occurs during the month of June. Contrary to the common perce
 \end{figure}
 
 \subsection{ Northern Italy: pedestrian vulnerability}
-The Northern regions exhibit a behavior diametrically opposed to the national average regarding weekly distribution:
+Northern regions exhibit a behavior diametrically opposed to the national trend regarding weekly distribution:
 \begin{itemize}
-    \item \textbf{Workweek vs. weekend:} In Northern Italy, accidents are more frequent during the \textbf{workweek} rather than the weekend. Incidents are strictly correlated with commuting hours, specifically \textbf{08:00-09:00} and \textbf{18:00-19:00}.
-    \item \textbf{Pedestrian trend:} These regions show a higher than average trend for \textbf{vehicle - pedestrian} accidents compared to the rest of the country, highlighting a specific vulnerability in urban mobility management.
-    \item \textbf{Insight:} The data suggests that in Northern Italy, road risk is an commuting hours byproduct rather than a leisure-related phenomenon. The fact that pedestrian risk is higher in the ``rush hour" pressure, indicates that interventions should prioritize the de-confliction of pedestrian and vehicular flows during the peaks hours.
+    \item \textbf{Workweek vs. weekend:} in northern Italy, accidents are more frequent during the \textbf{workweek} rather than the weekend. Incidents are strictly correlated with commuting hours, specifically \textbf{08:00-09:00} and \textbf{18:00-19:00}.
+    \item \textbf{Pedestrian trend:} these regions show a higher than average trend for \textbf{vehicle - pedestrian} accidents compared to the rest of the country, highlighting a specific vulnerability in urban mobility management.
+    \item \textbf{Insight:} the data suggests that in northern Italy, road risk is generally related to commuting hours. The fact that pedestrian risk is higher in the ``rush hour" pressure, indicates that interventions should prioritize the decoupling of pedestrian and vehicular flows during peak hours.
 \end{itemize}
 \begin{figure}[H]
     \centering
@@ -232,14 +216,14 @@ The Northern regions exhibit a behavior diametrically opposed to the national av
         \includegraphics[width=0.85\linewidth]{insight_2c}
         \caption{Workweek}
     \end{subfigure}
-    \caption{Accident type distribution over weekends (a), over the workweek (b) and hour peaks of accidents occurring during the workweek (c).}
+    \caption{Accident type distribution over weekends (a), over the workweek (b) and peak hours of accidents occurring during the workweek (c).}
 \end{figure}
 \subsection{ Seasonal inversion: cold vs. warm months}
 Cross-referencing the time of year with the type of accident revealed a systematic trend reversal:
 \begin{itemize}
-    \item \textbf{Cold months:} These months record a number of \textbf{vehicle-pedestrian} accidents significantly above the national average, while vehicle-to-vehicle collisions remain below average.
-    \item \textbf{Warm months:} The pattern inverts completely. Summer months see a dominance of vehicle-to-vehicle collisions and a sharp decrease in pedestrian-involved fatalities.
-    \item \textbf{Insight:} This inversion reflects that winter risk is concentrated in high-density urban commuting where visibility is lower, whereas summer shifts the risk toward long-distance travel and inter city mobility, probably transferring the danger from the sidewalk to the highway. 
+    \item \textbf{Cold months:} these months record a number of \textbf{vehicle-pedestrian} accidents significantly above the national average, while vehicle-to-vehicle collisions remain below average.
+    \item \textbf{Warm months:} the pattern inverts completely. Summer months see a dominance of vehicle-to-vehicle collisions and a sharp decrease in pedestrian-involved fatalities.
+    \item \textbf{Insight:} this inversion reflects that winter risk is concentrated in high-density urban commuting where visibility is lower, whereas summer shifts the risk toward long-distance travel and inter city mobility, probably transferring the danger from the sidewalk to the highway. 
 \end{itemize}
 \begin{figure}[H]
     \centering
@@ -259,8 +243,8 @@ Cross-referencing the time of year with the type of accident revealed a systemat
 \subsection{ PCA analysis: uniqueness of fatalities}
 The application of Principal Component Analysis (PCA) provided a fundamental insight into the nature of fatal accidents:
 \begin{itemize}
-    \item \textbf{Low Density:} Fatal accidents exhibit extremely low commonality. In the PCA projection, these events consistently show a \textbf{density of 1} and a \textbf{number of observations equal to 1}.
-    \item \textbf{Analytical conclusion:} This indicates that fatal accidents are indeed ``outliers" or unique events. Unlike non-fatal accidents, which display common attributes, fatal incidents are characterized by a unique combination of variables, suggesting that prevention requires a multifactorial approach.
+    \item \textbf{Low density:} fatal accidents exhibit extremely low commonality. In the PCA projection, these events consistently show a \textbf{density of 1} and a \textbf{number of observations equal to 1}.
+    \item \textbf{Insight:} this indicates that fatal accidents are indeed ``outliers" or unique events. Unlike non-fatal accidents, which display common attributes, fatal incidents are characterized by a unique combination of variables, suggesting that prevention requires a multifactorial approach.
 \end{itemize}
 \begin{figure}[H]
     \centering
@@ -268,17 +252,17 @@ The application of Principal Component Analysis (PCA) provided a fundamental ins
     \caption{PCA dimensionality reduction graph on deadly road accidents selection}
 \end{figure}
 \section{Conclusions and future work}
-This project provides an analysis of road accidents, highlighting how temporal and geographical factors significantly influence accident typologies. To further enhance the current solution, even more functionalities can be adde, such as:
+This project provides an analysis of road accidents, highlighting how temporal and geographical factors significantly influence accident typologies. To further enhance the current solution, even more functionalities can be added, such as:
 
 \begin{itemize}
-    \item \textbf{Multi-category filtering:} Future integration will allow for simultaneous selections within the same attribute. This will enable more complex cross-referencing of data belonging 
+    \item \textbf{Multi-category filtering:} future integration will allow for simultaneous selections within the same attribute. This will enable more complex cross-referencing of data belonging 
     %to different values of the same 
     to the same category or ``type" for deeper comparative analysis.
-    \item \textbf{Per capita normalization:} The current map visualization, which displays the absolute accident counts, could be integrated with a \textbf{per capita} view.
-    By weighing accidents against the regional population, it is possible to provide another and different representation of relative risk across italian's regions.
-    \item \textbf{Temporal expansion:} While the current analysis focuses on 2024 data, future updates might include \textbf{multi-year selection}. This expansion could allow users to track trends over a longer period of time and evaluate the impact of law changes across different years.
+    \item \textbf{Per capita normalization:} the current map visualization, which displays the absolute accidents count, could be integrated with a \textbf{per capita} view.
+    By weighing accidents against the regional population, it would be possible to provide another and different representation of relative risk across italian's regions.
+    \item \textbf{Temporal expansion:} while the current analysis focuses on 2024 data, future updates might include \textbf{multi-year selection}. This expansion could allow users to track trends over a longer period of time and evaluate the impact of law changes across different years.
 \end{itemize}
-What's more, a further investigation on a more suitable method of performing dimensionality reductions with PCA on a dataset presenting several categorical attributes could be explored, as it would allow a better separation of data in the scatterplot and a better clustering.
+What's more, a further investigation on a more suitable method of performing dimensionality reductions with PCA on a dataset presenting several categorical attributes could be explored, as it would allow a better separation of data in the scatterplot for better clustering.
 \newpage
 
 % \section{References}
