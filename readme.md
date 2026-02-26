@@ -1,5 +1,5 @@
-# ACCIVIS APP
-A visual analytics solution to visually interact with road accident data and discover powerful insights.
+# GUARD
+A Graphical Unit for Accident Reporting and Diagnostics to visually interact with road accident data and discover powerful insights.
 
 ## Requirements
 - `Docker`
